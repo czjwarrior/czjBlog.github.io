@@ -1,12 +1,19 @@
 ---
 bg: "owl.jpg"
 layout: page
-title: "About"
+title: "关于"
 crawlertitle: "Why and how this blog was created"
 permalink: /about/
-summary: "About this blog"
+summary: "关于我的博客"
 active: about
 ---
+
+QQ: 1127292580
+
+E-mail: czjbusiness@gmail.com
+
+GitHub: {{site.github_username}} /
+[github](https://github.com/czj1127292580)
 
 This is the base Jekyll theme. You can find out more info about customizing your Jekyll theme, as well as basic Jekyll usage documentation at [jekyllrb.com](http://jekyllrb.com/)
 
