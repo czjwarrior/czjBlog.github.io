@@ -1,4 +1,4 @@
-## Welcome to GitHub Pages
+## 生活不止眼前的苟且
 
 You can use the [editor on GitHub](https://github.com/czj1127292580/czj1127292580.github.io/edit/master/index.md) to maintain and preview the content for your website in Markdown files.
 

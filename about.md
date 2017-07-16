@@ -5,7 +5,7 @@ title: "关于"
 crawlertitle: "Why and how this blog was created"
 permalink: /about/
 summary: "关于我的博客"
-active: about
+active: 关于
 ---
 
 QQ: 1127292580
