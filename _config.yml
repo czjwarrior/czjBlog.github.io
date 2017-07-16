@@ -21,6 +21,7 @@ disqus_username:
 
 # Build settings
 markdown: kramdown
+highlighter: rouge
 relative_permalinks: false
 permalink: /:categories/:title/
 
@@ -40,6 +41,5 @@ compress_html:
 sass:
   sass_dir: assets/_sass
   style: compressed
-
 
 images: '/assets/images'
