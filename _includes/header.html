@@ -1,20 +1,17 @@
-<header class="main-header content-wrapper">
-
-  <input type="checkbox" id="menu-checkbox" />
-
-  <nav class="center-wrapper nav-main">
-
-    <a class="blog-logo" href="{{ site.baseurl }}/">{{ site.title }}</a>
-
-    {% for my_page in site.pages %}
-      {% if my_page.active %}
-        <a href="{{ my_page.url | prepend: site.baseurl }}">{{ my_page.title }}</a>
-      {% endif %}
-    {% endfor %}
-
-    <a href="{{ "/feed.xml" | prepend: site.baseurl }}">RSS</a>
-
-    <label for="menu-checkbox" class="toggle-button" data-open="☰" data-close="☰" onclick></label>
-  </nav>
-
+<header class="site-header">
+    <div class="container">
+        <a id="site-header-brand" href="/" title="{{ site.name }}">
+            <span class="octicon octicon-mark-github"></span> {{ site.name }}
+        </a>
+        <nav class="site-header-nav" role="navigation">
+            {% for nav in site.navs %}
+            <a href="{{ nav.href }}"
+               class="{% if page.menu == nav.label %} selected {% endif %} site-header-nav-item hvr-underline-from-center"
+               target="{{ nav.target | default: _self }}"
+               title="{{ nav.label }}">
+                {{ nav.label }}
+            </a>
+            {% endfor %}
+        </nav>
+    </div>
 </header>

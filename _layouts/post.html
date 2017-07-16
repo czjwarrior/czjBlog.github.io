@@ -1,39 +1,34 @@
 ---
 layout: default
+css: ['sidebar-post-nav.css']
 ---
-<article class="post">
+{% include jumbotron.html %}
+<article class="post container" itemscope itemtype="http://schema.org/BlogPosting">
 
-  <h1 class="post-title">{{ page.title }}</h1>
+    <div class="row">
 
-  <p class="post-meta">
-    <time datetime="{{ page.date | date: "%Y-%m-%d" }}">{{ page.date | date: "%d-%m-%Y" }}</time>
+        {% if page.no-post-nav %}
+        <div class="col-md-12 markdown-body">
 
-    {% if page.author %}
-      &nbsp;/&nbsp;
-      <span>{{ page.author }}</span>
-    {% endif %}
-  </p>
+            {{ content }}
 
-  <div class="post-content">
+            <!-- Comments -->
+            {% include disqus-comments.html %}
+        </div>
+        {% else %}
+        <div class="col-md-8 markdown-body">
 
-    {{ content }}
+            {{ content }}
 
-    <div class="post-links">
-      {% if page.next.url %}
-        <a class="link-to-post" href="{{ page.next.url }}">
-          <span class="link-to-post__next">&#10535; &nbsp;Next post</span>
-          <span class="link-to-post__title">{{ page.next.title }}</span>
-        </a>
-      {% endif %}
+            <!-- Comments -->
+            {% include disqus-comments.html %}
+        </div>
 
-      {% if page.previous.url %}
-        <a class="link-to-post" href="{{ page.previous.url }}">
-          <span class="link-to-post__prev">&#10535; &nbsp;Previous post</span>
-          <span class="link-to-post__title">{{ page.previous.title }}</span>
-        </a>
-      {% endif %}
+        <div class="col-md-4">
+            {% include sidebar-post-nav.html %}
+        </div>
+        {% endif %}
+
     </div>
-
-  </div>
 
 </article>
