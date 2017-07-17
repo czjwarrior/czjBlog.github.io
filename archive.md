@@ -2,8 +2,8 @@
 bg: "tag.jpg"
 layout: page
 permalink: /posts/
-title: "Archive"
-crawlertitle: "All articles"
+title: "归档"
+crawlertitle: "全部文章"
 summary: "Posts about jekyll"
 active: archive
 ---
