@@ -3,8 +3,8 @@ bg: "tag.jpg"
 layout: page
 permalink: /posts/
 title: "归档"
-crawlertitle: "全部文章"
-summary: "Posts about jekyll"
+crawlertitle: "归档|岑志军的博客"
+summary: "所有文章"
 active: archive
 ---
 
@@ -31,3 +31,5 @@ active: archive
   </ul>
 
 {% endfor %}
+
+
