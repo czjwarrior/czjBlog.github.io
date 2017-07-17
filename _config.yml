@@ -16,7 +16,7 @@ baseurl: "" # the subpath of your site, e.g. /blog
 lang: "en"
 url: "http://www.cenzhijun.top/" # the base hostname & protocol for your site
 twitter_username: jekyllrb
-github_username:  jekyll
+github_username:  我的GitHub主页
 disqus_username:
 
 # Build settings
