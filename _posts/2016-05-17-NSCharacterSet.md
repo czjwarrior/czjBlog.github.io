@@ -29,8 +29,15 @@ NSMutableCharacterSet *base = [NSMutableCharacterSet lowercaseLetterCharacterSet
 
 判断字符串是否是纯数字
 
-
 ```
-
+- (BOOL)isPureNumandCharacters:(NSString *)string
+{
+    string = [string stringByTrimmingCharactersInSet:[NSCharacterSet decimalDigitCharacterSet]];
+    if(string.length > 0)
+    {
+        return NO;
+    }
+    return YES;
+}
 ```
 
