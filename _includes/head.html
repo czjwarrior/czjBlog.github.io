@@ -11,6 +11,7 @@
     {% else %}
       {{ site.title | escape }}
     {% endif %}
+    <link rel="icon" href="{{ site.url }}{{ site.images }}/{{ logo.ico }}"" type="img/x-ico" />
   </title>
 
   <meta name="description" content="{% if page.excerpt %}{{ page.excerpt | strip_html | strip_newlines | truncate: 160 }}{% else %}{{ site.description }}{% endif %}">
