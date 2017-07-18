@@ -19,6 +19,9 @@ twitter_username: jekyllrb
 github_username:  我的GitHub主页
 disqus_username:
 
+paginate: 5
+paginate_path: "page:num"
+
 # Build settings
 markdown: kramdown
 highlighter: rouge
