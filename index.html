@@ -25,19 +25,19 @@ summary: "main page"
 {% endif %}
 
 {% if paginator.previous_page %}
-    <a href="{{ paginator.previous_page_path | prepend: site.url | replace: '//', '/' }}"上一页</a>
+    <a href="{{ paginator.previous_page_path | replace: '//', '/' }}"上一页</a>
 {% endif %}
 
 {% for page in (1..paginator.total_pages) %}
     {% if page == paginator.page %}
       <span class="active">{{ page }}</span>
     {% elsif page == 1 %}
-      <a href="{{ '/index.html' | prepend: site.url | replace: '//', '/' }}">{{ page }}</a>
+      <a href="{{ '/index.html' | replace: '//', '/' }}">{{ page }}</a>
     {% else %}
-      <a href="{{ site.paginate_path | prepend: site.url | replace: '//', '/' | replace: ':num', page }}">{{ page }}</a>
+      <a href="{{ site.paginate_path | replace: '//', '/' | replace: ':num', page }}">{{ page }}</a>
     {% endif %}
 {% endfor %}
 
 {% if paginator.next_page %}
-    <a href="{{ paginator.next_page_path | prepend: site.url | replace: '//', '/' }}">下一页</a>
+    <a href="{{ paginator.next_page_path | replace: '//', '/' }}">下一页</a>
 {% endif %}
