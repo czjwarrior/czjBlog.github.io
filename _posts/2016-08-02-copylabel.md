@@ -9,10 +9,10 @@ categories: blog
 tags: ['2016-08']
 author: 岑志军
 ---
-##一、UIMenuController认识 
-######1、默认情况下，UITextView / UITextFiled / UIWebView 都有苹果自带的有UIMenuController功能
-##二、对UILabel添加UIMenuController扩展
-######1、新建一个SSCopyLabel，继承UIlabel，.m文件如下：
+## 一、UIMenuController认识 
+1、默认情况下，UITextView / UITextFiled / UIWebView 都有苹果自带的有UIMenuController功能
+## 二、对UILabel添加UIMenuController扩展
+2、新建一个SSCopyLabel，继承UIlabel，.m文件如下：
 
 
 ```
@@ -68,8 +68,8 @@ author: 岑志军
 ```
 demo示例： 
 没内容的时候：
-[![railroad]({{ site.images }}/rails.jpg)]({{ site.images }}/2016-08-02-demo1.jpg)
+[![railroad]({{ site.images }}/2016-08-02-demo1.jpg)]({{ site.images }}/2016-08-02-demo1.jpg)
 
 有内容的时候： 
-[![railroad]({{ site.images }}/rails.jpg)]({{ site.images }}/2016-08-02-demo2.jpg)
+[![railroad]({{ site.images }}/2016-08-02-demo2.jpg)]({{ site.images }}/2016-08-02-demo2.jpg)
 
