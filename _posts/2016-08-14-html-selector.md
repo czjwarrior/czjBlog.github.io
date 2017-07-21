@@ -55,7 +55,25 @@ div[name]{
 Demo练习：
 
 ```
+<body>
+    <div id="main">11111111111111</div>
+    <div>11111111111111</div>
+    <div>11111111111111</div>
 
+    <p>2222222222222</p>
+
+    <div class="one">2222222222</div>
+    <p class="one">4444444444444</p>
+
+    <div id="test1">
+        <p>
+            <div>3434343424234</div>
+        </p>
+    </div>
+
+    <div name="cen">98989898</div>
+    <div>77777777777</div>
+</body>
 ```
 
 

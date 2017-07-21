@@ -9,7 +9,6 @@ categories: blog
 tags: ['2016-08']
 author: 岑志军
 ---
-##  Swift学习-函数
 
 ```
 /* swift定义函数格式：
