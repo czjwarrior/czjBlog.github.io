@@ -68,8 +68,8 @@ author: 岑志军
 ```
 demo示例： 
 没内容的时候：
-[![railroad]({{ site.images }}/2016-08-02-demo1.jpg)]({{ site.images }}/2016-08-02-demo1.jpg)
+[![demo1]({{ site.images }}/2016-08-02-demo1.jpg)]({{ site.images }}/2016-08-02-demo1.jpg)
 
 有内容的时候： 
-[![railroad]({{ site.images }}/2016-08-02-demo2.jpg)]({{ site.images }}/2016-08-02-demo2.jpg)
+[![demo2]({{ site.images }}/2016-08-02-demo2.jpg)]({{ site.images }}/2016-08-02-demo2.jpg)
 
