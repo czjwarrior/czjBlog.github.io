@@ -34,7 +34,7 @@ summary: "main page"
     {% elsif page == 1 %}
       <a href="{{ '/index.html' | replace: '//', '/' }}">{{ page }}</a>
     {% else %}
-      <a href="{{ site.paginate_path | replace: '//', '/' | replace: 'num', page }}">{{ page }}</a>
+      <a href="{{ site.paginate_path | replace: '//', '/' | replace: page, ':num' }}">{{ page }}</a>
     {% endif %}
 {% endfor %}
 
