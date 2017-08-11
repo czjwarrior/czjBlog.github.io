@@ -2,7 +2,7 @@
 layout: post
 title: "react-navigation的使用"
 date: 2017-08-11
-tag: iOS
+tag: ReactNative
 ---
 
 ### `react-navigation`分为三个部分
