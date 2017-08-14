@@ -2,7 +2,7 @@
 layout: post
 title: "HTML5选择器"
 date: 2016-08-14
-tag: iOS
+tag: HTML5
 ---
 最近刚开始学习HTML5，记录一下自己学习的笔记，方便以后查阅： 
 首先选择器的常用分类：

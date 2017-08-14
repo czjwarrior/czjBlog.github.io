@@ -2,7 +2,7 @@
 layout: post
 title:  "HTML5-CSS布局"
 date:   2016-08-14
-tag: iOS
+tag: HTML5
 ---
 
 一、默认情况下，所有的网页标签都在标准流布局中，从上到下，从左到右。
