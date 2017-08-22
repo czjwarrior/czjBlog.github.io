@@ -146,6 +146,6 @@ const MinePage = ({ navigation }) => (
 
 效果图：
 
-![](/images/posts/react-native-navigator.png)
+![](http://otogtitz7.bkt.clouddn.com/react-native-navigator.png)
 
 

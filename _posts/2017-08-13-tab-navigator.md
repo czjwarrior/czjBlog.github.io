@@ -146,5 +146,5 @@ AppRegistry.registerComponent('DemoApp', () => DemoApp);
 
 效果图：
 
-![](/images/posts/2017-08-13-tabbar.png)
+![](http://otogtitz7.bkt.clouddn.com/2017-08-13-tabbar.png)
 
