@@ -7,7 +7,7 @@ tags: iOS底层
 
 众说周知，我们平时编写的OC代码，底层都是C/C++实现的
 
-![](media/15209125059994/15209130736084.jpg)
+![](http://otogtitz7.bkt.clouddn.com/2018-03-13-15209130736084.jpg)
 
 我们可以通过一个终端指令，将我们的OCdiamante转换成C/C++代码
 
@@ -100,19 +100,19 @@ NSLog(@"%zd", class_getInstanceSize([NSObject class]));
 ```
 Debug -> Debug Workfllow -> View Memory （Shift + Command + M）
 ```
-![](media/15209125059994/15209139194113.jpg)
+![](http://otogtitz7.bkt.clouddn.com/2018-03-13-15209139194113.jpg)
 
-![](media/15209125059994/15209142507883.jpg)
+![](http://otogtitz7.bkt.clouddn.com/2018-03-13-15209142507883.jpg)
 
 输入内存地址：
-![](media/15209125059994/15209142877899.jpg)
+![](http://otogtitz7.bkt.clouddn.com/2018-03-13-15209142877899.jpg)
 
 同样发现一个Student占16个字节，其中指针占了8个字节
 
 方法三：可以通过lldb命令查看
 
 常用lldb命令
-![](media/15209125059994/15209143991235.jpg)
+![](http://otogtitz7.bkt.clouddn.com/2018-03-13-15209143991235.jpg)
 
 查看结果如下：
 
@@ -122,6 +122,14 @@ Debug -> Debug Workfllow -> View Memory （Shift + Command + M）
 ```
 
 还可以通过lldb命令修改对象的值：
-![](media/15209125059994/15209148405061.jpg)
+![](http://otogtitz7.bkt.clouddn.com/2018-03-13-15209148405061.jpg)
+
+
+
+
+
+
+
+
 
 
