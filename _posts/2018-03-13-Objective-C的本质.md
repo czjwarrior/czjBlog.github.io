@@ -308,6 +308,8 @@ class的isa指向meta-class：
 
 ## isa和superclass的调用流程
 
+[Greg Parker的一份精彩图谱](http://www.sealiesoftware.com/blog/class%20diagram.pdf)
+
 ![](http://otogtitz7.bkt.clouddn.com/2018-03-19-15214498988799.jpg)
 
 通过上图可以总结如下：
