@@ -121,7 +121,7 @@ NSLog(@"%p", bigNumber);
 * 当8字节可以承载用于表示的数值时，系统就会以`Tagged Pointer`的方式生成指针，如果8字节承载不了时，则又用以前的方式来生成普通的指针。
 
 
-References:
+**References:**
 
 * https://blog.devtang.com/2014/03/21/weak_object_lifecycle_and_tagged_pointer/
 
