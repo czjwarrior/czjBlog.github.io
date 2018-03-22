@@ -9,7 +9,7 @@ tags: iOS底层
 
 ![](http://otogtitz7.bkt.clouddn.com/2018-03-13-15209130736084.jpg)
 
-我们可以通过一个终端指令，将我们的OCdiamante转换成C/C++代码
+我们可以通过一个终端指令，将我们的OC代码转换成C/C++代码
 
 ```
 xcrun -sdk iphoneos clang -arch arm64 -rewrite-objc 文件名 -o 输出的CPP文件
