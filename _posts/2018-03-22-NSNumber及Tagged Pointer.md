@@ -123,9 +123,9 @@ NSLog(@"%p", bigNumber);
 
 References:
 
-https://blog.devtang.com/2014/03/21/weak_object_lifecycle_and_tagged_pointer/
+* https://blog.devtang.com/2014/03/21/weak_object_lifecycle_and_tagged_pointer/
 
-http://www.infoq.com/cn/articles/deep-understanding-of-tagged-pointer/
+* http://www.infoq.com/cn/articles/deep-understanding-of-tagged-pointer/
 
 
 
