@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <title>（7）theos安装</title>
+  <meta name="description" content="安装签名工具ldid  先确保安装了brew">
+  <meta name="author" content="leopardpan">
+
+  <meta name="keywords" content="iOS开发,岑志军的个人博客,reactNative,ListView,wifi列表,reactnative开发,数字货币,加密货币,solidity,fabric,ethereum,blockchain,hyperledger,区块链部落,从零到壹全栈部落,智能合约,超级账本,ICO,比特币,以太坊" />
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="（7）theos安装">
+  <meta name="twitter:description" content="安装签名工具ldid  先确保安装了brew">
+  
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="（7）theos安装">
+  <meta property="og:description" content="安装签名工具ldid  先确保安装了brew">
+  
+  <link rel="icon" type="image/png" href="/images/favicon.png" />
+  <link href="/images/favicon.png" rel="shortcut icon" type="image/png">
+  
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+
+  <link rel="canonical" href="http://www.cenzhijun.top//2018/01/theos/">
+  <link rel="alternate" type="application/rss+xml" title="岑志军的个人博客" href="http://www.cenzhijun.top//feed.xml">
+  
+  <meta name="google-site-verification" content="1-1ZlHoRvM0T2FqPbW2S-qLgYXN6rsn52kErlMPd_gw" />
+
+<!-- 站点统计 -->
+  <script 
+  async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+  </script>  
+
+<!-- 百度统计 -->
+  
+  <script>
+      var _hmt = _hmt || [];
+      (function() {
+        var hm = document.createElement("script");
+        hm.src = "//hm.baidu.com/hm.js?0352fdd0e57585d9a54ff3a6906ae365";
+        var s = document.getElementsByTagName("script")[0]; 
+        s.parentNode.insertBefore(hm, s);
+      })();
+  </script>
+  
+
+<!-- google 统计 -->
+  
+
+</head>
+
+
+  <body>
+
+    <span class="mobile btn-mobile-menu">        
+      <div class="nav_container">
+         <nav class="nav-menu-item" style = "float:right">
+            <i class="nav-menu-item">
+              <a href="/#blog" title="" class="blog-button">  博客主页
+              </a>
+            </i>
+            
+                <i class="nav-menu-item">
+
+                  <a href="/archive" title="archive" class="btn-mobile-menu__icon">
+                      所有文章
+                  </a>
+                </i>
+            
+                <i class="nav-menu-item">
+
+                  <a href="/tags" title="tags" class="btn-mobile-menu__icon">
+                      分类
+                  </a>
+                </i>
+            
+                <i class="nav-menu-item">
+
+                  <a href="/about" title="about" class="btn-mobile-menu__icon">
+                      关于我
+                  </a>
+                </i>
+            
+          </nav>
+      </div>
+    </span>
+    
+    <header class="panel-cover panel-cover--collapsed" style="background-image: url('/images/background-cover.jpg')">
+  <div class="panel-main">
+
+    <div class="panel-main__inner panel-inverted">
+    <div class="panel-main__content">
+        <!-- 头像效果-start -->
+        <div class="ih-item circle effect right_to_left">            
+            <a href="/#blog" title="前往 岑志军的个人博客 的主页" class="blog-button">
+                <div class="img"><img src="/images/avatar.jpg" alt="img"></div>
+                <div class="info">
+                    <div class="info-back">
+                        <h2> 
+                            
+                                czjDevloper
+                            
+                        </h2>
+                        <p>
+                           
+                                iOS / React-Native
+                            
+                        </p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <!-- 头像效果-end -->
+        <h1 class="panel-cover__title panel-title"><a href="/#blog" title="link to homepage for 岑志军的个人博客" class="blog-button">岑志军的个人博客</a></h1>
+        
+        <span class="panel-cover__subtitle panel-subtitle">我的博客</span>
+        
+        <hr class="panel-cover__divider" />
+        <p class="panel-cover__description">欢迎来到我的博客~</p>
+        <hr class="panel-cover__divider panel-cover__divider--secondary" />
+        
+        
+        
+
+        <div class="navigation-wrapper">
+          <div>
+            <nav class="cover-navigation cover-navigation--primary">
+              <ul class="navigation">
+                <li class="navigation__item"><a href="/#blog" title="" class="blog-button">博客主页</a></li>
+                
+                  <li class="navigation__item"><a href="/archive" title="archive">所有文章</a></li>
+                
+                  <li class="navigation__item"><a href="/tags" title="tags">分类</a></li>
+                
+                  <li class="navigation__item"><a href="/about" title="about">关于我</a></li>
+                
+              </ul>
+            </nav>
+          </div>          
+        </div>
+
+
+        </div>
+      </div>
+    </div>
+    
+    
+    <div class="panel-cover--overlay cover-clear"></div>
+    
+  </div>
+</header>
+
+
+    <div class="content-wrapper">
+        <div class="content-wrapper__inner">
+            <article class="post-container post-container--single" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <h1 class="post-title">（7）theos安装</h1>
+    <div class="post-meta">
+      <img src="/images/calendar.png" width="20px"/> 
+      <time datetime="2018-01-28 00:00:00 +0800" itemprop="datePublished" class="post-meta__date date">2018-01-28</time>  
+         
+      <span id="busuanzi_container_page_pv"> | 阅读：<span id="busuanzi_value_page_pv"></span>次</span>
+    </p>
+    </div>
+  </header>
+
+  <section class="post">
+    <h2 id="ldid">安装签名工具ldid</h2>
+<ul>
+  <li>先确保安装了<a href="https://brew.sh/">brew</a></li>
+</ul>
+
+<p><code class="highlighter-rouge">
+$ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+</code></p>
+
+<ul>
+  <li>利用<code class="highlighter-rouge">brew</code>安装<code class="highlighter-rouge">ldid</code></li>
+</ul>
+
+<p><code class="highlighter-rouge">
+$ brew install ldid
+</code></p>
+
+<h2 id="section">修改环境变量</h2>
+
+<ul>
+  <li>编辑用户的配置文件</li>
+</ul>
+
+<p><code class="highlighter-rouge">
+$ vim ~/.bash_profile
+</code></p>
+
+<ul>
+  <li>在<code class="highlighter-rouge">.bash_profile</code>文件后面加入以下2行</li>
+</ul>
+
+<p><code class="highlighter-rouge">
+export THEOS=~/theos
+export PATH=$THEOS/bin:$PATH
+</code></p>
+
+<ul>
+  <li>让<code class="highlighter-rouge">.bash_profile</code>配置的环境变量立即生效（或者重新打开终端）</li>
+</ul>
+
+<p><code class="highlighter-rouge">
+$ source ~/.bash_profile
+</code></p>
+
+<h2 id="theos">下载theos</h2>
+
+<ul>
+  <li>建议在<code class="highlighter-rouge">$THEOS</code>目录下载代码（也就是刚才配置的<code class="highlighter-rouge">~/theos</code>）</li>
+</ul>
+
+<p><code class="highlighter-rouge">
+$ git clone --recursive https://github.com/theos/theos.git $THEOS
+</code></p>
+
+<h2 id="tweak">新建tweak项目</h2>
+
+<ul>
+  <li>cd到一个存放项目代码的文件夹（比如桌面）</li>
+</ul>
+
+<p><code class="highlighter-rouge">
+$ cd ~/Desktop
+$ nic.pl
+</code>
+* 选择<code class="highlighter-rouge">[11.] iphone/tweak</code></p>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-01-28-15171339273450.jpg" alt="" /></p>
+
+<ul>
+  <li>填写项目信息
+    <ul>
+      <li>Project Name (项目名称)</li>
+      <li>Package Name（项目ID，可随便写）</li>
+      <li>Author/Maintainer Name
+        <ul>
+          <li>作者</li>
+          <li>直接回车就行，默认Mac上的用户名</li>
+        </ul>
+      </li>
+      <li>[iphone/tweak] MobileSubstrate Bundle filter
+        <ul>
+          <li>需要修改的APP的Bundle identifier</li>
+          <li>可以通过<code class="highlighter-rouge">Cycript</code>查看APP的Bundle identifier</li>
+        </ul>
+      </li>
+      <li>[iphone/tweak] List of applications to terminate upon installation
+        <ul>
+          <li>直接回车就行</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="makefile">编辑Makefile</h2>
+
+<ul>
+  <li>在前面加入环境变量，写清楚通过哪个IP和端口访问手机
+    <ul>
+      <li>THEOS_DEVICE_IP</li>
+      <li>THEOS_DEVICE_PORT</li>
+    </ul>
+  </li>
+</ul>
+
+<p>```
+export THEOS_DEVICE_IP=127.0.0.1
+export THEOS_DEVICE_PORT=10010</p>
+
+<p>include $(THEOS)/makefiles/common.mk</p>
+
+<p>TWEAK_NAME = tingtweak2
+tingtweak2_FILES = Tweak.xm</p>
+
+<p>include $(THEOS_MAKE_PATH)/tweak.mk</p>
+
+<p>after-install::
+	install.exec “killall -9 SpringBoard”
+```</p>
+
+<p>如果不希望每个项目的Makefile都编写IP和端口环境变量，也可以添加到用户的配置文件中，编辑完毕后<code class="highlighter-rouge">$ source ~/.bash_profile</code>(或者重启终端)</p>
+
+<p><code class="highlighter-rouge">
+$ vim ~/.bash_profile
+export THEOS=~/theos
+export PATH=$THEOS/bin:$PATH
+export THEOS_DEVICE_IP=127.0.0.1
+export THEOS_DEVICE_PORT=10010
+$ source ~/.bash_profile
+</code></p>
+
+<h2 id="section-1">编写代码</h2>
+
+<ul>
+  <li>打开<code class="highlighter-rouge">Tweak.xm</code>文件</li>
+</ul>
+
+<p>```
+%hook XMSoundPatchImageView</p>
+
+<ul>
+  <li>(id)initWithFrame:(struct CGRect)arg1{
+  return nil;
+}</li>
+</ul>
+
+<p>%end</p>
+
+<p>%hook XMAdAnimationViewTwo</p>
+
+<ul>
+  <li>(id)initWithFrame:(struct CGRect)arg1{
+  return nil;
+}</li>
+</ul>
+
+<p>%end
+```</p>
+
+<h2 id="section-2">编译-打包-安装</h2>
+
+<ul>
+  <li>编译</li>
+</ul>
+
+<p><code class="highlighter-rouge">
+make
+</code></p>
+
+<ul>
+  <li>打包成<code class="highlighter-rouge">deb</code></li>
+</ul>
+
+<p><code class="highlighter-rouge">
+make package
+</code></p>
+
+<ul>
+  <li>安装</li>
+</ul>
+
+<p><code class="highlighter-rouge">
+make install
+</code></p>
+
+<h2 id="section-3">可能遇到的问题</h2>
+
+<h4 id="make-package"><code class="highlighter-rouge">make package</code>的错误</h4>
+
+<p><code class="highlighter-rouge">
+ $ make package
+  Can't locate IO/Compress/Lzma.pm in @INC (you may need to install the
+  IO::Compress::Lzma module) (@INC contains: /Library/Perl/5.18/darwin-
+  thread-multi-2level /Library/Perl/5.18 /Network/Library/Perl/5.18/darwin-
+  thread-multi-2level /Network/Library/Perl/5.18 /Library/Perl/Updates/5.18.2
+  /System/Library/Perl/5.18/darwin-thread-multi-2level
+  /System/Library/Perl/5.18 /System/Library/Perl/Extras/5.18/darwin-thread-
+  multi-2level /System/Library/Perl/Extras/5.18 .) at
+  /Users/mj/theos/bin/dm.pl line 12.
+  BEGIN failed--compilation aborted at /Users/mj/theos/bin/dm.pl line 12.
+  make: *** [internal-package] Error 2
+</code></p>
+
+<ul>
+  <li>是因为打包压缩方式有问题，改成<code class="highlighter-rouge">gzip</code>压缩就行了
+    <ul>
+      <li>修改<code class="highlighter-rouge">dm.pl</code>文件，用<code class="highlighter-rouge">#</code>号注释掉下面两句</li>
+    </ul>
+  </li>
+</ul>
+
+<p><code class="highlighter-rouge">
+$ vim $THEOS/vendor/dm.pl/dm.pl
+#use IO::Compress::Lzma;
+#use IO::Compress::Xz;
+</code></p>
+
+<ul>
+  <li>修改<code class="highlighter-rouge">deb.mk</code>文件第6行的压缩方式为<code class="highlighter-rouge">gzip</code></li>
+</ul>
+
+<p><code class="highlighter-rouge">
+$ vim $THEOS/makefiles/package/deb.mk
+           _THEOS_PLATFORM_DPKG_DEB_COMPRESSION ?= gzip
+</code></p>
+
+<h4 id="make">make的错误</h4>
+
+<p><code class="highlighter-rouge">
+$ make
+  Error: You do not have an SDK in
+  /Library/Developer/CommandLineTools/Platforms/iPhoneOS.platform/Developer/S
+  DKs
+</code></p>
+
+<ul>
+  <li>是因为多个Xcode导致路径（可能安装了多个xcode）,需要指定以下xcode</li>
+</ul>
+
+<p><code class="highlighter-rouge">
+$ sudo xcode-select --switch
+/Applications/Xcode.app/Contents/Developer/
+</code></p>
+
+<ul>
+  <li>之前编译过，有会有以下提示</li>
+</ul>
+
+<p><code class="highlighter-rouge">
+$ make
+  &gt; Making all for tweak xxx...
+  make[2]: Nothing to be done for `internal-library-compile'. 
+</code></p>
+
+<p>这是因为缓存导致的，但是不影响操作，如需出现原来的打印，可以<code class="highlighter-rouge">clean</code>一下</p>
+
+<p><code class="highlighter-rouge">
+$ make clean
+$ make
+</code></p>
+
+
+
+  </section>
+</article>
+
+<section>
+
+            <div class="content-play">
+              <p><a href="javascript:void(0)" onclick="dashangToggle()" class="dashang" title="打赏，支持一下">打赏一个呗</a></p>
+              <div class="hide_box-play"></div>
+              <div class="shang_box-play">
+                <a class="shang_close-play" href="javascript:void(0)" onclick="dashangToggle()" title="关闭"><img src="/images/payimg/close.jpg" alt="取消" /></a>
+                <div class="shang_tit-play">
+                  <p>感谢您的支持，我会继续努力的!</p>
+                </div>
+                <div class="shang_payimg">
+                    <img src="/images/payimg/alipayimg.jpg" alt="扫码支持" title="扫一扫" />
+                </div>
+              <div class="shang_payimg">    
+                    <img src="/images/payimg/weipayimg.jpg" alt="扫码支持" title="扫一扫" />
+                </div>
+                <div class="pay_explain">扫码打赏，你说多少就多少</div>
+                <div class="shang_payselect">
+                  <div class="pay_item checked" data-id="alipay">
+                    <span class="pay_logo"><img src="/images/payimg/alipay.jpg" alt="支付宝" /></span>
+                  </div>
+                  <div class="pay_item" data-id="weipay">
+                    <span class="pay_logo"><img src="/images/payimg/wechat.jpg" alt="微信" /></span>
+                  </div>
+                </div>
+                <div class="shang_info-play">
+                  <p>打开<span id="shang_pay_txt">支付宝</span>扫一扫，即可进行扫码打赏哦</p>
+                </div>
+              </div>
+            </div>
+            <script type="text/javascript">
+            function dashangToggle(){
+              $(".hide_box-play").fadeToggle();
+              $(".shang_box-play").fadeToggle();
+            }
+            </script>
+
+            <div style="text-align:center;margin:50px 0; font:normal 14px/24px 'MicroSoft YaHei';"></div>
+
+            <style type="text/css">
+              .content-play{width:80%;margin-top: 20px;margin-bottom: 10px;height:40px;}
+              .hide_box-play{z-index:999;filter:alpha(opacity=50);background:#666;opacity: 0.5;-moz-opacity: 0.5;left:0;top:0;height:99%;width:100%;position:fixed;display:none;}
+              .shang_box-play{width:540px;height:540px;padding:10px;background-color:#fff;border-radius:10px;position:fixed;z-index:1000;left:50%;top:50%;margin-left:-280px;margin-top:-280px;border:1px dotted #dedede;display:none;}
+              .shang_box-play img{border:none;border-width:0;}
+              .dashang{display:block;width:100px;margin:5px auto;height:25px;line-height:25px;padding:10px;background-color:#E74851;color:#fff;text-align:center;text-decoration:none;border-radius:10px;font-weight:bold;font-size:16px;transition: all 0.3s;}
+              .dashang:hover{opacity:0.8;padding:15px;font-size:18px;}
+              .shang_close-play{float:right;display:inline-block;
+                margin-right: 10px;margin-top: 20px;
+              }
+              .shang_logo{display:block;text-align:center;margin:20px auto;}
+              .shang_tit-play{width: 100%;height: 75px;text-align: center;line-height: 66px;color: #a3a3a3;font-size: 16px;background: url('/images/payimg/cy-reward-title-bg.jpg');font-family: 'Microsoft YaHei';margin-top: 7px;margin-right:2px;}
+              .shang_tit-play p{color:#a3a3a3;text-align:center;font-size:16px;}
+              .shang_payimg{width:140px;padding:10px;padding-left: 80px; /*border:6px solid #EA5F00;**/margin:0 auto;border-radius:3px;height:140px;display:inline-block;}
+              .shang_payimg img{display:inline-block;margin-right:10px;float:left;text-align:center;width:140px;height:140px; }
+              .pay_explain{text-align:center;margin:10px auto;font-size:12px;color:#545454;}
+              .shang_payselect{text-align:center;margin:0 auto;margin-top:40px;cursor:pointer;height:60px;width:500px;margin-left:110px;}
+              .shang_payselect .pay_item{display:inline-block;margin-right:140px;float:left;}
+              .shang_info-play{clear:both;}
+              .shang_info-play p,.shang_info-play a{color:#C3C3C3;text-align:center;font-size:12px;text-decoration:none;line-height:2em;}
+            </style>
+
+       <ul class="pager">
+        
+        <li class="previous">
+            <a href="/2018/01/%E8%84%B1%E5%A3%B3/" data-toggle="tooltip" data-placement="top" title="（6）脱壳">上一篇：  <span>（6）脱壳</span>
+            </a>
+        </li>
+        
+        
+        <li class="next">
+            <a href="/2018/03/Objective-C%E7%9A%84%E6%9C%AC%E8%B4%A8/" data-toggle="tooltip" data-placement="top" title="（1）Objective-C的本质">下一篇：  <span>（1）Objective-C的本质</span>
+            </a>
+        </li>
+        
+    </ul>
+</section>
+
+<section class="post-comments">
+
+
+    <!-- <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    <script src="https://img1.cache.netease.com/f2e/tie/yun/sdk/loader.js"></script>
+    <script>
+    var cloudTieConfig = {
+      url: document.location.href, 
+      sourceId: "",
+      productKey: "aa395cf7778f458492060f3f53301b7c",
+      target: "cloud-tie-wrapper"
+    };
+    var yunManualLoad = true;
+    Tie.loader("aHR0cHM6Ly9hcGkuZ2VudGllLjE2My5jb20vcGMvbGl2ZXNjcmlwdC5odG1s", true);
+    </script> -->
+
+    <script type="text/javascript" id="wumiiComments">
+      var wumiiPermaLink = "http://www.cenzhijun.top/2018/01/theos/"; //请用代码生成文章永久的链接
+      var wumiiTitle = "（7）theos安装"; //请用代码生成文章标题
+      var wumiiSitePrefix = "http://www.cenzhijun.top"; //安装无觅评论插件的网站的域名，如果是放在子域名上，请提供子域名，如"http://blog.wumii.com"。如果这里填写的域名不对，请自行改正。
+      var wumiiCommentParams = "&pf=JAVASCRIPT";
+
+    </script>
+    <script type="text/javascript" src="http://widget.wumii.cn/ext/cw/widget"></script>
+
+
+  
+</section>
+
+
+            <section class="footer">
+    <footer>
+        <div class = "footer_div">  
+        <nav class="cover-navigation navigation--social">
+          <ul class="navigation">
+
+          
+          <!-- Weibo -->
+          <li class="navigation__item_social">
+            <a href="http://weibo.com/3291155444" title="@3291155444 的微博" target="_blank">
+              <i class='social fa fa-weibo fa-2x'></i>
+              <span class="label">Weibo</span>
+            </a>
+          </li>
+          
+
+          
+          <!-- Github -->
+          <li class="navigation__item_social">
+            <a href="https://github.com/czj1127292580" title="@czj1127292580 的 Github" target="_blank">
+              <i class='social fa fa-github fa-2x'></i>
+              <span class="label">Github</span>
+            </a>
+          </li>
+          
+          
+          
+
+          
+
+          <!-- RSS -->
+          <li class="navigation__item_social">
+            <a href="/feed.xml" rel="author" title="RSS" target="_blank">
+              <i class='social fa fa-rss fa-2x'></i>
+              <span class="label">RSS</span>
+            </a>
+          </li>
+
+          
+          <!-- Email -->
+          <li class="navigation__item_social">
+            <a href="mailto:13621130170@163.com" title="Contact me">
+              <i class='social fa fa-envelope fa-2x'></i>
+              <span class="label">Email</span>
+            </a>
+          </li>
+          
+
+          </ul>
+        </nav>
+
+        </div>
+
+        <div class = "footer_div">  
+           <p class="copyright text-muted">
+            Copyright &copy; 岑志军的个人博客 2018
+            </p>
+        	<div align="right">
+    			<link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+
+          <!-- 访问统计 -->
+          <span id="busuanzi_container_site_pv">
+            本站总访问量
+            <span id="busuanzi_value_site_pv"></span>次
+          </span>
+
+        </div>
+        <div>
+    </footer>
+</section>
+
+        </div>
+    </div>
+    
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="/js/main.js"></script>
+
+<script type="text/javascript" src="/js/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+  </body>
+
+</html>

@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <title>（2）逆向环境搭建</title>
+  <meta name="description" content="Mac远程登录到iPhone">
+  <meta name="author" content="leopardpan">
+
+  <meta name="keywords" content="iOS开发,岑志军的个人博客,reactNative,ListView,wifi列表,reactnative开发,数字货币,加密货币,solidity,fabric,ethereum,blockchain,hyperledger,区块链部落,从零到壹全栈部落,智能合约,超级账本,ICO,比特币,以太坊" />
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="（2）逆向环境搭建">
+  <meta name="twitter:description" content="Mac远程登录到iPhone">
+  
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="（2）逆向环境搭建">
+  <meta property="og:description" content="Mac远程登录到iPhone">
+  
+  <link rel="icon" type="image/png" href="/images/favicon.png" />
+  <link href="/images/favicon.png" rel="shortcut icon" type="image/png">
+  
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+
+  <link rel="canonical" href="http://www.cenzhijun.top//2018/01/%E9%80%86%E5%90%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/">
+  <link rel="alternate" type="application/rss+xml" title="岑志军的个人博客" href="http://www.cenzhijun.top//feed.xml">
+  
+  <meta name="google-site-verification" content="1-1ZlHoRvM0T2FqPbW2S-qLgYXN6rsn52kErlMPd_gw" />
+
+<!-- 站点统计 -->
+  <script 
+  async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+  </script>  
+
+<!-- 百度统计 -->
+  
+  <script>
+      var _hmt = _hmt || [];
+      (function() {
+        var hm = document.createElement("script");
+        hm.src = "//hm.baidu.com/hm.js?0352fdd0e57585d9a54ff3a6906ae365";
+        var s = document.getElementsByTagName("script")[0]; 
+        s.parentNode.insertBefore(hm, s);
+      })();
+  </script>
+  
+
+<!-- google 统计 -->
+  
+
+</head>
+
+
+  <body>
+
+    <span class="mobile btn-mobile-menu">        
+      <div class="nav_container">
+         <nav class="nav-menu-item" style = "float:right">
+            <i class="nav-menu-item">
+              <a href="/#blog" title="" class="blog-button">  博客主页
+              </a>
+            </i>
+            
+                <i class="nav-menu-item">
+
+                  <a href="/archive" title="archive" class="btn-mobile-menu__icon">
+                      所有文章
+                  </a>
+                </i>
+            
+                <i class="nav-menu-item">
+
+                  <a href="/tags" title="tags" class="btn-mobile-menu__icon">
+                      分类
+                  </a>
+                </i>
+            
+                <i class="nav-menu-item">
+
+                  <a href="/about" title="about" class="btn-mobile-menu__icon">
+                      关于我
+                  </a>
+                </i>
+            
+          </nav>
+      </div>
+    </span>
+    
+    <header class="panel-cover panel-cover--collapsed" style="background-image: url('/images/background-cover.jpg')">
+  <div class="panel-main">
+
+    <div class="panel-main__inner panel-inverted">
+    <div class="panel-main__content">
+        <!-- 头像效果-start -->
+        <div class="ih-item circle effect right_to_left">            
+            <a href="/#blog" title="前往 岑志军的个人博客 的主页" class="blog-button">
+                <div class="img"><img src="/images/avatar.jpg" alt="img"></div>
+                <div class="info">
+                    <div class="info-back">
+                        <h2> 
+                            
+                                czjDevloper
+                            
+                        </h2>
+                        <p>
+                           
+                                iOS / React-Native
+                            
+                        </p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <!-- 头像效果-end -->
+        <h1 class="panel-cover__title panel-title"><a href="/#blog" title="link to homepage for 岑志军的个人博客" class="blog-button">岑志军的个人博客</a></h1>
+        
+        <span class="panel-cover__subtitle panel-subtitle">我的博客</span>
+        
+        <hr class="panel-cover__divider" />
+        <p class="panel-cover__description">欢迎来到我的博客~</p>
+        <hr class="panel-cover__divider panel-cover__divider--secondary" />
+        
+        
+        
+
+        <div class="navigation-wrapper">
+          <div>
+            <nav class="cover-navigation cover-navigation--primary">
+              <ul class="navigation">
+                <li class="navigation__item"><a href="/#blog" title="" class="blog-button">博客主页</a></li>
+                
+                  <li class="navigation__item"><a href="/archive" title="archive">所有文章</a></li>
+                
+                  <li class="navigation__item"><a href="/tags" title="tags">分类</a></li>
+                
+                  <li class="navigation__item"><a href="/about" title="about">关于我</a></li>
+                
+              </ul>
+            </nav>
+          </div>          
+        </div>
+
+
+        </div>
+      </div>
+    </div>
+    
+    
+    <div class="panel-cover--overlay cover-clear"></div>
+    
+  </div>
+</header>
+
+
+    <div class="content-wrapper">
+        <div class="content-wrapper__inner">
+            <article class="post-container post-container--single" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <h1 class="post-title">（2）逆向环境搭建</h1>
+    <div class="post-meta">
+      <img src="/images/calendar.png" width="20px"/> 
+      <time datetime="2018-01-21 00:00:00 +0800" itemprop="datePublished" class="post-meta__date date">2018-01-21</time>  
+         
+      <span id="busuanzi_container_page_pv"> | 阅读：<span id="busuanzi_value_page_pv"></span>次</span>
+    </p>
+    </div>
+  </header>
+
+  <section class="post">
+    <h2 id="maciphone">Mac远程登录到iPhone</h2>
+
+<ul>
+  <li>我们经常在Mac的终端上，通过敲一些命令行来完成一些操作</li>
+</ul>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-01-21-Terminal.png" alt="Termina" /></p>
+
+<ul>
+  <li>iOS和Mac OS X都是基于Darwin（苹果的一个基于Unix的开源系统内核），所以iOS中同样支持终端的命令行操作</li>
+  <li>在逆向工程中，我们经常会通过命令行来操纵iPhone</li>
+  <li>为了能够让Mac终端中的命令行能作用在iPhone上，我们得让Mac和iPhone建立连接</li>
+  <li>通过Mac远程登录到iPhone的方式建立连接
+<img src="http://otogtitz7.bkt.clouddn.com/2018-01-21-mac-iphone.jpg" alt="mac-iphone" /></li>
+</ul>
+
+<h2 id="sshopenssh">SSH、OpenSSH</h2>
+<ul>
+  <li>SSH
+    <ul>
+      <li>Secure Shell的缩写，意为“安全外壳协议”，是一种可以为远程登录提供安全保障的协议</li>
+      <li>使用SSH，可以把所有传输的数据进行加密，“中间人”攻击方式就不可能实现，能防止DNS欺骗和IP欺骗
+<img src="http://otogtitz7.bkt.clouddn.com/2018-01-21-ssh-sniffer.png" alt="ssh-sniffe" /></li>
+    </ul>
+  </li>
+  <li>OpenSSH
+    <ul>
+      <li>是SSH协议的免费开源实现</li>
+      <li>可以通过OpenSSH的方式让Mac远程登录到iPhone</li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="openssh">使用OpenSSH远程登录</h2>
+<ul>
+  <li>在iPhone上通过Cydia安装OpenSSH工具（软件源http://apt.saurik.com）</li>
+</ul>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-01-21-OpenSSH.png" alt="OpenSSH" /></p>
+
+<ul>
+  <li>OpenSSH的具体使用步骤可以查看Description中的描述</li>
+</ul>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-01-21-OpenSSH-desc.png" alt="OpenSSH-des" /></p>
+
+<ul>
+  <li>初次使用步骤
+    <ul>
+      <li>SSH是通过TCP协议通信，所以要确保Mac和iPhone在同一局域网下，比如连接着同一个WiFi</li>
+      <li>在Mac的终端输入<code class="highlighter-rouge">ssh root@服务器主机地址</code>，比如<code class="highlighter-rouge">ssh root@10.1.1.168</code>（这里的服务器是手机）</li>
+      <li>初始密码<code class="highlighter-rouge">alpine</code></li>
+      <li>登录成功后就可以使用终端命令行操作iPhone</li>
+      <li>退出登录命令是<code class="highlighter-rouge">exit</code></li>
+    </ul>
+
+    <p><img src="http://otogtitz7.bkt.clouddn.com/2018-01-21-login_handle_step.png" alt="login_handle_step" /></p>
+  </li>
+</ul>
+
+<h2 id="rootmobile">root和mobile</h2>
+<ul>
+  <li>iOS下有2个常用账户：<code class="highlighter-rouge">root</code>、<code class="highlighter-rouge">mobile</code>
+    <ul>
+      <li><code class="highlighter-rouge">root</code>：最高权限账户，$HOME是<code class="highlighter-rouge">/var/root</code></li>
+      <li><code class="highlighter-rouge">mobile</code>：普通权限账户，只能操作一些普通文件，不能操作系统级别的文件，$HOME是<code class="highlighter-rouge">/var/mobile</code></li>
+      <li>登录mobile用户：<code class="highlighter-rouge">root mobile@服务器主机地址</code></li>
+      <li>root和mobile用户的初始登录密码都是<code class="highlighter-rouge">alpine</code></li>
+    </ul>
+
+    <p><img src="http://otogtitz7.bkt.clouddn.com/2018-01-21-modify_passwd.png" alt="modify_passwd" /></p>
+  </li>
+</ul>
+
+<h2 id="ssh">SSH的安全验证方式</h2>
+<ul>
+  <li>SSH提供了2种方式的安全验证
+    <ul>
+      <li>基于口令的安全验证
+        <ul>
+          <li>使用帐号和口令即可验证（口令就是密码）</li>
+        </ul>
+      </li>
+      <li>基于密钥的安全验证
+        <ul>
+          <li>免口令验证</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="ssh---">SSH - 基于密钥的安全验证</h4>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-01-21-flow_chart.png" alt="flow_chart" /></p>
+
+<h6 id="key-pairpublic-keyprivate-key">在客户端生成一对相关联的密钥（Key Pair）：一个公钥（Public Key），一个私钥（Private Key）</h6>
+<ul>
+  <li>怎么生成公钥和私钥</li>
+</ul>
+
+<p><code class="highlighter-rouge">
+ssh-copy-id root@服务器主机地址
+</code>
+&gt; 一路敲回车键（Enter）即可
+&gt; 生成的公钥：<code class="highlighter-rouge">~/.ssh/id_rsa.pub</code>
+&gt; 生成的私钥：<code class="highlighter-rouge">~/.ssh/id_rsa</code></p>
+
+<h6 id="sshauthorizedkeys">把客户端的公钥内容追加到服务器的授权文件（~/.ssh/authorized_keys）尾部</h6>
+<ul>
+  <li>怎么追加</li>
+</ul>
+
+<p><code class="highlighter-rouge">
+ssh-copy-id root@服务器主机地址
+</code></p>
+
+<blockquote>
+  <p>需要输入root用户的登录密码
+<code class="highlighter-rouge">ssh-copy-id</code>会将客户端<code class="highlighter-rouge">~/.ssh/id_rsa.pub</code>的内容自动追加到服务器的<code class="highlighter-rouge">~/.ssh/authorized_keys</code>尾部</p>
+</blockquote>
+
+<ul>
+  <li>整个过程使用RSA非对称加密算法（公钥进行加密、私钥进行解密）保证安全性</li>
+  <li>注意：由于是在~文件夹下操作，所以上述操作仅仅是解决了root用户的登录问题（不会影响mobile用户）</li>
+</ul>
+
+<h2 id="section">公钥 » 授权文件</h2>
+<ul>
+  <li>可以使用ssh-copy-id将客户端的公钥内容自动追加到服务器的授权文件尾部，也可以手动操作
+    <ul>
+      <li>复制客户端的公钥到服务器某路径
+        <ul>
+          <li><code class="highlighter-rouge">scp ~/.ssh/id_rsa.pub root@服务器主机地址:~</code></li>
+          <li><code class="highlighter-rouge">scp</code>是secure copy的缩写，是基于SSH登录进行安全的远程文件拷贝命令，把一个文件copy到远程另外一台主机上</li>
+          <li>上面的命令行将客户端的<code class="highlighter-rouge">~/.ssh/id_rsa.pub</code>拷贝到了服务器的~地址</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>SSH登录服务器
+    <ul>
+      <li><code class="highlighter-rouge">ssh root@服务器主机地址</code></li>
+      <li>需要输入<code class="highlighter-rouge">root</code>用户的登录密码</li>
+    </ul>
+  </li>
+  <li>在服务器创建.ssh文件夹
+    <ul>
+      <li><code class="highlighter-rouge">mkdir .ssh</code></li>
+    </ul>
+  </li>
+  <li>追加公钥内容到授权文件尾部
+    <ul>
+      <li><code class="highlighter-rouge">cat ~/id_rsa.pub &gt;&gt; ~/.ssh/authorized_keys</code></li>
+    </ul>
+  </li>
+  <li>删除公钥
+    <ul>
+      <li><code class="highlighter-rouge">rm ~/id_rsa.pub</code></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="sslopenssl">SSL、OpenSSL</h2>
+
+<p>很多人会将SSH、OpenSSH、SSL、OpenSSL搞混</p>
+
+<ul>
+  <li>SSL
+    <ul>
+      <li>Secure Sockets Layer的缩写，是为网络通信提供安全及数据完整性的一种安全协议，在传输层对网络连接进行加密</li>
+    </ul>
+  </li>
+  <li>OpenSSL
+    <ul>
+      <li>SSL的开源实现</li>
+      <li>绝大部分HTTPS请求等价于：HTTP + OpenSSL</li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="opensshopenssl">OpenSSH的加密就是通过OpenSSL完成的</h4>
+
+<h2 id="usbssh">通过USB进行SSH登录</h2>
+
+<p>默认情况下，由于SSH走的是TCP协议，Mac是通过网络连接的方式SSH登录到iPhone，要求iPhone连接WiFi。</p>
+
+<p>为了加快传输速度，也可以通过USB连接的方式进行SSH登录。</p>
+
+<ul>
+  <li>Mac上有个服务程序usbmuxd（它会开机自动启动），可以实现USB进行SSH登陆</li>
+  <li><code class="highlighter-rouge">/System/Library/PrivateFrameworks/MobileDevice.framework/Resources/usbmuxd</code></li>
+</ul>
+
+<h2 id="section-1">22端口</h2>
+
+<p>端口就是设备对外提供服务的窗口，每个端口都有个端口号（范围是0~65535，共2^16个）</p>
+
+<p>有些端口号是保留的，已经规定了用途，比如:</p>
+
+<ul>
+  <li>21端口提供FTP服务</li>
+  <li>80端口提供HTTP服务</li>
+  <li>22端口提供SSH服务</li>
+  <li>更多保留端口号： https://baike.baidu.com/item/%E7%AB%AF%E5%8F%A3%E5%8F%B7/10883658#4_3</li>
+</ul>
+
+<h4 id="iphone22sshtcp">iPhone默认是使用22端口进行SSH通信，采用的是TCP协议</h4>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-01-21-wifi_ssh_login.png" alt="wifi_ssh_login" /></p>
+
+<h2 id="usbmuxd1">usbmuxd的使用1</h2>
+
+<ul>
+  <li>下载usbmuxd工具包（下载v1.0.8版本，主要用到里面的一个python脚本：tcprelay.py）</li>
+  <li>https://cgit.sukimashita.com/usbmuxd.git/snapshot/usbmuxd-1.0.8.tar.gz</li>
+  <li>将iPhone的22端口（SSH端口）映射到Mac本地的10010端口</li>
+  <li><code class="highlighter-rouge">cd ~/Downloads/usbmuxd-1.0.8/python-client</code></li>
+  <li>
+    <p><code class="highlighter-rouge">python tcprelay.py 22:10010</code>
+#### 注意：要想保持端口转换状态，不能终止此命令行（如果要执行其他终端命令行，请新开一个终端界面）</p>
+  </li>
+  <li>不一定非要10010端口，只要不是保留端口就行</li>
+</ul>
+
+<h2 id="usbmuxd2">usbmuxd的使用2</h2>
+<p>端口映射完毕后，以后如果想跟iPhone的22端口通信，直接跟Mac本地的10010端口通信就可以了</p>
+
+<ul>
+  <li>新开一个终端界面，SSH登录到Mac本地的10010端口（以下方式2选1）</li>
+  <li><code class="highlighter-rouge">ssh root@localhost -p 10010</code></li>
+  <li>ssh root@127.0.0.1 -p 10010</li>
+  <li>localhost是一个域名，指向的IP地址是127.0.0.1，本机虚拟网卡的IP地址</li>
+  <li>usbmuxd会将Mac本地10010端口的TCP协议数据，通过USB连接转发到iPhone的22端口</li>
+</ul>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-01-21-usb_ssh_login.png" alt="usb_ssh_login" /></p>
+
+<h2 id="ios">iOS终端的中文乱码问题</h2>
+
+<p>默认情况下，iOS终端不支持中文输入和显示</p>
+
+<p>解决方案：新建一个~/.inputrc文件，文件内容是：
+* <code class="highlighter-rouge">set convert-meta off </code>(不将中文字符转化为转义序列)
+* <code class="highlighter-rouge">set output-meta on</code>(允许向终端输出中文)
+* <code class="highlighter-rouge">set meta-flag on </code>（允许向终端输入中文）
+* <code class="highlighter-rouge">set input-meta on</code>（允许向终端输入中文）</p>
+
+<h4 id="cydiavimhttpaptsaurikcom">如果是想在终端编辑文件内容，可以通过Cydia安装一个vim（软件源http://apt.saurik.com）</h4>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-01-21-vim_improved.png" alt="vim_improved" /></p>
+
+
+
+  </section>
+</article>
+
+<section>
+
+            <div class="content-play">
+              <p><a href="javascript:void(0)" onclick="dashangToggle()" class="dashang" title="打赏，支持一下">打赏一个呗</a></p>
+              <div class="hide_box-play"></div>
+              <div class="shang_box-play">
+                <a class="shang_close-play" href="javascript:void(0)" onclick="dashangToggle()" title="关闭"><img src="/images/payimg/close.jpg" alt="取消" /></a>
+                <div class="shang_tit-play">
+                  <p>感谢您的支持，我会继续努力的!</p>
+                </div>
+                <div class="shang_payimg">
+                    <img src="/images/payimg/alipayimg.jpg" alt="扫码支持" title="扫一扫" />
+                </div>
+              <div class="shang_payimg">    
+                    <img src="/images/payimg/weipayimg.jpg" alt="扫码支持" title="扫一扫" />
+                </div>
+                <div class="pay_explain">扫码打赏，你说多少就多少</div>
+                <div class="shang_payselect">
+                  <div class="pay_item checked" data-id="alipay">
+                    <span class="pay_logo"><img src="/images/payimg/alipay.jpg" alt="支付宝" /></span>
+                  </div>
+                  <div class="pay_item" data-id="weipay">
+                    <span class="pay_logo"><img src="/images/payimg/wechat.jpg" alt="微信" /></span>
+                  </div>
+                </div>
+                <div class="shang_info-play">
+                  <p>打开<span id="shang_pay_txt">支付宝</span>扫一扫，即可进行扫码打赏哦</p>
+                </div>
+              </div>
+            </div>
+            <script type="text/javascript">
+            function dashangToggle(){
+              $(".hide_box-play").fadeToggle();
+              $(".shang_box-play").fadeToggle();
+            }
+            </script>
+
+            <div style="text-align:center;margin:50px 0; font:normal 14px/24px 'MicroSoft YaHei';"></div>
+
+            <style type="text/css">
+              .content-play{width:80%;margin-top: 20px;margin-bottom: 10px;height:40px;}
+              .hide_box-play{z-index:999;filter:alpha(opacity=50);background:#666;opacity: 0.5;-moz-opacity: 0.5;left:0;top:0;height:99%;width:100%;position:fixed;display:none;}
+              .shang_box-play{width:540px;height:540px;padding:10px;background-color:#fff;border-radius:10px;position:fixed;z-index:1000;left:50%;top:50%;margin-left:-280px;margin-top:-280px;border:1px dotted #dedede;display:none;}
+              .shang_box-play img{border:none;border-width:0;}
+              .dashang{display:block;width:100px;margin:5px auto;height:25px;line-height:25px;padding:10px;background-color:#E74851;color:#fff;text-align:center;text-decoration:none;border-radius:10px;font-weight:bold;font-size:16px;transition: all 0.3s;}
+              .dashang:hover{opacity:0.8;padding:15px;font-size:18px;}
+              .shang_close-play{float:right;display:inline-block;
+                margin-right: 10px;margin-top: 20px;
+              }
+              .shang_logo{display:block;text-align:center;margin:20px auto;}
+              .shang_tit-play{width: 100%;height: 75px;text-align: center;line-height: 66px;color: #a3a3a3;font-size: 16px;background: url('/images/payimg/cy-reward-title-bg.jpg');font-family: 'Microsoft YaHei';margin-top: 7px;margin-right:2px;}
+              .shang_tit-play p{color:#a3a3a3;text-align:center;font-size:16px;}
+              .shang_payimg{width:140px;padding:10px;padding-left: 80px; /*border:6px solid #EA5F00;**/margin:0 auto;border-radius:3px;height:140px;display:inline-block;}
+              .shang_payimg img{display:inline-block;margin-right:10px;float:left;text-align:center;width:140px;height:140px; }
+              .pay_explain{text-align:center;margin:10px auto;font-size:12px;color:#545454;}
+              .shang_payselect{text-align:center;margin:0 auto;margin-top:40px;cursor:pointer;height:60px;width:500px;margin-left:110px;}
+              .shang_payselect .pay_item{display:inline-block;margin-right:140px;float:left;}
+              .shang_info-play{clear:both;}
+              .shang_info-play p,.shang_info-play a{color:#C3C3C3;text-align:center;font-size:12px;text-decoration:none;line-height:2em;}
+            </style>
+
+       <ul class="pager">
+        
+        <li class="previous">
+            <a href="/2018/01/%E6%90%AD%E5%BB%BA%E8%B6%8A%E7%8B%B1%E7%8E%AF%E5%A2%83/" data-toggle="tooltip" data-placement="top" title="（1）越狱环境搭建">上一篇：  <span>（1）越狱环境搭建</span>
+            </a>
+        </li>
+        
+        
+        <li class="next">
+            <a href="/2018/01/Cycript/" data-toggle="tooltip" data-placement="top" title="（3）Cycript">下一篇：  <span>（3）Cycript</span>
+            </a>
+        </li>
+        
+    </ul>
+</section>
+
+<section class="post-comments">
+
+
+    <!-- <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    <script src="https://img1.cache.netease.com/f2e/tie/yun/sdk/loader.js"></script>
+    <script>
+    var cloudTieConfig = {
+      url: document.location.href, 
+      sourceId: "",
+      productKey: "aa395cf7778f458492060f3f53301b7c",
+      target: "cloud-tie-wrapper"
+    };
+    var yunManualLoad = true;
+    Tie.loader("aHR0cHM6Ly9hcGkuZ2VudGllLjE2My5jb20vcGMvbGl2ZXNjcmlwdC5odG1s", true);
+    </script> -->
+
+    <script type="text/javascript" id="wumiiComments">
+      var wumiiPermaLink = "http://www.cenzhijun.top/2018/01/%E9%80%86%E5%90%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/"; //请用代码生成文章永久的链接
+      var wumiiTitle = "（2）逆向环境搭建"; //请用代码生成文章标题
+      var wumiiSitePrefix = "http://www.cenzhijun.top"; //安装无觅评论插件的网站的域名，如果是放在子域名上，请提供子域名，如"http://blog.wumii.com"。如果这里填写的域名不对，请自行改正。
+      var wumiiCommentParams = "&pf=JAVASCRIPT";
+
+    </script>
+    <script type="text/javascript" src="http://widget.wumii.cn/ext/cw/widget"></script>
+
+
+  
+</section>
+
+
+            <section class="footer">
+    <footer>
+        <div class = "footer_div">  
+        <nav class="cover-navigation navigation--social">
+          <ul class="navigation">
+
+          
+          <!-- Weibo -->
+          <li class="navigation__item_social">
+            <a href="http://weibo.com/3291155444" title="@3291155444 的微博" target="_blank">
+              <i class='social fa fa-weibo fa-2x'></i>
+              <span class="label">Weibo</span>
+            </a>
+          </li>
+          
+
+          
+          <!-- Github -->
+          <li class="navigation__item_social">
+            <a href="https://github.com/czj1127292580" title="@czj1127292580 的 Github" target="_blank">
+              <i class='social fa fa-github fa-2x'></i>
+              <span class="label">Github</span>
+            </a>
+          </li>
+          
+          
+          
+
+          
+
+          <!-- RSS -->
+          <li class="navigation__item_social">
+            <a href="/feed.xml" rel="author" title="RSS" target="_blank">
+              <i class='social fa fa-rss fa-2x'></i>
+              <span class="label">RSS</span>
+            </a>
+          </li>
+
+          
+          <!-- Email -->
+          <li class="navigation__item_social">
+            <a href="mailto:13621130170@163.com" title="Contact me">
+              <i class='social fa fa-envelope fa-2x'></i>
+              <span class="label">Email</span>
+            </a>
+          </li>
+          
+
+          </ul>
+        </nav>
+
+        </div>
+
+        <div class = "footer_div">  
+           <p class="copyright text-muted">
+            Copyright &copy; 岑志军的个人博客 2018
+            </p>
+        	<div align="right">
+    			<link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+
+          <!-- 访问统计 -->
+          <span id="busuanzi_container_site_pv">
+            本站总访问量
+            <span id="busuanzi_value_site_pv"></span>次
+          </span>
+
+        </div>
+        <div>
+    </footer>
+</section>
+
+        </div>
+    </div>
+    
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="/js/main.js"></script>
+
+<script type="text/javascript" src="/js/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+  </body>
+
+</html>
