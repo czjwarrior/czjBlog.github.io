@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <title>（3）OC中消息和消息转发-01</title>
+  <meta name="description" content="前一段时间有朋友问了下面的这个问题，我给出的回答是这样的：">
+  <meta name="author" content="leopardpan">
+
+  <meta name="keywords" content="iOS开发,岑志军的个人博客,reactNative,ListView,wifi列表,reactnative开发,数字货币,加密货币,solidity,fabric,ethereum,blockchain,hyperledger,区块链部落,从零到壹全栈部落,智能合约,超级账本,ICO,比特币,以太坊" />
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="（3）OC中消息和消息转发-01">
+  <meta name="twitter:description" content="前一段时间有朋友问了下面的这个问题，我给出的回答是这样的：">
+  
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="（3）OC中消息和消息转发-01">
+  <meta property="og:description" content="前一段时间有朋友问了下面的这个问题，我给出的回答是这样的：">
+  
+  <link rel="icon" type="image/png" href="/images/favicon.png" />
+  <link href="/images/favicon.png" rel="shortcut icon" type="image/png">
+  
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+
+  <link rel="canonical" href="http://www.cenzhijun.top//2018/03/msgSend-01/">
+  <link rel="alternate" type="application/rss+xml" title="岑志军的个人博客" href="http://www.cenzhijun.top//feed.xml">
+  
+  <meta name="google-site-verification" content="1-1ZlHoRvM0T2FqPbW2S-qLgYXN6rsn52kErlMPd_gw" />
+
+<!-- 站点统计 -->
+  <script 
+  async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+  </script>  
+
+<!-- 百度统计 -->
+  
+  <script>
+      var _hmt = _hmt || [];
+      (function() {
+        var hm = document.createElement("script");
+        hm.src = "//hm.baidu.com/hm.js?0352fdd0e57585d9a54ff3a6906ae365";
+        var s = document.getElementsByTagName("script")[0]; 
+        s.parentNode.insertBefore(hm, s);
+      })();
+  </script>
+  
+
+<!-- google 统计 -->
+  
+
+</head>
+
+
+  <body>
+
+    <span class="mobile btn-mobile-menu">        
+      <div class="nav_container">
+         <nav class="nav-menu-item" style = "float:right">
+            <i class="nav-menu-item">
+              <a href="/#blog" title="" class="blog-button">  博客主页
+              </a>
+            </i>
+            
+                <i class="nav-menu-item">
+
+                  <a href="/archive" title="archive" class="btn-mobile-menu__icon">
+                      所有文章
+                  </a>
+                </i>
+            
+                <i class="nav-menu-item">
+
+                  <a href="/tags" title="tags" class="btn-mobile-menu__icon">
+                      分类
+                  </a>
+                </i>
+            
+                <i class="nav-menu-item">
+
+                  <a href="/about" title="about" class="btn-mobile-menu__icon">
+                      关于我
+                  </a>
+                </i>
+            
+          </nav>
+      </div>
+    </span>
+    
+    <header class="panel-cover panel-cover--collapsed" style="background-image: url('/images/background-cover.jpg')">
+  <div class="panel-main">
+
+    <div class="panel-main__inner panel-inverted">
+    <div class="panel-main__content">
+        <!-- 头像效果-start -->
+        <div class="ih-item circle effect right_to_left">            
+            <a href="/#blog" title="前往 岑志军的个人博客 的主页" class="blog-button">
+                <div class="img"><img src="/images/avatar.jpg" alt="img"></div>
+                <div class="info">
+                    <div class="info-back">
+                        <h2> 
+                            
+                                czjDevloper
+                            
+                        </h2>
+                        <p>
+                           
+                                iOS / React-Native
+                            
+                        </p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <!-- 头像效果-end -->
+        <h1 class="panel-cover__title panel-title"><a href="/#blog" title="link to homepage for 岑志军的个人博客" class="blog-button">岑志军的个人博客</a></h1>
+        
+        <span class="panel-cover__subtitle panel-subtitle">我的博客</span>
+        
+        <hr class="panel-cover__divider" />
+        <p class="panel-cover__description">欢迎来到我的博客~</p>
+        <hr class="panel-cover__divider panel-cover__divider--secondary" />
+        
+        
+        
+
+        <div class="navigation-wrapper">
+          <div>
+            <nav class="cover-navigation cover-navigation--primary">
+              <ul class="navigation">
+                <li class="navigation__item"><a href="/#blog" title="" class="blog-button">博客主页</a></li>
+                
+                  <li class="navigation__item"><a href="/archive" title="archive">所有文章</a></li>
+                
+                  <li class="navigation__item"><a href="/tags" title="tags">分类</a></li>
+                
+                  <li class="navigation__item"><a href="/about" title="about">关于我</a></li>
+                
+              </ul>
+            </nav>
+          </div>          
+        </div>
+
+
+        </div>
+      </div>
+    </div>
+    
+    
+    <div class="panel-cover--overlay cover-clear"></div>
+    
+  </div>
+</header>
+
+
+    <div class="content-wrapper">
+        <div class="content-wrapper__inner">
+            <article class="post-container post-container--single" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <h1 class="post-title">（3）OC中消息和消息转发-01</h1>
+    <div class="post-meta">
+      <img src="/images/calendar.png" width="20px"/> 
+      <time datetime="2018-03-26 00:00:00 +0800" itemprop="datePublished" class="post-meta__date date">2018-03-26</time>  
+         
+      <span id="busuanzi_container_page_pv"> | 阅读：<span id="busuanzi_value_page_pv"></span>次</span>
+    </p>
+    </div>
+  </header>
+
+  <section class="post">
+    <p>前一段时间有朋友问了下面的这个问题，我给出的回答是这样的：</p>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-03-26-15220365281833.jpg" alt="" /></p>
+
+<p>其实上面回答的方法调用也都是基于以前对runtime的理解，和自己试验出来的结果，但是，回答完这个问题之后，抱着探究到底的精神（其实是这几天产品没提什么需求，有点儿闲），问了自己一个问题：你怎么知道是底层调用的是这几个方法？？。。。又是一番查资料，验证问题。。。下面正式开始分析：</p>
+
+<ul>
+  <li>首先新建一个Person类，代码如下：</li>
+</ul>
+
+<p>Person.h
+```
+#import &lt;Foundation/Foundation.h&gt;</p>
+
+<p>@interface Person : NSObject</p>
+
+<ul>
+  <li>(void)eat;</li>
+</ul>
+
+<p>@end
+```</p>
+
+<p>Person.m</p>
+
+<p>```
+#import “Person.h”</p>
+
+<p>@implementation Person</p>
+
+<ul>
+  <li>(void)eat{
+  NSLog(@”Person eat=======”);
+}</li>
+</ul>
+
+<p>@end
+```</p>
+
+<p>很简单的一个类</p>
+
+<p>在main函数里面调用<code class="highlighter-rouge">eat</code>方法：</p>
+
+<p>```
+Person *p = [[Person alloc] init];</p>
+
+<p>[p eat];
+```</p>
+
+<p>将<code class="highlighter-rouge">main.m</code>代码转换成c++代码：</p>
+
+<p><code class="highlighter-rouge">
+ xcrun -sdk iphoneos clang -arch arm64 -rewrite-objc main.m -o main.cpp
+</code>
+在<code class="highlighter-rouge">main.cpp</code>文件当中查看底层实现：</p>
+
+<p>```
+int main(int argc, const char * argv[]) {
+    /* @autoreleasepool */ { __AtAutoreleasePool __autoreleasepool;</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>    Person *p = ((Person *(*)(id, SEL))(void *)objc_msgSend)((id)((Person *(*)(id, SEL))(void *)objc_msgSend)((id)objc_getClass("Person"), sel_registerName("alloc")), sel_registerName("init"));
+
+    ((void (*)(id, SEL))(void *)objc_msgSend)((id)p, sel_registerName("eat"));
+
+}
+return 0; } ```
+</code></pre>
+</div>
+
+<p>通过这些代码我们发现，OC中方法调用本质上就是给对象发消息，上面给对象发消息的代码可以简写成：</p>
+
+<p><code class="highlighter-rouge">
+objc_msgSend(p, @selector(eat));
+</code></p>
+
+<p>上面方法调用的意思就是：给<code class="highlighter-rouge">p</code>对象发送名为<code class="highlighter-rouge">eat</code>的消息，所以OC中给对象发消息本质上都是调用<code class="highlighter-rouge">objc_msgSend</code>方法，接着看下苹果官方文档对这个方法的定义（我是用的Dash查看的）：</p>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-03-26-15220439314182.jpg" alt="" /></p>
+
+<ul>
+  <li><code class="highlighter-rouge">self</code> ：指向接收消息的类实例的指针。简单来说就是消息的接收者。</li>
+  <li><code class="highlighter-rouge">op</code>：处理消息的方法选择器，也就是我们常见的<code class="highlighter-rouge">@selector()</code>。</li>
+  <li><code class="highlighter-rouge">...</code>：包含方法参数的可变参数列表，</li>
+</ul>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-03-26-15220443215386.jpg" alt="" /></p>
+
+<p>翻译如下：</p>
+
+<p>当遇到方法调用时，编译器生成对其中一个函数的调用。当向superclass发消息的时候调用的是<code class="highlighter-rouge">objc_msgSendSuper</code>，向其他对象发消息的时候调用<code class="highlighter-rouge">objc_msgSend</code>，方法返回值是一个结构体的时候调用的是<code class="highlighter-rouge">objc_msgSendSuper_stret</code>和<code class="highlighter-rouge">objc_msgSend_stret</code>。</p>
+
+<p>接下来我们再看下<code class="highlighter-rouge">objc_msgSend</code>的底层实现，<a href="https://opensource.apple.com/tarballs/objc4/">objc 源码</a>，发现底层是用汇编代码实现的（表示很蛋疼）：</p>
+
+<p>```
+ENTRY _objc_msgSend
+	UNWIND _objc_msgSend, NoFrame
+	MESSENGER_START</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>NilTest	NORMAL
+
+GetIsaFast NORMAL		// r10 = self-&gt;isa  
+CacheLookup NORMAL, CALL	// calls IMP on success
+
+NilTestReturnZero NORMAL
+
+GetIsaSupport NORMAL
+</code></pre>
+</div>
+
+<p>// cache miss: go search the method lists
+LCacheMiss:
+	// isa still in r10
+	MESSENGER_END_SLOW
+	jmp	__objc_msgSend_uncached</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>END_ENTRY _objc_msgSend ```
+</code></pre>
+</div>
+
+<p>由于本人汇编就懂几个简单的指令，所以就做简单分析：</p>
+
+<p>首先，<code class="highlighter-rouge">GetIsaFast</code>获取对象的isa指针，接着通过<code class="highlighter-rouge">CacheLookup</code>从缓存查找方法的实现，会调用<code class="highlighter-rouge">cache_getImp(Class cls, SEL sel)</code>，如果缓存中没有查到也就是<code class="highlighter-rouge">cache miss</code>，会跳到<code class="highlighter-rouge">__objc_msgSend_uncached</code>方法：</p>
+
+<p>```
+STATIC_ENTRY __objc_msgSend_uncached
+	UNWIND __objc_msgSend_uncached, FrameWithNoSaves</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>// THIS IS NOT A CALLABLE C FUNCTION
+// Out-of-band r10 is the searched class
+
+// r10 is already the class to search
+MethodTableLookup NORMAL	// r11 = IMP
+jmp	*%r11			// goto *imp
+
+END_ENTRY __objc_msgSend_uncached ```
+</code></pre>
+</div>
+
+<p>在这个方法里面又会调用<code class="highlighter-rouge">MethodTableLookup</code>查找方法列表：</p>
+
+<p>```
+.macro MethodTableLookup</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>push	%rbp
+mov	%rsp, %rbp
+
+sub	$$0x80+8, %rsp		// +8 for alignment
+
+movdqa	%xmm0, -0x80(%rbp)
+push	%rax			// might be xmm parameter count
+movdqa	%xmm1, -0x70(%rbp)
+push	%a1
+movdqa	%xmm2, -0x60(%rbp)
+push	%a2
+movdqa	%xmm3, -0x50(%rbp)
+push	%a3
+movdqa	%xmm4, -0x40(%rbp)
+push	%a4
+movdqa	%xmm5, -0x30(%rbp)
+push	%a5
+movdqa	%xmm6, -0x20(%rbp)
+push	%a6
+movdqa	%xmm7, -0x10(%rbp)
+
+// _class_lookupMethodAndLoadCache3(receiver, selector, class)    ...    ...    省略 ```
+</code></pre>
+</div>
+
+<p>在<code class="highlighter-rouge">MethodTableLookup</code>里面又调用了<code class="highlighter-rouge">_class_lookupMethodAndLoadCache3</code>方法：</p>
+
+<p><code class="highlighter-rouge">
+/***********************************************************************
+* _class_lookupMethodAndLoadCache.
+* Method lookup for dispatchers ONLY. OTHER CODE SHOULD USE lookUpImp().
+* This lookup avoids optimistic cache scan because the dispatcher 
+* already tried that.
+**********************************************************************/
+IMP _class_lookupMethodAndLoadCache3(id obj, SEL sel, Class cls)
+{
+    return lookUpImpOrForward(cls, sel, obj, 
+                              YES/*initialize*/, NO/*cache*/, YES/*resolver*/);
+}
+</code></p>
+
+<p>接下来看一下<code class="highlighter-rouge">lookUpImpOrForward</code>的实现</p>
+
+<p>```
+IMP lookUpImpOrForward(Class cls, SEL sel, id inst, 
+                       bool initialize, bool cache, bool resolver)
+{
+    IMP imp = nil;
+    bool triedResolver = NO;</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>runtimeLock.assertUnlocked();
+
+// Optimistic cache lookup
+if (cache) {
+    imp = cache_getImp(cls, sel);
+    if (imp) return imp;
+}
+
+// runtimeLock is held during isRealized and isInitialized checking
+// to prevent races against concurrent realization.
+
+// runtimeLock is held during method search to make
+// method-lookup + cache-fill atomic with respect to method addition.
+// Otherwise, a category could be added but ignored indefinitely because
+// the cache was re-filled with the old value after the cache flush on
+// behalf of the category.
+
+runtimeLock.read();
+
+if (!cls-&gt;isRealized()) {
+    // Drop the read-lock and acquire the write-lock.
+    // realizeClass() checks isRealized() again to prevent
+    // a race while the lock is down.
+    runtimeLock.unlockRead();
+    runtimeLock.write();
+
+    realizeClass(cls);
+
+    runtimeLock.unlockWrite();
+    runtimeLock.read();
+}
+
+if (initialize  &amp;&amp;  !cls-&gt;isInitialized()) {
+    runtimeLock.unlockRead();
+    _class_initialize (_class_getNonMetaClass(cls, inst));
+    runtimeLock.read();
+    // If sel == initialize, _class_initialize will send +initialize and 
+    // then the messenger will send +initialize again after this 
+    // procedure finishes. Of course, if this is not being called 
+    // from the messenger then it won't happen. 2778172
+}
+</code></pre>
+</div>
+
+<p>retry:  <br />
+    runtimeLock.assertReading();</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>// Try this class's cache.
+
+imp = cache_getImp(cls, sel);
+if (imp) goto done;
+
+// Try this class's method lists.
+{
+    Method meth = getMethodNoSuper_nolock(cls, sel);
+    if (meth) {
+        log_and_fill_cache(cls, meth-&gt;imp, sel, inst, cls);
+        imp = meth-&gt;imp;
+        goto done;
+    }
+}
+
+// Try superclass caches and method lists.
+{
+    unsigned attempts = unreasonableClassCount();
+    for (Class curClass = cls-&gt;superclass;
+         curClass != nil;
+         curClass = curClass-&gt;superclass)
+    {
+        // Halt if there is a cycle in the superclass chain.
+        if (--attempts == 0) {
+            _objc_fatal("Memory corruption in class list.");
+        }
+        
+        // Superclass cache.
+        imp = cache_getImp(curClass, sel);
+        if (imp) {
+            if (imp != (IMP)_objc_msgForward_impcache) {
+                // Found the method in a superclass. Cache it in this class.
+                log_and_fill_cache(cls, imp, sel, inst, curClass);
+                goto done;
+            }
+            else {
+                // Found a forward:: entry in a superclass.
+                // Stop searching, but don't cache yet; call method 
+                // resolver for this class first.
+                break;
+            }
+        }
+        
+        // Superclass method list.
+        Method meth = getMethodNoSuper_nolock(curClass, sel);
+        if (meth) {
+            log_and_fill_cache(cls, meth-&gt;imp, sel, inst, curClass);
+            imp = meth-&gt;imp;
+            goto done;
+        }
+    }
+}
+
+// No implementation found. Try method resolver once.
+
+if (resolver  &amp;&amp;  !triedResolver) {
+    runtimeLock.unlockRead();
+    _class_resolveMethod(cls, sel, inst);
+    runtimeLock.read();
+    // Don't cache the result; we don't hold the lock so it may have 
+    // changed already. Re-do the search from scratch instead.
+    triedResolver = YES;
+    goto retry;
+}
+
+// No implementation found, and method resolver didn't help. 
+// Use forwarding.
+
+imp = (IMP)_objc_msgForward_impcache;
+cache_fill(cls, sel, imp, inst);
+</code></pre>
+</div>
+
+<p>done:
+    runtimeLock.unlockRead();</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>return imp; } ```
+</code></pre>
+</div>
+
+<p>我们重点看<code class="highlighter-rouge">// No implementation found. Try method resolver once.</code>下面的代码，如果依然没有找到方法的实现，会调用<code class="highlighter-rouge">_class_resolveMethod</code>方法：</p>
+
+<p><code class="highlighter-rouge">
+void _class_resolveMethod(Class cls, SEL sel, id inst)
+{
+    if (! cls-&gt;isMetaClass()) {
+        // try [cls resolveInstanceMethod:sel]
+        _class_resolveInstanceMethod(cls, sel, inst);
+    } 
+    else {
+        // try [nonMetaClass resolveClassMethod:sel]
+        // and [cls resolveInstanceMethod:sel]
+        _class_resolveClassMethod(cls, sel, inst);
+        if (!lookUpImpOrNil(cls, sel, inst, 
+                            NO/*initialize*/, YES/*cache*/, NO/*resolver*/)) 
+        {
+            _class_resolveInstanceMethod(cls, sel, inst);
+        }
+    }
+}
+</code></p>
+
+<p>在这个方法里面，我们可以清楚地看到，首先会判断该对象是否是元类对象，如果不是，会调用<code class="highlighter-rouge">_class_resolveInstanceMethod</code>方法，否则会调用<code class="highlighter-rouge">_class_resolveClassMethod</code>方法。如果还没有找到对应的IMP方法实现：</p>
+
+<p><code class="highlighter-rouge">
+// No implementation found, and method resolver didn't help. 
+// Use forwarding.
+</code></p>
+
+<p>接下来就会用到消息转发，调用这个方法<code class="highlighter-rouge">_objc_msgForward_impcache</code></p>
+
+<p>```
+/<strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong>**
+*
+* id _objc_msgForward(id self, SEL _cmd,…);
+*
+* _objc_msgForward and _objc_msgForward_stret are the externally-callable
+*   functions returned by things like method_getImplementation().
+* _objc_msgForward_impcache is the function pointer actually stored in
+*   method caches.
+*
+<strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong><strong>**</strong>**/</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>STATIC_ENTRY __objc_msgForward_impcache
+// Method cache version
+
+// THIS IS NOT A CALLABLE C FUNCTION
+// Out-of-band condition register is NE for stret, EQ otherwise.
+
+MESSENGER_START
+nop
+MESSENGER_END_SLOW
+
+jne	__objc_msgForward_stret
+jmp	__objc_msgForward
+
+END_ENTRY __objc_msgForward_impcache
+
+
+ENTRY __objc_msgForward
+// Non-stret version
+
+movq	__objc_forward_handler(%rip), %r11
+jmp	*%r11
+
+END_ENTRY __objc_msgForward
+
+
+ENTRY __objc_msgForward_stret
+// Struct-return version
+
+movq	__objc_forward_stret_handler(%rip), %r11
+jmp	*%r11
+
+END_ENTRY __objc_msgForward_stret
+...    ...    省略 ```
+</code></pre>
+</div>
+
+<p>从description可以看到<code class="highlighter-rouge">__objc_msgForward_impcache</code>实际上是一个存储在方法缓存当中的函数指针，当某种类型的对象处理消息的过程中，无论怎样都找不到对应的IMP实现时，会将它作为sel对应的imp记入缓存。所以，从严格意义上来讲<code class="highlighter-rouge">_class_resolveInstanceMethod</code>和<code class="highlighter-rouge">_class_resolveClassMethod</code>并不是由<code class="highlighter-rouge">__objc_msgForward_impcache</code>触发的，并不能算作消息转发的后续步骤，消息转发后，该对象如果再次遇到同名消息是，会直接从缓存中找到对应的IMP,即<code class="highlighter-rouge">_objc_msgForward_impcache</code>，此时我们需要重写<code class="highlighter-rouge">- (id)forwardingTargetForSelector:(SEL)aSelector</code>方法，重定向到别的类当中找到方法的实现。</p>
+
+<p><code class="highlighter-rouge">
+imp = (IMP)_objc_msgForward_impcache;
+cache_fill(cls, sel, imp, inst);
+</code></p>
+
+<p>官方文档截图：
+<img src="http://otogtitz7.bkt.clouddn.com/2018-03-26-15220568983751.jpg" alt="" /></p>
+
+<p>主要看下官方文档里面的Discussion：
+<img src="http://otogtitz7.bkt.clouddn.com/2018-03-26-15220569597686.jpg" alt="" /></p>
+
+<p>官方文档写的非常清楚：当你只想将消息重定向到另一个类时，用这个方法非常有用，因为它比常规的转发快一个数量级,他转发的目标是捕获<code class="highlighter-rouge">NSInvocation</code>。也有人将这种方式称为<code class="highlighter-rouge">Fast Forwarding</code>，因为这一步不会创建<code class="highlighter-rouge">NSInvocation</code>对象。</p>
+
+<p>今天先写这么多，还没完呢，上网查了好多资料，好多网上资料苹果的源代码都是老的，跟最新代码不太一样，也费了我很多时间，下一篇文章将会介绍如何通过<code class="highlighter-rouge">regular forwarding</code>也有人叫<code class="highlighter-rouge">Normal Forwarding</code>，动态添加方法实现。。。。</p>
+
+<p><br /><br /><br /></p>
+
+<hr />
+
+<p><strong>References:</strong></p>
+
+<ul>
+  <li>https://lpd-ios.github.io/2017/12/19/ObjC-Message/</li>
+</ul>
+
+
+
+  </section>
+</article>
+
+<section>
+
+            <div class="content-play">
+              <p><a href="javascript:void(0)" onclick="dashangToggle()" class="dashang" title="打赏，支持一下">打赏一个呗</a></p>
+              <div class="hide_box-play"></div>
+              <div class="shang_box-play">
+                <a class="shang_close-play" href="javascript:void(0)" onclick="dashangToggle()" title="关闭"><img src="/images/payimg/close.jpg" alt="取消" /></a>
+                <div class="shang_tit-play">
+                  <p>感谢您的支持，我会继续努力的!</p>
+                </div>
+                <div class="shang_payimg">
+                    <img src="/images/payimg/alipayimg.jpg" alt="扫码支持" title="扫一扫" />
+                </div>
+              <div class="shang_payimg">    
+                    <img src="/images/payimg/weipayimg.jpg" alt="扫码支持" title="扫一扫" />
+                </div>
+                <div class="pay_explain">扫码打赏，你说多少就多少</div>
+                <div class="shang_payselect">
+                  <div class="pay_item checked" data-id="alipay">
+                    <span class="pay_logo"><img src="/images/payimg/alipay.jpg" alt="支付宝" /></span>
+                  </div>
+                  <div class="pay_item" data-id="weipay">
+                    <span class="pay_logo"><img src="/images/payimg/wechat.jpg" alt="微信" /></span>
+                  </div>
+                </div>
+                <div class="shang_info-play">
+                  <p>打开<span id="shang_pay_txt">支付宝</span>扫一扫，即可进行扫码打赏哦</p>
+                </div>
+              </div>
+            </div>
+            <script type="text/javascript">
+            function dashangToggle(){
+              $(".hide_box-play").fadeToggle();
+              $(".shang_box-play").fadeToggle();
+            }
+            </script>
+
+            <div style="text-align:center;margin:50px 0; font:normal 14px/24px 'MicroSoft YaHei';"></div>
+
+            <style type="text/css">
+              .content-play{width:80%;margin-top: 20px;margin-bottom: 10px;height:40px;}
+              .hide_box-play{z-index:999;filter:alpha(opacity=50);background:#666;opacity: 0.5;-moz-opacity: 0.5;left:0;top:0;height:99%;width:100%;position:fixed;display:none;}
+              .shang_box-play{width:540px;height:540px;padding:10px;background-color:#fff;border-radius:10px;position:fixed;z-index:1000;left:50%;top:50%;margin-left:-280px;margin-top:-280px;border:1px dotted #dedede;display:none;}
+              .shang_box-play img{border:none;border-width:0;}
+              .dashang{display:block;width:100px;margin:5px auto;height:25px;line-height:25px;padding:10px;background-color:#E74851;color:#fff;text-align:center;text-decoration:none;border-radius:10px;font-weight:bold;font-size:16px;transition: all 0.3s;}
+              .dashang:hover{opacity:0.8;padding:15px;font-size:18px;}
+              .shang_close-play{float:right;display:inline-block;
+                margin-right: 10px;margin-top: 20px;
+              }
+              .shang_logo{display:block;text-align:center;margin:20px auto;}
+              .shang_tit-play{width: 100%;height: 75px;text-align: center;line-height: 66px;color: #a3a3a3;font-size: 16px;background: url('/images/payimg/cy-reward-title-bg.jpg');font-family: 'Microsoft YaHei';margin-top: 7px;margin-right:2px;}
+              .shang_tit-play p{color:#a3a3a3;text-align:center;font-size:16px;}
+              .shang_payimg{width:140px;padding:10px;padding-left: 80px; /*border:6px solid #EA5F00;**/margin:0 auto;border-radius:3px;height:140px;display:inline-block;}
+              .shang_payimg img{display:inline-block;margin-right:10px;float:left;text-align:center;width:140px;height:140px; }
+              .pay_explain{text-align:center;margin:10px auto;font-size:12px;color:#545454;}
+              .shang_payselect{text-align:center;margin:0 auto;margin-top:40px;cursor:pointer;height:60px;width:500px;margin-left:110px;}
+              .shang_payselect .pay_item{display:inline-block;margin-right:140px;float:left;}
+              .shang_info-play{clear:both;}
+              .shang_info-play p,.shang_info-play a{color:#C3C3C3;text-align:center;font-size:12px;text-decoration:none;line-height:2em;}
+            </style>
+
+       <ul class="pager">
+        
+        <li class="previous">
+            <a href="/2018/03/NSNumber%E5%8F%8ATagged-Pointer/" data-toggle="tooltip" data-placement="top" title="（2）NSNumber及Tagged Pointer">上一篇：  <span>（2）NSNumber及Tagged Pointer</span>
+            </a>
+        </li>
+        
+        
+    </ul>
+</section>
+
+<section class="post-comments">
+
+
+    <!-- <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    <script src="https://img1.cache.netease.com/f2e/tie/yun/sdk/loader.js"></script>
+    <script>
+    var cloudTieConfig = {
+      url: document.location.href, 
+      sourceId: "",
+      productKey: "aa395cf7778f458492060f3f53301b7c",
+      target: "cloud-tie-wrapper"
+    };
+    var yunManualLoad = true;
+    Tie.loader("aHR0cHM6Ly9hcGkuZ2VudGllLjE2My5jb20vcGMvbGl2ZXNjcmlwdC5odG1s", true);
+    </script> -->
+
+    <script type="text/javascript" id="wumiiComments">
+      var wumiiPermaLink = "http://www.cenzhijun.top/2018/03/msgSend-01/"; //请用代码生成文章永久的链接
+      var wumiiTitle = "（3）OC中消息和消息转发-01"; //请用代码生成文章标题
+      var wumiiSitePrefix = "http://www.cenzhijun.top"; //安装无觅评论插件的网站的域名，如果是放在子域名上，请提供子域名，如"http://blog.wumii.com"。如果这里填写的域名不对，请自行改正。
+      var wumiiCommentParams = "&pf=JAVASCRIPT";
+
+    </script>
+    <script type="text/javascript" src="http://widget.wumii.cn/ext/cw/widget"></script>
+
+
+  
+</section>
+
+
+            <section class="footer">
+    <footer>
+        <div class = "footer_div">  
+        <nav class="cover-navigation navigation--social">
+          <ul class="navigation">
+
+          
+          <!-- Weibo -->
+          <li class="navigation__item_social">
+            <a href="http://weibo.com/3291155444" title="@3291155444 的微博" target="_blank">
+              <i class='social fa fa-weibo fa-2x'></i>
+              <span class="label">Weibo</span>
+            </a>
+          </li>
+          
+
+          
+          <!-- Github -->
+          <li class="navigation__item_social">
+            <a href="https://github.com/czj1127292580" title="@czj1127292580 的 Github" target="_blank">
+              <i class='social fa fa-github fa-2x'></i>
+              <span class="label">Github</span>
+            </a>
+          </li>
+          
+          
+          
+
+          
+
+          <!-- RSS -->
+          <li class="navigation__item_social">
+            <a href="/feed.xml" rel="author" title="RSS" target="_blank">
+              <i class='social fa fa-rss fa-2x'></i>
+              <span class="label">RSS</span>
+            </a>
+          </li>
+
+          
+          <!-- Email -->
+          <li class="navigation__item_social">
+            <a href="mailto:13621130170@163.com" title="Contact me">
+              <i class='social fa fa-envelope fa-2x'></i>
+              <span class="label">Email</span>
+            </a>
+          </li>
+          
+
+          </ul>
+        </nav>
+
+        </div>
+
+        <div class = "footer_div">  
+           <p class="copyright text-muted">
+            Copyright &copy; 岑志军的个人博客 2018
+            </p>
+        	<div align="right">
+    			<link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+
+          <!-- 访问统计 -->
+          <span id="busuanzi_container_site_pv">
+            本站总访问量
+            <span id="busuanzi_value_site_pv"></span>次
+          </span>
+
+        </div>
+        <div>
+    </footer>
+</section>
+
+        </div>
+    </div>
+    
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="/js/main.js"></script>
+
+<script type="text/javascript" src="/js/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+  </body>
+
+</html>
