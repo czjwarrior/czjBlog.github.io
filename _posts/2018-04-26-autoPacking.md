@@ -173,7 +173,9 @@ fastlane actions [firim]
 
 至此，利用`fastlane`自动化打包就算告一段落了，但是[fastlane官网](https://docs.fastlane.tools/)还提供了很多的语法说明，感兴趣的可以参考下，另外说明下，由于我是最近才开始用，所以一般给测试人员打包的时候我都是用`fastlane`，真正要上线提交AppStore的时候，我还是用Xcode，毕竟放心。提交到App Store还没用过，有什么坑我也不知道，如果有人实践过，欢迎评论区互相交流（另外，觉得写得不错的，请点赞❤️❤️❤️！！！哈哈）
 
+***
 
+我的博客即将搬运同步至腾讯云+社区，邀请大家一同入驻：https://cloud.tencent.com/developer/support-plan?invite_code=1denjdl5jafn
 
 
 
