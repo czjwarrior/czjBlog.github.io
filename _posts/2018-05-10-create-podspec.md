@@ -160,9 +160,63 @@ end
 
 [这里写得很详细，参考这个吧](http://blog.wtlucky.com/blog/2015/02/26/create-private-podspec/)
 
+## 遇到的坑
+
+**错误一**
+
+![409FDEA31A5A4FA21B2B14E42D7D96A4](http://otogtitz7.bkt.clouddn.com/2018-05-14-409FDEA31A5A4FA21B2B14E42D7D96A4.jpg)
+
+`pod lib lint` 验证的时候一直报这个错，原因是私有库中添加了动态库或者静态库，解决方案：
+
+```
+pod lib lint --use-libraries
+```
+
+`--use-libraries`：表示使用静态库或者是framework，这里主要是解决当我们依赖一些framework库后校验提示找不到库的时候用到。
+
+**错误二**
+
+![E03336C72F6E450A612C4021C7FA09E6](http://otogtitz7.bkt.clouddn.com/2018-05-14-E03336C72F6E450A612C4021C7FA09E6.jpg)
+
+`pod lib lint`的时候一直有一些警告，可以忽略掉这些警告：
+
+```
+pod lib lint --allow-warnings
+```
+
+`--allow-warnings`：表示允许警告
+
+保险起见可以使用：
+
+```
+pod lib lint --use-libraries --allow-warnings
+```
+
+**错误三**
+
+`pod lib lint`验证通过，但是`repo push`的时候却一直报错，又忘截图了，大概是这样的：
+
+```
+xcodebuild: Returned an unsuccessful exit code. You can use `--verbose` for more information
+```
+
+我之所以报这个错，是因为，修改了自己的私有库，打了`tag`，`podspec`文件对应的`s.version`忘了修改了，解决方案：
+
+重新发一个`release`版的，打上`tag`之后，修改`podspec`文件对应的`s.version`，重新`pod repo push`
+
+**温馨提示：**如果你在`pod lib lint`的时候用到了`--use-libraries`或者`--allow-warnings`，那么在`pod repo push`的时候也要加上这些指令！！！例如：
+
+```
+pod repo push ZJTestSpecs ZJEncryptPodTest.podspec --use-libraries --allow-warnings
+```
+
 ## 总结
 
 创建私有库的时候，尽管我参考的这篇文章已经写得十分详细，但是还是有一个过时的操作，很导致操作错误，尤其是在本地仓库`push`到远程仓库那里出现问题，同时创建私有库不能和`GitHub`上存在的第三方库重名也是我摸索很久发现的，希望看到这篇文章的同学能够少走弯路❤️❤️❤️❤️
+
+
+
+
 
 
 
