@@ -112,7 +112,8 @@ lipo 文件路径1 文件路径2 -output 输出文件路径
 
 可以用`PP助手安装`，也可以用`Xcode`安装，我采用`Xocde`安装：
 
-![4191B41CE853157649ACF5A344449979](http://otogtitz7.bkt.clouddn.com/2018-05-29-wechat_hook_01.jpg)
+![4191B41CE853157649ACF5A344449979](http://otogtitz7.bkt.clouddn.com/2018-05-29-4191B41CE853157649ACF5A344449979.jpg)
+
 
 不出意外地话，第二个微信就成功的安装到了你的手机上。如果装不上的话，基本上大部分原因就是证书不对。。。
 
