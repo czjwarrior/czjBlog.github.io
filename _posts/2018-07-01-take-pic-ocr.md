@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "iOS模仿系统相机拍照及解决照片自动旋转90°的问题"
+title: "iOS模仿系统相机拍照你不曾注意过的细节"
 date: 2018-07-01
 tags: iOS
 ---
