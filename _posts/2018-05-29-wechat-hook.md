@@ -112,7 +112,7 @@ lipo 文件路径1 文件路径2 -output 输出文件路径
 
 可以用`PP助手安装`，也可以用`Xcode`安装，我采用`Xocde`安装：
 
-![4191B41CE853157649ACF5A344449979](http://otogtitz7.bkt.clouddn.com/2018-05-29-4191B41CE853157649ACF5A344449979.jpg)
+![install-wechat](http://upload-images.jianshu.io/upload_images/423503-33808e5a3de12398.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 
 不出意外地话，第二个微信就成功的安装到了你的手机上。如果装不上的话，基本上大部分原因就是证书不对。。。
@@ -132,6 +132,20 @@ lipo 文件路径1 文件路径2 -output 输出文件路径
 这篇文章图有点儿多。。。。。
 
 **注意：重签名方式安装的微信，是对微信APP的一种破解，会被官方认定为非安全软件，有被封号的危险**。但是这种方式对破解各种其他软件都是有用的，利用逆向相关的知识，我们可以利用这种知识做很多我们想做的事儿！！！（不要做非法的事情哈！）
+
+## 遇到的坑
+
+* 错误一：
+![988D211E9B6C6BEF7659DAA8854AAFBD](http://otogtitz7.bkt.clouddn.com/2018-06-04-988D211E9B6C6BEF7659DAA8854AAFBD.jpg)
+
+**解决办法：**证书不对，仔细检查下证书
+
+* 错误二
+![BD2A4E9CB954AB66E6598ED5CCA85F8B](http://otogtitz7.bkt.clouddn.com/2018-06-04-BD2A4E9CB954AB66E6598ED5CCA85F8B.jpg)
+
+**解决办法：**删除`ipa`包里面的`watch`相关的文件
+
+
 
 ## 总结
 
