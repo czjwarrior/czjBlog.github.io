@@ -1,0 +1,50 @@
+I"(<p>1、判断是否有中文</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>+ (BOOL)IsChinese:(NSString *)str {
+    for(int i=0; i&lt; [str length];i++){
+        int a = [str characterAtIndex:i];
+        if(a &gt; 0x4e00 &amp;&amp; a &lt; 0x9fff)
+        {
+            return YES;
+        }
+    }
+    return NO;
+}
+</code></pre></div></div>
+
+<p>2、过滤特殊字符串</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>+ (NSString *)isSpecialCharacter:(NSString *)str{
+    NSCharacterSet *doNotWant = [NSCharacterSet characterSetWithCharactersInString:@"@／：；（）¥「」＂、[]{}%-+=_\\|~＜＞$€^•'@$%^&amp;()_+'\""];
+    str = [[str componentsSeparatedByCharactersInSet:doNotWant] componentsJoinedByString:@""];
+
+    return str;
+}
+</code></pre></div></div>
+
+<p>3、提取特定字符串</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>-(NSString *)filterCharacterFromOriginStr:(NSString *)originalString
+{
+    NSMutableString *numberString = [[NSMutableString alloc] init];
+    NSString *tempStr = [[NSString alloc] init];
+    NSScanner *scanner = [NSScanner scannerWithString:originalString];
+    // 提取包含0-9和*#的字符串
+    NSCharacterSet *numbers = [NSCharacterSet characterSetWithCharactersInString:@"0123456789*#"];
+
+    while (![scanner isAtEnd]) {
+        // Throw away characters before the first number.
+        [scanner scanUpToCharactersFromSet:numbers intoString:NULL];
+
+        // Collect numbers.
+        [scanner scanCharactersFromSet:numbers intoString:&amp;tempStr];
+        [numberString appendString:tempStr];
+        tempStr = @"";
+    }
+    // Result.
+
+    return numberString;
+}
+</code></pre></div></div>
+
+:ET

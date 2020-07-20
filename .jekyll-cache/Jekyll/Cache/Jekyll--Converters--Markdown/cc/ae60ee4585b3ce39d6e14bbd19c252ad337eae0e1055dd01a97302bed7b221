@@ -1,0 +1,8 @@
+I"�<p>检查代码是否有leak的时候，发现NSURLSession存在leak，最后发现必须session请求完成后，立即释放，代码如下：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error{
+    [session finishTasksAndInvalidate];
+}
+</code></pre></div></div>
+
+:ET

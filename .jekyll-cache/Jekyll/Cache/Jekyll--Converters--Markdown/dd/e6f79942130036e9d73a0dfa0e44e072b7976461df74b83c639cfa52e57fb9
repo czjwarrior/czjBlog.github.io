@@ -1,0 +1,142 @@
+I"�<p>首先需要安装 <code class="language-plaintext highlighter-rouge">react-native-tab-navigator</code></p>
+
+<p><code class="language-plaintext highlighter-rouge">npm install react-native-tab-navigator –save</code></p>
+
+<p>导入组件</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>import TabNavigator from 'react-native-tab-navigator'
+</code></pre></div></div>
+
+<p>详细代码如下：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>import React, { Component } from 'react';
+import {
+  AppRegistry,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  Text,
+  Image,
+  View,
+} from 'react-native';
+
+import { StackNavigator } from 'react-navigation';
+
+import TabNavigator from 'react-native-tab-navigator'
+
+export default class DemoApp extends Component {
+
+    constructor(props){  
+        super(props)  
+        this.state={  
+            selectedTab:'首页',  
+        }  
+    } 
+
+  render() {
+    return (
+      &lt;View style={styles.container}&gt;
+        &lt;TabNavigator&gt;
+            &lt;TabNavigator.Item
+                selected={this.state.selectedTab === '首页'}
+                title = '首页'
+                titleStyle={styles.tabText}
+                selectedTitleStyle={styles.selectedTabText} 
+                renderIcon={() =&gt; &lt;Image style={styles.icon} source={require("./images/tab_icon_home@2x.png")} /&gt;}
+
+                renderSelectedIcon={() =&gt; &lt;Image style={[styles.icon,{tintColor:'red'}]} source={require("./images/tab_icon_homes@2x.png")} /&gt;}
+                
+                onPress={() =&gt; this.setState({ selectedTab: '首页' })}
+            &gt;
+                &lt;View style={styles.page0}&gt;
+                    &lt;Text style=&gt;首页&lt;/Text&gt;
+                &lt;/View&gt;
+            &lt;/TabNavigator.Item&gt;
+
+            &lt;TabNavigator.Item
+                selected={this.state.selectedTab === '购物车'}
+                title = '购物车'
+                titleStyle={styles.tabText}
+                selectedTitleStyle={styles.selectedTabText} 
+                renderIcon={() =&gt; &lt;Image style={styles.icon} source={require("./images/tab_icon_home@2x.png")} /&gt;}
+
+                renderSelectedIcon={() =&gt; &lt;Image style={[styles.icon,{tintColor:'red'}]} source={require("./images/tab_icon_homes@2x.png")} /&gt;}
+                
+                onPress={() =&gt; this.setState({ selectedTab: '购物车' })}
+            &gt;
+                &lt;View style={styles.page1}&gt;
+                    &lt;Text style=&gt;购物车&lt;/Text&gt;
+                &lt;/View&gt;
+            &lt;/TabNavigator.Item&gt;
+
+            &lt;TabNavigator.Item
+                selected={this.state.selectedTab === '目的地'}
+                title = '目的地'
+                titleStyle={styles.tabText}
+                selectedTitleStyle={styles.selectedTabText} 
+                renderIcon={() =&gt; &lt;Image style={styles.icon} source={require("./images/tab_icon_destn@2x.png")} /&gt;}
+
+                renderSelectedIcon={() =&gt; &lt;Image style={[styles.icon,{tintColor:'red'}]} source={require("./images/tab_icon_destns@2x.png")} /&gt;}
+                
+                onPress={() =&gt; this.setState({ selectedTab: '目的地' })}
+            &gt;
+                &lt;View style={styles.page0}&gt;
+                    &lt;Text style=&gt;目的地&lt;/Text&gt;
+                &lt;/View&gt;
+            &lt;/TabNavigator.Item&gt;
+
+            &lt;TabNavigator.Item
+                selected={this.state.selectedTab === '我的'}
+                title = '我的'
+                titleStyle={styles.tabText}
+                selectedTitleStyle={styles.selectedTabText} 
+                renderIcon={() =&gt; &lt;Image style={styles.icon} source={require("./images/tab_icon_usercenter@2x.png")} /&gt;}
+
+                renderSelectedIcon={() =&gt; &lt;Image style={[styles.icon,{tintColor:'red'}]} source={require("./images/tab_icon_usercenters@2x.png")} /&gt;}
+                
+                onPress={() =&gt; this.setState({ selectedTab: '我的' })}
+            &gt;
+                &lt;View style={styles.page1}&gt;
+                    &lt;Text style=&gt;我的&lt;/Text&gt;
+                &lt;/View&gt;
+            &lt;/TabNavigator.Item&gt;
+        &lt;/TabNavigator&gt;
+      &lt;/View&gt;
+    );
+  }
+}
+
+const styles = StyleSheet.create({
+    container: {
+        flex:1
+    },
+    tabText: {
+        fontSize: 10,
+        color: 'black'
+    },
+    selectedTabText: {
+        fontSize: 10,
+        color: 'red'
+    },
+    icon: {
+        width: 22,
+        height: 22
+    },
+    page0: {
+        flex: 1,
+        backgroundColor: 'yellow'
+    },
+    page1: {
+        flex: 1,
+        backgroundColor: 'red'
+    }
+});
+
+AppRegistry.registerComponent('DemoApp', () =&gt; DemoApp);
+</code></pre></div></div>
+
+<p>效果图：</p>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2017-08-13-tabbar.png" alt="" /></p>
+
+:ET

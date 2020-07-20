@@ -1,0 +1,411 @@
+I"�*<blockquote>
+  <p>最近几天学了几个ReactNative组件，总觉得单纯的学几个组件进步慢，所以我打算做一些综合性的小案例，练习下实战，我从网上找到<a href="http://www.jianshu.com/p/85a691b6d5b2">一个小案例</a>
+，感觉挺好，也学习了很多，代码内容可能不太一样，主要区别是：我把RN官方不推荐或者已经放弃了的组件进行了替换，如果有需要的可以互相参考下</p>
+</blockquote>
+
+<p>接着上篇案例开始写，这篇文章将会讲解如何编写轮播图和列表</p>
+
+<h1 id="源代码下载"><a href="https://github.com/czj1127292580/WYNews">源代码下载</a></h1>
+
+<p>首先<code class="language-plaintext highlighter-rouge">WYHome.js</code>代码如下：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>import React, { Component } from 'react';
+import {
+    StyleSheet,
+    Text,
+    View,
+    ListView
+} from 'react-native';
+
+import Request from '../Utils/WYRequest'
+import WYSwiper from './Swiper/WYHomeSwiper'
+import WYNewsCell from './WYNewsCell'
+
+export default class WYHome extends Component {
+  static defaultProps = {
+    api_url: 'http://c.m.163.com/nc/article/headline/T1348647853363/0-20.html?from=toutiao&amp;fn=1&amp;prog=LTitleA&amp;passport=&amp;devId=nTM86EPlcxZu09VdpTEh6aR3%2B%2FQX6x8vHBD3ne3k5bbgOrg%2FIP5DcguSDmtYyWbs&amp;offset=0&amp;size=20&amp;version=14.0&amp;spever=false&amp;net=wifi&amp;lat=DUH4Hf95lyIDaAI03C3RSA%3D%3D&amp;lon=HJ4tj6FL5wRHQxcf5GLEcg%3D%3D&amp;ts=1470728804&amp;sign=1H8K3yy9bMXakmxAlZ9P86meraJtjKQFz5vJuwhjNyl48ErR02zJ6%2FKXOnxX046I&amp;encryption=1&amp;canal=appstore',
+    key_word: 'T1348647853363'
+  };
+
+  // 构造
+  constructor(props){
+    super(props);
+
+    // 数据源
+    var ds = new ListView.DataSource({
+      rowHasChanged: (r1, r2) =&gt; r1 !== r2
+    });
+    // 初始状态
+    this.state = {
+
+      dataSource:ds,
+      // 广告
+      headerAdArr:[],
+
+      // 判断是否为空
+      flag:false
+    };
+  }
+  render() {
+    return (
+      &lt;ListView 
+        dataSource={this.state.dataSource}
+        renderHeader={this._renderHeader.bind(this)}
+        renderRow={this._renderRow.bind(this)}
+      &gt;
+      
+      &lt;/ListView&gt;
+    );
+  }
+
+  componentDidMount() {
+    Request.get(this.props.api_url, (responseData) =&gt; {
+      // 取出数组
+      const dataArr = responseData[this.props.key_word];
+      // 临时数组
+      var tempListArr = [], adArr = [];
+
+      // 遍历数组
+      dataArr.forEach((value, index) =&gt; {
+        
+        if(value.hasAd == 1 || value.hasHead == 1) {
+          adArr = value.ads;
+        } else {
+          tempListArr.push(value);
+        }
+      });
+
+      // 更新状态，刷新UI
+      this.setState({
+        dataSource:this.state.dataSource.cloneWithRows(tempListArr),
+        headerAdArr:adArr,
+        flag:true
+      });
+    }, (error) =&gt; {
+        alert(error);
+    });
+  }
+
+  // 广告
+  _renderHeader(){
+    // 防止空数据
+    if(!this.state.flag) return;
+
+    // 容错
+    if(this.state.headerAdArr.length == 0) return;
+
+    return(
+      &lt;WYSwiper dataArr={this.state.headerAdArr}&gt;&lt;/WYSwiper&gt;
+    );
+  }
+
+  /**
+     * 返回具体的行
+     * @private
+     */
+    _renderRow(rowData){
+        // 0. 防止空数据
+        if(!this.state.flag) return;
+
+        return(
+            &lt;WYNewsCell model={rowData} navigator={this.props.navigation}/&gt;
+        );
+    }
+}
+</code></pre></div></div>
+
+<p>其中网络解析<code class="language-plaintext highlighter-rouge">WYRequest</code>抽离成一个帮助类：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>module.exports = {
+    /**
+     * 基于fetch的get方法
+     * @method post
+     * @param {string} url
+     * @param {function} callback 请求成功回调
+     */
+    get: function(url, successCallback, failCallback){
+        fetch(url)
+            .then((response) =&gt; response.json())
+            .then((responseText) =&gt; {
+                successCallback(responseText);
+            })
+            .catch(function(err){
+                failCallback(err);
+            });
+    }
+};
+</code></pre></div></div>
+
+<p>轮播图也单独抽离为一个组件，方便直接导入：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>import React, { Component } from 'react'
+import {
+  Text,
+  View,
+  Image,
+  Dimensions
+} from 'react-native'
+
+import Swiper from 'react-native-swiper'
+const { width } = Dimensions.get('window');
+
+export default class extends Component {
+  static defaultProps = {
+      dataArr: []
+  };
+
+  constructor(props) {
+    super(props);
+    // 初始状态
+    this.state = {
+        currentTitle: ''
+    };
+  }
+
+  render() {
+    return (
+      &lt;View&gt;
+        &lt;Swiper
+          style={styles.wrapper}
+          height={170}
+          onMomentumScrollEnd={(e, state, context) =&gt; this.setState({
+              // currentTitle: dataArr[state.index].title
+          })}
+          dot={&lt;View style= /&gt;}
+          activeDot={&lt;View style= /&gt;}
+          paginationStyle=
+          loop
+        &gt;
+          {this._renderImage()}
+        &lt;/Swiper&gt;
+      &lt;/View&gt;
+    );
+  }
+
+  _renderImage(){
+    // 组件数组
+    var itemArr = [];
+
+    const dataArr = this.props.dataArr;
+    dataArr.forEach((value, index) =&gt; {
+      itemArr.push(
+        &lt;View key={index} style={styles.slide}&gt;
+          &lt;Image
+              resizeMode='stretch'
+              style={styles.image}
+              source=
+              defaultSource=
+          /&gt;
+          &lt;View style={styles.indicatorViewStyle}&gt;
+              &lt;Text style=&gt;{value.title}&lt;/Text&gt;
+          &lt;/View&gt;
+        &lt;/View&gt;
+      );
+    });
+
+    // 返回组件
+    return itemArr;
+  }
+}
+
+const styles = {
+  wrapper: {
+  },
+
+  slide: {
+    flex: 1,
+    justifyContent: 'center',
+    backgroundColor: 'transparent'
+  },
+
+  slide1: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#9DD6EB'
+  },
+
+  slide2: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#97CAE5'
+  },
+
+  slide3: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#92BBD9'
+  },
+
+  text: {
+    color: '#fff',
+    fontSize: 30,
+    fontWeight: 'bold'
+  },
+
+  image: {
+    width,
+    flex: 1
+  },
+
+  indicatorViewStyle:{
+     width,
+     height:36,
+     backgroundColor:'rgba(0,0,0, 0.4)',
+     position:'absolute',
+     left:0,
+     bottom:0,
+
+     justifyContent:'center',
+     paddingLeft:5
+  }
+};
+</code></pre></div></div>
+
+<p>自定义cell<code class="language-plaintext highlighter-rouge">WYNewsCell.js</code>代码如下：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>import React, { Component, PropTypes } from 'react';
+import {
+    StyleSheet,
+    Text,
+    View,
+    TouchableOpacity,
+    Image,
+    PixelRatio
+} from 'react-native';
+
+var Dimensions = require('Dimensions');
+var {width, height} = Dimensions.get('window');
+
+export default class WYNewsCell extends Component {
+  // 构造
+  constructor(props){
+    super(props);
+
+    this.state = {
+      model: this.props.model,
+      navigator: this.props.navigator,
+    };
+  }
+  render() {
+    var model = this.state.model;
+    var hahah = this.state.navigator;
+
+    return (
+      &lt;TouchableOpacity style={styles.cellStyle} onPress={() =&gt; {
+        hahah.navigate('WYNewsDetail', {title: model.title});
+      }}&gt;
+        &lt;Image
+            source={ {uri: model.imgsrc} }
+            defaultSource={ {uri: 'placeholder'} }
+            style={styles.imgStyle}
+        /&gt;
+        &lt;View style={styles.rightViewStyle}&gt;
+            &lt;Text
+                numberOfLines={2}
+            &gt;
+                {model.title}
+            &lt;/Text&gt;
+            &lt;View style={styles.rightInnerViewStyle}&gt;
+                &lt;Text style=&gt;{model.source}&lt;/Text&gt;
+                &lt;Text style=&gt;{model.ptime}&lt;/Text&gt;
+            &lt;/View&gt;
+        &lt;/View&gt;
+      &lt;/TouchableOpacity&gt;
+    );
+  }
+}
+
+const styles = StyleSheet.create({
+  cellStyle:{
+    borderBottomWidth: 1/PixelRatio.get(),
+    borderBottomColor: '#666',
+
+    flexDirection:'row',
+    padding:10
+  },
+
+  imgStyle:{
+    width:90,
+    height:90,
+    borderRadius:5,
+    marginRight:10
+  },
+
+  rightViewStyle:{
+    flex:1,
+    justifyContent:'space-around'
+  },
+
+  rightInnerViewStyle:{
+    flexDirection:'row',
+    justifyContent:'space-between'
+  }
+});
+
+module.exports = WYNewsCell;
+</code></pre></div></div>
+
+<p>点击cell跳转到详情页面：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>render() {
+    var model = this.state.model;
+    var hahah = this.state.navigator;
+
+    return (
+      &lt;TouchableOpacity style={styles.cellStyle} onPress={() =&gt; {
+        hahah.navigate('WYNewsDetail', {title: model.title});
+      }}&gt;
+        &lt;Image
+            source=
+            defaultSource=
+            style={styles.imgStyle}
+        /&gt;
+        &lt;View style={styles.rightViewStyle}&gt;
+            &lt;Text
+                numberOfLines={2}
+            &gt;
+                {model.title}
+            &lt;/Text&gt;
+            &lt;View style={styles.rightInnerViewStyle}&gt;
+                &lt;Text style=&gt;{model.source}&lt;/Text&gt;
+                &lt;Text style=&gt;{model.ptime}&lt;/Text&gt;
+            &lt;/View&gt;
+        &lt;/View&gt;
+      &lt;/TouchableOpacity&gt;
+    );
+  }
+</code></pre></div></div>
+
+<p>难点：
+点击cell跳转详情界面，需要将<code class="language-plaintext highlighter-rouge">WYHome.js</code>文件当中的<code class="language-plaintext highlighter-rouge">navigation</code>传递到cell当中：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;WYNewsCell model={rowData} navigator={this.props.navigation}/&gt;
+</code></pre></div></div>
+
+<p>然后在cell当中就可以进行跳转了。。。。</p>
+
+<h2 id="注意">注意</h2>
+<p>要想进行跳转必须在<code class="language-plaintext highlighter-rouge">WYMain.js</code>文件中，对视图进行注册</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>const StackNavigators = StackNavigator({
+    TabNav: {
+      screen: TabNav,
+    },
+
+    // 跳转注册
+    WYNewsDetail: {
+      screen: WYNewsDetail,
+    }
+});
+</code></pre></div></div>
+
+<h2 id="下一篇讲解如何加载网页">下一篇讲解，如何加载网页</h2>
+
+<h3 id="效果图">效果图</h3>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2017-08-21.gif" alt="" /></p>
+
+:ET

@@ -1,0 +1,179 @@
+I"c<h3 id="这只是一个简单的listview的小demo">这只是一个简单的listView的小demo</h3>
+
+<p>初始化项目之后，index.ios.js代码如下</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/**
+ * Sample React Native App
+ * https://github.com/facebook/react-native
+ * @flow
+ */
+
+import React, { Component } from 'react';
+import {
+  AppRegistry,
+  StyleSheet,
+  Text,
+  View,
+  ListView
+} from 'react-native';
+
+import Request from './test/Request';
+import TestCell from './test/TestCell'
+
+const Dimensions = require('Dimensions');
+const {width, height, scale} = Dimensions.get('window');
+
+export default class DemoApp extends Component {
+
+    constructor(props){
+        super(props);
+
+        var ds = new ListView.DataSource({
+            rowHasChanged:(r1, r2) =&gt; r1 !== r2
+        });
+
+        this.state = {
+            dataArr: new Array,
+            dataSource: ds
+        };
+    }
+  render() {
+    return (
+      &lt;View style={styles.container}&gt;
+        &lt;ListView
+            dataSource={this.state.dataSource}
+            renderRow={(rowData) =&gt; this._renderRow(rowData)}
+            contentInset=
+        &gt;
+        
+        &lt;/ListView&gt;
+      &lt;/View&gt;
+    );
+  }
+
+  _renderRow(rowData){
+      return(
+        &lt;TestCell wine={rowData}&gt;&lt;/TestCell&gt;
+      )
+  };
+
+  componentDidMount() {
+      var url_api = 'http://wifi.3wchina.net/index.php/mobile/mobile/appapi';
+      Request.get(url_api, (responseData)=&gt;{
+            // 取出所有的数据
+            var data = responseData;
+            
+            this.setState({
+                dataArr: data,
+                dataSource: this.state.dataSource.cloneWithRows(data)
+            });
+        }, (error)=&gt;{
+            alert(error);
+        });
+  }
+}
+
+const styles = StyleSheet.create({
+    container: {
+        flex:1,
+        backgroundColor: '#e8e8e8'
+    },
+});
+
+AppRegistry.registerComponent('DemoApp', () =&gt; DemoApp);
+</code></pre></div></div>
+
+<p>封装简单的get请求</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>module.exports = {
+    /**
+     * 基于fetch的get方法
+     * @method get
+     * @param {string} url
+     * @param {function} callback 请求成功回调
+     */
+    get: function(url, successCallback, failCallback){
+        fetch(url)
+            .then((response) =&gt; response.json())
+            .then((responseText) =&gt; {
+                successCallback(responseText);
+            })
+            .catch(function(err){
+                failCallback(err);
+            });
+    }
+};
+</code></pre></div></div>
+
+<p>cell代码如下</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>import React, { Component, PropTypes } from 'react';
+import {
+    AppRegistry,
+    StyleSheet,
+    Text,
+    View,
+    TouchableOpacity,
+    Image,
+    ScrollView,
+    InteractionManager,
+    DeviceEventEmitter
+} from 'react-native';
+
+var Dimensions = require('Dimensions');
+var {width, height} = Dimensions.get('window');
+
+class TestCell extends Component{
+    // 构造
+    constructor(props){
+        super(props);
+
+        this.state = {
+            wine:this.props.wine
+        };
+    }
+
+    render(){
+        var wine = this.state.wine;
+        return(
+                &lt;TouchableOpacity style={styles.viewStyle}&gt;
+                
+                    &lt;TouchableOpacity style={styles.leftView}&gt;
+                        &lt;View style=&gt;
+                            &lt;Text
+                                style={styles.titleStyle}
+                                numberOfLines={1}
+                            &gt;
+                            {wine.title}
+                            &lt;/Text&gt;
+                        &lt;/View&gt;
+                    &lt;/TouchableOpacity&gt;
+                &lt;/TouchableOpacity&gt;
+        )
+    }
+}
+
+const styles = StyleSheet.create({
+    viewStyle:{
+        flexDirection: 'row',
+        backgroundColor: '#fff',
+        borderBottomWidth:1,
+        borderBottomColor: '#ccc'
+    },
+
+    leftView:{
+        width: width * 0.7,
+        height:44,
+        flexDirection:'row',
+        overflow:'hidden',
+        alignItems:'center'
+    }
+});
+
+module.exports = TestCell;
+</code></pre></div></div>
+
+<p>运行效果如下：
+<img src="/images/posts/2017-08-09-demo.png" alt="" /></p>
+
+:ET

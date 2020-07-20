@@ -1,0 +1,37 @@
+I"�<blockquote>
+  <p><a href="http://www.cenzhijun.top/">欢迎放我我的个人博客</a></p>
+</blockquote>
+
+<ol>
+  <li>进入友盟后台</li>
+</ol>
+
+<p>点击：错误分析-&gt;错误列表
+看到如下：</p>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2017-11-10-crash01.png" alt="" /></p>
+
+<ol>
+  <li>点击一个进入详情，看到如下：</li>
+</ol>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2017-11-10-crash02.png" alt="" /></p>
+
+<ol>
+  <li>打开Xcode-&gt;Windows-&gt;Organizer-&gt;archivers选择你要查看的错误报告所在的版本，这个一定要选对！！！显示包内容找到dSYMs和Products下的Applications下的文件，并将它们拷贝到一个文件夹下</li>
+  <li>打开终端cd到刚才新建的文件夹(错误报告)的目录下，输入如下命令：</li>
+</ol>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>xcrun atos -arch arm64 -o demo.app/demo 0x100301da0
+</code></pre></div></div>
+
+<ul>
+  <li>其中<code class="language-plaintext highlighter-rouge">demo</code>对应的是你的工程名</li>
+  <li><code class="language-plaintext highlighter-rouge">0x100301da0</code>是错误代码的地址，友盟错误报告中淡绿色的地址</li>
+</ul>
+
+<p>这样就看到自己项目中的错误代码了！！！</p>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2017-11-10-crash03.png" alt="" /></p>
+
+:ET

@@ -1,0 +1,5 @@
+I"b<h2 id="一uimenucontroller认识">一、UIMenuController认识</h2>
+<p>1、默认情况下，UITextView / UITextFiled / UIWebView 都有苹果自带的有UIMenuController功能</p>
+<h2 id="二对uilabel添加uimenucontroller扩展">二、对UILabel添加UIMenuController扩展</h2>
+<p>2、新建一个SSCopyLabel，继承UIlabel，.m文件如下：</p>
+:ET

@@ -1,0 +1,28 @@
+I"�<p>标准写法：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 在swift中，类方法是不允许定义静态变量的
+    static var once_t: dispatch_once_t = 0
+    static var instance: NetWorkTools?
+    class func sharedNetWorkTools() -&gt; NetWorkTools {
+        dispatch_once(&amp;once_t) { 
+            instance = NetWorkTools()
+        }
+        return instance!
+    }
+</code></pre></div></div>
+
+<p>简单写法：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// swift中的let是线程安全的
+    // 用到时才会创建
+    static let instance: NetWorkTools = NetWorkTools()
+    class func sharedNetWorkTools() -&gt; NetWorkTools {
+        return instance
+    }
+</code></pre></div></div>
+
+<p>##注意单例用到的时候才会创建！！！</p>
+
+<p><img src="/images/posts/2016-08-25-img.jpg" alt="" /></p>
+
+:ET

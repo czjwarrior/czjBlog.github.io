@@ -1,0 +1,394 @@
+I"J<h2 id="什么是kvo">什么是KVO??</h2>
+
+<p>KVO就是<code class="language-plaintext highlighter-rouge">NSKeyValueObserving</code>，请看官方文档的解释：</p>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-05-20-15267338239333.jpg" alt="" /></p>
+
+<p>大概翻译如下：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>一种非正式协议，通知其他对象的指定属性发生了改变。
+</code></pre></div></div>
+
+<p>简单理解就是，可以监听一个对象的某个属性是否发生改变。</p>
+
+<p>那么问题来了，什么是非正式协议？？有正式协议吗？？</p>
+
+<p>麻蛋，本来想找官方文档的，找了半天没找到。从<a href="https://stackoverflow.com/questions/3082383/whats-the-difference-between-formal-and-informal-protocols-in-objective-c/3082409">Stackoverflow</a>找到了答案，貌似原来官方文档的链接失效了</p>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-05-20-15267396254430.jpg" alt="" /></p>
+
+<p>大概翻译如下：</p>
+
+<p><strong>非正式协议：</strong>非正式协议是NSObject的一个类别<code class="language-plaintext highlighter-rouge">Category</code>，几乎所有的对象都隐含的采用（类别是OC的语言特性，能够给类对象添加方法而不需要创建子类），非正式协议的方法是可选的</p>
+
+<p><strong>正式协议：</strong> 一个正式协议声明了类需要实现的方法列表，正式协议有自己的声明、采用和类型检查语法。你可以使用<code class="language-plaintext highlighter-rouge">@required</code>或者<code class="language-plaintext highlighter-rouge">optional</code>关键字指定方法是否必须实现。子类继承父类采用的协议。正式协议也可以遵守其他协议</p>
+
+<h2 id="kvo实现">KVO实现</h2>
+
+<ul>
+  <li>监听某个对象的某个属性</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void)addObserver:(NSObject *)observer forKeyPath:(NSString *)keyPath options:(NSKeyValueObservingOptions)options context:(nullable void *)context;
+</code></pre></div></div>
+
+<ul>
+  <li>实现非正式协议</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void)observeValueForKeyPath:(nullable NSString *)keyPath ofObject:(nullable id)object change:(nullable NSDictionary&lt;NSKeyValueChangeKey, id&gt; *)change context:(nullable void *)context;
+</code></pre></div></div>
+
+<ul>
+  <li>移除监听</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void)removeObserver:(NSObject *)observer forKeyPath:(NSString *)keyPath;
+</code></pre></div></div>
+
+<p>简单代码演示：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view, typically from a nib.
+    
+    self.person = [[ZJPerson alloc] init];
+    
+    [self.person setName:@"zhangsan"];
+    
+    [self.person addObserver:self forKeyPath:@"name" options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context:nil];
+    
+}
+
+- (void)touchesBegan:(NSSet&lt;UITouch *&gt; *)touches withEvent:(UIEvent *)event{
+    [self.person setName:@"lisi"];
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary&lt;NSKeyValueChangeKey,id&gt; *)change context:(void *)context{
+    NSLog(@"%@", change);
+}
+
+- (void)dealloc{
+    [self.person removeObserver:self forKeyPath:@"name"];
+}
+</code></pre></div></div>
+
+<p>打印结果：
+<img src="http://otogtitz7.bkt.clouddn.com/2018-05-20-15267408193583.jpg" alt="" /></p>
+
+<p>用法其实很简单，接下来重点来了，KVO为什么能够监听到属性变化，底层做了什么？？</p>
+
+<h2 id="kvo底层实现探究">KVO底层实现探究</h2>
+
+<p>首先，我们利用<code class="language-plaintext highlighter-rouge">runtime</code>在添加监听之前和之后分别打印一下类对象</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>NSLog(@"%@", object_getClass(self.person));
+[self.person addObserver:self forKeyPath:@"name" options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context:nil];
+NSLog(@"%@", object_getClass(self.person));
+</code></pre></div></div>
+
+<p>打印结果：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>2018-05-19 22:48:18.726028+0800 KVO[33804:3059947] ZJPerson
+2018-05-19 22:48:18.726535+0800 KVO[33804:3059947] NSKVONotifying_ZJPerson
+</code></pre></div></div>
+
+<p>我们发现添加监听之后，实例对象的类对象发生了变化，系统为我们动态添加了一个<code class="language-plaintext highlighter-rouge">NSKVONotifying_+类名</code>的类，因为我们改变对象属性的值是通过<code class="language-plaintext highlighter-rouge">setter</code>方法实现了，所以很明显是系统动态生成的<code class="language-plaintext highlighter-rouge">NSKVONotifying_ZJPerson</code>类重写了<code class="language-plaintext highlighter-rouge">setter</code>方法。不信的话，我们可以做一个实验，自己手动添加一个<code class="language-plaintext highlighter-rouge">NSKVONotifying_ZJPerson</code>类，看下会打印什么</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>2018-05-19 22:56:32.223288+0800 KVO[33919:3068985] [general] KVO failed to allocate class pair for name NSKVONotifying_ZJPerson, automatic key-value observing will not work for this class
+</code></pre></div></div>
+<p>错误提示很明显，告诉我们创建<code class="language-plaintext highlighter-rouge">NSKVONotifying_ZJPerson</code>类失败，KVO失效</p>
+
+<p>那么系统自动创建重写的的<code class="language-plaintext highlighter-rouge">setter</code>方法内部做了什么呢？？同样在添加监听方法之前，利用<code class="language-plaintext highlighter-rouge">runtime</code>打印下方法的实现,截图如下：
+<img src="http://otogtitz7.bkt.clouddn.com/2018-05-20-15267426406662.jpg" alt="" />
+发现方法实现变了，内部调用了系统<code class="language-plaintext highlighter-rouge">Foundation</code>框架下的<code class="language-plaintext highlighter-rouge">_NSSetObjectValueAndNotify</code>方法。那么这个框架内部又是怎么实现的呢，我们可以下断点，查看下函数调用栈：</p>
+
+<p>首先通过设置一个观察点，观察属性的变化：
+<img src="http://otogtitz7.bkt.clouddn.com/2018-05-20-15267750438339.jpg" alt="" /></p>
+
+<p>继续执行，可以看到函数调用栈如下：
+<img src="http://otogtitz7.bkt.clouddn.com/2018-05-20-15267751175105.jpg" alt="" /></p>
+
+<p>在结果发生改变的地方继续下断点调试：
+<img src="http://otogtitz7.bkt.clouddn.com/2018-05-20-15267753001990.jpg" alt="" /></p>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-05-20-15267760918851.jpg" alt="" /></p>
+
+<p>由以上函数调用栈，我们大致可以猜测出，<code class="language-plaintext highlighter-rouge">_NSSetObjectValueAndNotify</code>函数内部实现过程如下：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>1. `-[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:]:
+2. -[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:usingBlock:]:
+3. [ZJPerson setName:];
+4. `NSKeyValueDidChange:
+5. `NSKeyValueNotifyObserver:
+6. - (void)observeValueForKeyPath:ofObject:change:context
+</code></pre></div></div>
+
+<p>简化成OC的伪代码大致如下：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void)setName:(NSString *)name{
+    _NSSetObjectValueAndNotify();
+}
+
+void _NSSetObjectValueAndNotify {
+    [self willChangeValueForKey:@"name"];
+    [super setName:name];
+    [self didChangeValueForKey:@"name"];
+}
+
+- (void)didChangeValueForKey:(NSString *)key{
+    [observe observeValueForKeyPath:key ofObject:self change:nil context:nil];
+}
+</code></pre></div></div>
+
+<h4 id="nskvonotifying_zjperson内部都重写了哪些方法">NSKVONotifying_ZJPerson内部都重写了哪些方法</h4>
+
+<p>可以利用<code class="language-plaintext highlighter-rouge">runtime</code>方法打印一下方法列表：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>unsigned int count;
+Method *methods = class_copyMethodList(object_getClass(self.person), &amp;count);
+    
+for (NSInteger index = 0; index &lt; count; index++) {
+   Method method = methods[index];
+   
+   NSString *methodStr = NSStringFromSelector(method_getName(method));
+   
+   NSLog(@"%@\n", methodStr);
+}
+</code></pre></div></div>
+
+<p>打印结果：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>2018-05-20 08:57:07.883400+0800 KVO[35888:3218908] setName:
+2018-05-20 08:57:07.883571+0800 KVO[35888:3218908] class
+2018-05-20 08:57:07.883676+0800 KVO[35888:3218908] dealloc
+2018-05-20 08:57:07.883793+0800 KVO[35888:3218908] _isKVOA
+</code></pre></div></div>
+
+<p>简单分析下重写这些方法的作用：</p>
+
+<p><code class="language-plaintext highlighter-rouge">class</code>：重写这个方法，是为了伪装苹果自动为我们生成的中间类。
+<code class="language-plaintext highlighter-rouge">dealloc</code>：应该是处理对象销毁之前的一些收尾工作
+<code class="language-plaintext highlighter-rouge">_isKVOA</code>：告诉系统使用了<code class="language-plaintext highlighter-rouge">kvo</code></p>
+
+<h2 id="拓展">拓展</h2>
+
+<p>学任何东西，通过我们的思考一定会问出一些别的问题，通过深入了解kvo，下面两个问题，是面试经常会被问到的，也是我所能想到的：</p>
+
+<ul>
+  <li>如何动态生成一个类？？</li>
+  <li>知道了原理，能不能自己写一个KVO？？</li>
+</ul>
+
+<h4 id="动态生成一个自己的类">动态生成一个自己的类</h4>
+
+<p>既然是动态生成，肯定是利用了苹果的<code class="language-plaintext highlighter-rouge">runtime</code>机制，通过上面对<code class="language-plaintext highlighter-rouge">KVO</code>的学习，也了解到了<code class="language-plaintext highlighter-rouge">runtime</code>的强大之处。</p>
+
+<ul>
+  <li>创建类</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Class customClass = objc_allocateClassPair([NSObject class], "ZJCustomClass", 0);
+</code></pre></div></div>
+
+<ul>
+  <li>添加实例变量</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 添加实例变量
+    class_addIvar(customClass, "age", sizeof(int), 0, "i");
+</code></pre></div></div>
+
+<ul>
+  <li>添加方法，<code class="language-plaintext highlighter-rouge">V@:</code>表示方法的<a href="https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/ObjCRuntimeGuide/Articles/ocrtTypeEncodings.html#//apple_ref/doc/uid/TP40008048-CH100-SW1">参数和返回值</a></li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 添加方法
+    class_addMethod(customClass, @selector(hahahha), (IMP)hahahha, "V@:");
+</code></pre></div></div>
+
+<p>需要实现方法：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>void hahahha(id self, SEL _cmd)
+{
+    NSLog(@"hahahha====");
+}
+
+- (void)hahahha{
+
+}
+</code></pre></div></div>
+
+<ul>
+  <li>注册到运行时环境</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>objc_registerClassPair(customClass);
+</code></pre></div></div>
+
+<h6 id="打印方法列表和成员变量列表查看是否创建成功">打印方法列表和成员变量列表，查看是否创建成功</h6>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#pragma mark - Util
+
+- (NSString *)copyMethodsByClass:(Class)cls{
+    unsigned int count;
+    Method *methods = class_copyMethodList(cls, &amp;count);
+    
+    NSString *methodStrs = @"";
+    
+    for (NSInteger index = 0; index &lt; count; index++) {
+        Method method = methods[index];
+        
+        NSString *methodStr = NSStringFromSelector(method_getName(method));
+        
+        methodStrs = [NSString stringWithFormat:@"%@ ", methodStr];
+    }
+    
+    free(methods);
+    
+    return methodStrs;
+}
+
+- (NSString *)copyIvarsByClass:(Class)cls{
+    unsigned int count;
+    Ivar *ivars = class_copyIvarList(cls, &amp;count);
+    
+    NSMutableString *ivarStrs = [NSMutableString string];
+    
+    for (NSInteger index = 0; index &lt; count; index++) {
+        Ivar ivar = ivars[index];
+        
+        NSString *ivarName = [NSString stringWithUTF8String:ivar_getName(ivar)];  //获取成员变量的名字
+        
+        NSString *ivarType = [NSString stringWithUTF8String:ivar_getTypeEncoding(ivar)]; //获取成员变量的数据类型
+        
+        [ivarStrs appendString:@"\n"];
+        [ivarStrs appendString:ivarName];
+        [ivarStrs appendString:@"-"];
+        [ivarStrs appendString:ivarType];
+        
+    }
+    
+    free(ivars);
+    
+    return ivarStrs;
+}
+</code></pre></div></div>
+
+<p>调用方法可看到创建成功：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>NSLog(@"%@", [self copyMethodsByClass:customClass]);
+NSLog(@"%@", [self copyIvarsByClass:customClass]);
+</code></pre></div></div>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-05-20-15267820941306.jpg" alt="" /></p>
+
+<p>动态创建类大致就这些步骤。。。</p>
+
+<h4 id="自己动手写一个kvo">自己动手写一个KVO</h4>
+
+<p><code class="language-plaintext highlighter-rouge">KVO</code>底层实现还是很复杂的，下面我只是简单的写下实现过程：</p>
+
+<ul>
+  <li>因为它是一个非正式协议，给<code class="language-plaintext highlighter-rouge">NSObject</code>新建一个<code class="language-plaintext highlighter-rouge">Category</code>，<code class="language-plaintext highlighter-rouge">NSObject+kvo.h</code>,添加监听方法：</li>
+</ul>
+
+<p><strong>.h文件</strong></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#import &lt;Foundation/Foundation.h&gt;
+
+@interface NSObject (kvo)
+
+- (void)zj_addObserver:(NSObject *)observer forKeyPath:(NSString *)keyPath options:(NSKeyValueObservingOptions)options context:(nullable void *)context;
+
+@end
+</code></pre></div></div>
+
+<p><strong>.m文件</strong></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#import "NSObject+kvo.h"
+#import &lt;objc/runtime.h&gt;
+#import &lt;objc/message.h&gt;
+
+@implementation NSObject (kvo)
+
+- (void)zj_addObserver:(NSObject *)observer forKeyPath:(NSString *)keyPath options:(NSKeyValueObservingOptions)options context:(void *)context{
+    //动态添加一个类
+    NSString *originClassName = NSStringFromClass([self class]);
+    
+    NSString *newClassName = [@"ZJKVO_" stringByAppendingString:originClassName];
+    
+    const char *newName = [newClassName UTF8String];
+    
+    // 继承自当前类，创建一个子类
+    Class kvoClass = objc_allocateClassPair([self class], newName, 0);
+    
+    // 添加setter方法
+    class_addMethod(kvoClass, @selector(setName:), (IMP)setName, "v@:@");
+    
+    //注册新添加的这个类
+    objc_registerClassPair(kvoClass);
+    
+    // 修改isa指针，由ZJPerson指向ZJKVO_Person
+    object_setClass(self, kvoClass);
+    
+    // 保存观察者属性到当前类中
+    objc_setAssociatedObject(self, (__bridge const void *)@"observer", observer, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+#pragma mark - 重写父类方法
+
+void setName(id self, SEL _cmd, NSString *name) {
+    
+    // 保存当前KVO的类
+    Class kvoClass = [self class];
+    
+    // 将self的isa指针指向父类ZJPerson，调用父类setter方法
+    object_setClass(self, class_getSuperclass([self class]));
+    
+    // 调用父类setter方法，重新复制
+    objc_msgSend(self, @selector(setName:), name);
+    
+    // 取出ZJKVO_Person观察者
+    id objc = objc_getAssociatedObject(self, (__bridge const void *)@"observer");
+
+    // 通知观察者，执行通知方法
+    objc_msgSend(objc, @selector(observeValueForKeyPath:ofObject:change:context:), name, self, nil, name);
+    
+    // 重新修改为ZJKVO_Person类
+    object_setClass(self, kvoClass);
+}
+</code></pre></div></div>
+
+<p><strong>注意一</strong>
+要修改下xcode中的一个配置，将它改为NO，否则会报参数太多的错误：</p>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-05-20-15267859753684.jpg" alt="" /></p>
+
+<p><strong>注意二</strong></p>
+
+<p>解释下代码中<code class="language-plaintext highlighter-rouge">v@:@</code>的意思：</p>
+<ul>
+  <li>第一个<code class="language-plaintext highlighter-rouge">v</code>表示方法返回值<code class="language-plaintext highlighter-rouge">void</code></li>
+  <li>第二三个<code class="language-plaintext highlighter-rouge">@:</code>一般是一块的，因为函数至少有两个参数<code class="language-plaintext highlighter-rouge">self和_cmd</code>，一般是固定写法</li>
+  <li>最后一个<code class="language-plaintext highlighter-rouge">@</code>表示参数类型，是一个对象</li>
+</ul>
+
+<p>下面在代码中实验，看下我们自己写的kvo有没有执行：</p>
+
+<p>修改添加监听者的方法，改成我们自己的</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[self.person zj_addObserver:self forKeyPath:@"name" options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context:nil];
+</code></pre></div></div>
+
+<p>看下回调中的打印：
+<img src="http://otogtitz7.bkt.clouddn.com/2018-05-20-15267866044207.jpg" alt="" /></p>
+
+<p>发现确实监听到了。。。</p>
+
+<h1 id="代码地址"><a href="https://github.com/czjwarrior/DailyPractice">代码地址</a></h1>
+
+<h2 id="总结">总结</h2>
+<p>kvo用法其实非常简单，但是深入了解，深入思考的话，知识点非常多。花了一天多的时间，期间查阅了很多文档（发现官方文档真的是非常有用），总算是写完了，对KVO有了一个更深入的认识和理解。今天是520，感谢女朋友的理解，终于可以陪她出去玩了，哈哈。。。</p>
+
+:ET

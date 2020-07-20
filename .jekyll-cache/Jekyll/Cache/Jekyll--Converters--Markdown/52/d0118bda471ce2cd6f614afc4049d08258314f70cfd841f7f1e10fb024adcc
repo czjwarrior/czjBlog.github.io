@@ -1,0 +1,39 @@
+I".<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#import "ViewController.h"
+#import &lt;CoreMotion/CoreMotion.h&gt;
+
+@interface ViewController ()
+
+@property (nonatomic, strong) CMStepCounter *conter;
+
+@property (weak, nonatomic) IBOutlet UILabel *stepLabel;
+
+@end
+
+@implementation ViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+
+    // 1、判断计步器是否可用
+    if (![CMStepCounter isStepCountingAvailable]) {return;}
+
+    // 2、开始计步
+    [self.conter startStepCountingUpdatesToQueue:[NSOperationQueue mainQueue] updateOn:5 withHandler:^(NSInteger numberOfSteps, NSDate * _Nonnull timestamp, NSError * _Nullable error) {
+
+        self.stepLabel.text = [NSString stringWithFormat:@"一共走了%ld步", numberOfSteps];
+    }];
+
+}
+
+- (CMStepCounter *)conter{
+    if (_conter == nil) {
+        _conter = [[CMStepCounter alloc] init];
+    }
+    return _conter;
+}
+</code></pre></div></div>
+
+<h2 id="效果图">效果图</h2>
+<p><img src="/images/posts/2016-08-10-demo.jpg" alt="" /></p>
+
+:ET

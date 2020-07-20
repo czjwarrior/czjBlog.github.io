@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <title>岑志军的个人博客</title>
+  <meta name="description" content="欢迎来到我的博客~">
+  <meta name="author" content="leopardpan">
+
+  <meta name="keywords" content="iOS开发,岑志军的个人博客,reactNative,ListView,wifi列表,reactnative开发,数字货币,加密货币,solidity,fabric,ethereum,blockchain,hyperledger,区块链部落,从零到壹全栈部落,智能合约,超级账本,ICO,比特币,以太坊" />
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="岑志军的个人博客">
+  <meta name="twitter:description" content="欢迎来到我的博客~">
+  
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="岑志军的个人博客">
+  <meta property="og:description" content="欢迎来到我的博客~">
+  
+  <link rel="icon" type="image/png" href="/images/favicon.png" />
+  <link href="/images/favicon.png" rel="shortcut icon" type="image/png">
+  
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+
+  <link rel="canonical" href="http://localhost:4000/page/3/">
+  <link rel="alternate" type="application/rss+xml" title="岑志军的个人博客" href="http://localhost:4000/feed.xml">
+  
+  <meta name="google-site-verification" content="1-1ZlHoRvM0T2FqPbW2S-qLgYXN6rsn52kErlMPd_gw" />
+
+<!-- 站点统计 -->
+  <script 
+  async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+  </script>  
+
+<!-- 百度统计 -->
+  
+  <script>
+      var _hmt = _hmt || [];
+      (function() {
+        var hm = document.createElement("script");
+        hm.src = "//hm.baidu.com/hm.js?0352fdd0e57585d9a54ff3a6906ae365";
+        var s = document.getElementsByTagName("script")[0]; 
+        s.parentNode.insertBefore(hm, s);
+      })();
+  </script>
+  
+
+<!-- google 统计 -->
+  
+
+</head>
+
+
+  <body>
+
+    <span class="mobile btn-mobile-menu">        
+      <div class="nav_container">
+         <nav class="nav-menu-item" style = "float:right">
+            <i class="nav-menu-item">
+              <a href="/#blog" title="" class="blog-button">  博客主页
+              </a>
+            </i>
+            
+                <i class="nav-menu-item">
+
+                  <a href="/archive" title="archive" class="btn-mobile-menu__icon">
+                      所有文章
+                  </a>
+                </i>
+            
+                <i class="nav-menu-item">
+
+                  <a href="/tags" title="tags" class="btn-mobile-menu__icon">
+                      分类
+                  </a>
+                </i>
+            
+                <i class="nav-menu-item">
+
+                  <a href="/about" title="about" class="btn-mobile-menu__icon">
+                      关于我
+                  </a>
+                </i>
+            
+          </nav>
+      </div>
+    </span>
+    
+    <header class="panel-cover " style="background-image: url('/images/background-cover.jpg')">
+  <div class="panel-main">
+
+    <div class="panel-main__inner panel-inverted">
+    <div class="panel-main__content">
+        <!-- 头像效果-start -->
+        <div class="ih-item circle effect right_to_left">            
+            <a href="/#blog" title="前往 岑志军的个人博客 的主页" class="blog-button">
+                <div class="img"><img src="/images/avatar.jpg" alt="img"></div>
+                <div class="info">
+                    <div class="info-back">
+                        <h2> 
+                            
+                                czjDevloper
+                            
+                        </h2>
+                        <p>
+                           
+                                iOS / React-Native
+                            
+                        </p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <!-- 头像效果-end -->
+        <h1 class="panel-cover__title panel-title"><a href="/#blog" title="link to homepage for 岑志军的个人博客" class="blog-button">岑志军的个人博客</a></h1>
+        
+        <span class="panel-cover__subtitle panel-subtitle">我的博客</span>
+        
+        <hr class="panel-cover__divider" />
+        <p class="panel-cover__description">欢迎来到我的博客~</p>
+        <hr class="panel-cover__divider panel-cover__divider--secondary" />
+        
+        
+        
+
+        <div class="navigation-wrapper">
+          <div>
+            <nav class="cover-navigation cover-navigation--primary">
+              <ul class="navigation">
+                <li class="navigation__item"><a href="/#blog" title="" class="blog-button">博客主页</a></li>
+                
+                  <li class="navigation__item"><a href="/archive" title="archive">所有文章</a></li>
+                
+                  <li class="navigation__item"><a href="/tags" title="tags">分类</a></li>
+                
+                  <li class="navigation__item"><a href="/about" title="about">关于我</a></li>
+                
+              </ul>
+            </nav>
+          </div>          
+        </div>
+
+
+        </div>
+      </div>
+    </div>
+    
+    
+    <div class="panel-cover--overlay cover-clear"></div>
+    
+  </div>
+</header>
+
+
+    <div class="content-wrapper">
+        <div class="content-wrapper__inner">
+            <div class="main-post-list hidden">
+
+  <ol class="post-list">
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2017/01/WKWebView-%E7%99%BD%E5%B1%8F/" title="访问 WKWebView 白屏问题">WKWebView 白屏问题</a></h2>
+      <p class="excerpt">1、WKWebView 自诩拥有更快的加载速度，更低的内存占用，但实际上 WKWebView 是一个多进程组件，Network Loading 以及 UI Rendering 在其它进程中执行。初次适配 WKWebView 的时候，我们也惊讶于打开 WKWebView 后，App 进程内存消耗反而大幅下降，但是仔细观察会发现，Other Process 的内存占用会增加。在一些用 webGL 渲染的复杂页面，使用 WKWebView 总体的内存占用（App Process Memory +...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2017-01-20 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2017-01-20</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">iOS</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2017/01/WKWebView-%E7%99%BD%E5%B1%8F/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2016/12/uiview-animation/" title="访问 iOS动画-定时对UIView进行翻转和抖动">iOS动画-定时对UIView进行翻转和抖动</a></h2>
+      <p class="excerpt">（翻转）方式一：[NSTimer scheduledTimerWithTimeInterval:3.f repeats:YES block:^(NSTimer * _Nonnull timer) {            CABasicAnimation* rotationAnimation = [CABasicAnimation animation];;            rotationAnimation = [CABasicAnimation animationWithKeyPa...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2016-12-22 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2016-12-22</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">iOS</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2016/12/uiview-animation/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2016/12/cocoapods-update/" title="访问 CocoaPods升级">CocoaPods升级</a></h2>
+      <p class="excerpt">前提是你以前已经安装过CocoaPods 1、查看当前pod版本pod --version2、命令行安装// 先更新gemsudo gem update --system    // 需要漫长的等待3、依次执行命令brew install rubygem sources --remove https://rubygems.org/gem sources -a https://ruby.taobao.org/gem sources -l*** CURRENT SOURCES ***https...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2016-12-13 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2016-12-13</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">iOS</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2016/12/cocoapods-update/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2016/12/operator-type/" title="访问 iOS判断运营商类型">iOS判断运营商类型</a></h2>
+      <p class="excerpt">一、获取运营类型1、需要导入两个头文件#import &lt;CoreTelephony/CTCarrier.h&gt;#import &lt;CoreTelephony/CTTelephonyNetworkInfo.h&gt;2、判断类型// 获取运营商类型+ (SSOperatorsType)getOperatorsType{    CTTelephonyNetworkInfo *telephonyInfo = [[CTTelephonyNetworkInfo alloc] init]...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2016-12-06 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2016-12-06</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">iOS</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2016/12/operator-type/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2016/12/current-net/" title="访问 iOS获取当前网络环境">iOS获取当前网络环境</a></h2>
+      <p class="excerpt">// 获取网络环境的方法+ (NSString *)networktype{    NSArray *subviews = [[[[UIApplication sharedApplication] valueForKey:@"statusBar"] valueForKey:@"foregroundView"]subviews];    NSNumber *dataNetworkItemView = nil;    for (id subview in subviews) {        ...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2016-12-06 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2016-12-06</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">iOS</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2016/12/current-net/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2016/12/afn-delegate/" title="访问 AFN挂代理访问">AFN挂代理访问</a></h2>
+      <p class="excerpt">AFHTTPSessionManager *manager = [[AFHTTPSessionManager alloc] initWithBaseURL:@"" sessionConfiguration:[self setProxyWithConfig]];    [manager.requestSerializer setValue:@"MQQBrowser" forHTTPHeaderField:@"User-Agent"];    [manager.responseSerializ...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2016-12-06 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2016-12-06</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">iOS</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2016/12/afn-delegate/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2016/12/AFN-redirect/" title="访问  AFN拦截重定向设置httpBody"> AFN拦截重定向设置httpBody</a></h2>
+      <p class="excerpt">1、拦截重定向获取里面的cookieAFHTTPRequestOperation *requestOperation=[[AFHTTPRequestOperation alloc] initWithRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@""]]];    [requestOperation setRedirectResponseBlock:^NSURLRequest *(NSURLConnection *con...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2016-12-06 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2016-12-06</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">iOS</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2016/12/AFN-redirect/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2016/11/wkwebview-cookies/" title="访问 清除WKWebView cookies">清除WKWebView cookies</a></h2>
+      <p class="excerpt">在UIWebView下，可以使用[[NSURLCache sharedURLCache] removeAllCachedResponses];//清除缓存 WKWebView清除cookies的方法（iOS9以上）WKWebsiteDataStore *dateStore = [WKWebsiteDataStore defaultDataStore];      [dateStore fetchDataRecordsOfTypes:[WKWebsiteDataStore allWebsit...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2016-11-22 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2016-11-22</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">iOS</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2016/11/wkwebview-cookies/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2016/11/push-wifilist/" title="访问  解决iOS10不能跳转系统WiFi列表的问题"> 解决iOS10不能跳转系统WiFi列表的问题</a></h2>
+      <p class="excerpt">第一种方式：在iOS10更新后，系统设置跳转被禁用，只能跳转App设置，但是最近发现苹果又更新了URLscheme，亲测可用，建议iOS10已下，还用原来的scheme#define iOS10 ([[UIDevice currentDevice].systemVersion doubleValue] &gt;= 10.0)NSString * urlString = @"App-Prefs:root=WIFI";if ([[UIApplication sharedApplication]...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2016-11-22 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2016-11-22</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">iOS</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2016/11/push-wifilist/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2016/11/textfield-highlighted/" title="访问 UITextField添加点击高亮状态">UITextField添加点击高亮状态</a></h2>
+      <p class="excerpt">一、继承自UITextfield自定义一个SSTouchTextField代码如下：#import "SSTouchTextField.h"@implementation SSTouchTextField#pragma mark - Private- (void)setBackgroundHighlighted:(BOOL)highlighted{    [UIView animateWithDuration:0.3f delay:0.f options:UIViewAnimationOp...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2016-11-16 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2016-11-16</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">iOS</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2016/11/textfield-highlighted/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2016/10/NSDate/" title="访问 iOS单独对年月日加减">iOS单独对年月日加减</a></h2>
+      <p class="excerpt">1、当前时间减去18年+ (NSDate *)dateWithYearsBeforeNow:(NSInteger)year{    NSDate *currentDate = currentDate = [NSDate date];    NSCalendar *calendar = nil;    if (IOS8Higher) {        calendar = [NSCalendar calendarWithIdentifier:NSCalendarIdentifierGrego...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2016-10-19 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2016-10-19</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">iOS</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2016/10/NSDate/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2016/09/label-align/" title="访问 iOS开发 UIlabel 文字两边对齐">iOS开发 UIlabel 文字两边对齐</a></h2>
+      <p class="excerpt">1、给UIlabel添加一个分类即可，代码如下：  必须导入这个头文件：CoreText/CoreText.h- (void)changeAlignmentRightandLeft{    CGRect textSize = [self.text boundingRectWithSize:CGSizeMake(self.frame.size.width, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin | NSStringDr...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2016-09-28 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2016-09-28</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">iOS</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2016/09/label-align/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2016/09/imessage/" title="访问 iOS10新特性-自定义iMessage application">iOS10新特性-自定义iMessage application</a></h2>
+      <p class="excerpt">1、创建工程2、工程创建完成后的目录结构###3、接下来开始写代码////  MessagesViewController.swift//  MessagesExtension////  Created by 岑志军 on 2016/9/28.//  Copyright © 2016年 cen. All rights reserved.///* 虽然没有严格限制,但是苹果建议的表情文件大小: 1. Small: 100 x 100 pt @3x scale (300 x 300 pixel...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2016-09-28 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2016-09-28</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">iOS</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2016/09/imessage/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2016/08/%E5%8D%95%E4%BE%8B/" title="访问 Swift-单例">Swift-单例</a></h2>
+      <p class="excerpt">标准写法：// 在swift中，类方法是不允许定义静态变量的    static var once_t: dispatch_once_t = 0    static var instance: NetWorkTools?    class func sharedNetWorkTools() -&gt; NetWorkTools {        dispatch_once(&amp;once_t) {             instance = NetWorkTools()       ...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2016-08-25 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2016-08-25</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">iOS</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2016/08/%E5%8D%95%E4%BE%8B/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2016/08/swift-delegate/" title="访问 Swift开发-代理">Swift开发-代理</a></h2>
+      <p class="excerpt">在iOS开发中经常会用到代理,Swift开发中的代理这样写:1、首先定义一个协议// swift中如何定义协议: 必须遵守NSObjectProtocolprotocol VisitorViewDelegate : NSObjectProtocol{    // 登录回调    func loginBtnWillClick()    // 注册回调    func regiserBtnWillClick()}2、方法实现func loginBtnClick(){        delega...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2016-08-14 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2016-08-14</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">iOS</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2016/08/swift-delegate/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2016/08/html-selector/" title="访问 HTML5选择器">HTML5选择器</a></h2>
+      <p class="excerpt">最近刚开始学习HTML5，记录一下自己学习的笔记，方便以后查阅： 首先选择器的常用分类：  标签选择器div{       color: red;   }  类选择器.one{       color: yellow;    }  id选择器，注意id是唯一的标示，不能用于其他标签#main{       font-size: 40px;     }  后代选择器#test1 div{            color: black;            font-size: 50px;...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2016-08-14 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2016-08-14</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">HTML5</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2016/08/html-selector/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2016/08/html-css-style/" title="访问 HTML5-css样式分类">HTML5-css样式分类</a></h2>
+      <p class="excerpt">  行内样式&lt;body&gt;&lt;!--行内样式--&gt;    &lt;div style="font-size: 30px; color: red; background-color: blue;"&gt;121221323231221&lt;/div&gt;    &lt;div style="font-size: 30px; color: red; background-color: blue;"&gt;121221323231221&lt;/div&gt;    &l...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2016-08-14 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2016-08-14</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">HTML5</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2016/08/html-css-style/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2016/08/css-tag/" title="访问 HTML标签分类">HTML标签分类</a></h2>
+      <p class="excerpt">HTML有N多标签，根据显示的类型，主要可以分为3大类  块级标签：          独占一行的标签      能随时设置宽度和高度（比如div、p、h1、h2、ul、li）      &lt;style&gt;        div{            background-color: red;            width: 200px;            height: 50px;        }        p{            background-co...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2016-08-14 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2016-08-14</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">HTML5</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2016/08/css-tag/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2016/08/css-layout/" title="访问 HTML5-CSS布局">HTML5-CSS布局</a></h2>
+      <p class="excerpt">一、默认情况下，所有的网页标签都在标准流布局中，从上到下，从左到右。脱离标准流的方法有：  float属性  position属性和left、right、top、bottom属性1、float属性的常用取值有：  left：脱离标准流，浮动在父标签的最左边  right：脱离标准流，浮动在父标签的最右边&lt;!DOCTYPE html&gt;&lt;html lang="en"&gt;&lt;head&gt;    &lt;meta charset="UTF-8"&gt;    &lt;...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2016-08-14 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2016-08-14</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">HTML5</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2016/08/css-layout/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2016/08/swift-func/" title="访问 Swift学习-函数">Swift学习-函数</a></h2>
+      <p class="excerpt">/* swift定义函数格式： 语义：将前面计算结果返回给-&gt; 返回值 func 函数名称(参数列表) -&gt; 返回值 {    执行代码 } *///没有返回值没有参数// 如果函数没有返回值，就写Void// 如果函数没有返回值，就写Void,还可以简写// 1、()代替Void// 2、可以省略 -&gt; ()  -&gt;Voidfunc say() -&gt; Void {    print("hello")}say()func say2() -&gt; () {  ...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2016-08-11 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2016-08-11</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">iOS</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2016/08/swift-func/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+  </ol>
+
+  <hr class="post-list__divider " />
+
+<nav class="pagination" role="navigation">
+
+	<!-- 百度搜索 -->
+	<script type="text/javascript">(function(){document.write(unescape('%3Cdiv id="bdcs"%3E%3C/div%3E'));var bdcs = document.createElement('script');bdcs.type = 'text/javascript';bdcs.async = true;bdcs.src = 'http://znsv.baidu.com/customer_search/api/js?sid=12441349038163667913' + '&plate_url=' + encodeURIComponent(window.location.href) + '&t=' + Math.ceil(new Date()/3600000);var s = document.getElementsByTagName('script')[0];s.parentNode.insertBefore(bdcs, s);})();
+	</script>
+	
+    
+        <a class="newer-posts pagination__newer btn btn-small btn-tertiary" href="/page/2/#blog">&larr; 最近</a>
+    
+    <span class="pagination__page-number">3 / 4</span>
+    
+        <a class="older-posts pagination__older btn btn-small btn-tertiary" href="/page/4/#blog">更早 &rarr;</a>
+    
+</nav>
+
+
+</div>
+
+            <section class="footer">
+    <footer>
+        <div class = "footer_div">  
+        <nav class="cover-navigation navigation--social">
+          <ul class="navigation">
+
+          
+          <!-- Weibo -->
+          <li class="navigation__item_social">
+            <a href="http://weibo.com/3291155444" title="@3291155444 的微博" target="_blank">
+              <i class='social fa fa-weibo fa-2x'></i>
+              <span class="label">Weibo</span>
+            </a>
+          </li>
+          
+
+          
+          <!-- Github -->
+          <li class="navigation__item_social">
+            <a href="https://github.com/czjwarrior" title="@czjwarrior 的 Github" target="_blank">
+              <i class='social fa fa-github fa-2x'></i>
+              <span class="label">Github</span>
+            </a>
+          </li>
+          
+          
+          
+
+          
+
+          <!-- RSS -->
+          <li class="navigation__item_social">
+            <a href="/feed.xml" rel="author" title="RSS" target="_blank">
+              <i class='social fa fa-rss fa-2x'></i>
+              <span class="label">RSS</span>
+            </a>
+          </li>
+
+          
+          <!-- Email -->
+          <li class="navigation__item_social">
+            <a href="mailto:13621130170@163.com" title="Contact me">
+              <i class='social fa fa-envelope fa-2x'></i>
+              <span class="label">Email</span>
+            </a>
+          </li>
+          
+
+          </ul>
+        </nav>
+
+        </div>
+
+        <div class = "footer_div">  
+           <p class="copyright text-muted">
+            Copyright &copy; 岑志军的个人博客 2020
+            </p>
+        	<div align="right">
+    			<link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+
+          <!-- 访问统计 -->
+          <span id="busuanzi_container_site_pv">
+            本站总访问量
+            <span id="busuanzi_value_site_pv"></span>次
+          </span>
+
+        </div>
+        <div>
+    </footer>
+</section>
+
+        </div>
+    </div>
+    
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="/js/main.js"></script>
+
+<script type="text/javascript" src="/js/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+  </body>
+
+</html>

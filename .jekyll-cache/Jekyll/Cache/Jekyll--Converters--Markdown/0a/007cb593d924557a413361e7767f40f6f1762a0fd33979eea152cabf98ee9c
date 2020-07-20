@@ -1,0 +1,132 @@
+I"�<h2 id="加壳">加壳</h2>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-01-28-15170517356893.jpg" alt="" /></p>
+
+<ul>
+  <li>什么是加壳？
+    <ul>
+      <li>利用特殊的算法，对可执行文件的编码进行改变（比如压缩、加密），以达到保护程序代码的目的</li>
+    </ul>
+  </li>
+</ul>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-01-28-15170517891591.jpg" alt="" /></p>
+
+<h2 id="脱壳">脱壳</h2>
+
+<ul>
+  <li>什么是脱壳？
+    <ul>
+      <li>摘掉壳程序，将未加密的可执行文件还原出来（有些人也称为“砸壳”）</li>
+    </ul>
+  </li>
+  <li>脱壳主要有2种方法：硬脱壳、动态脱壳</li>
+</ul>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-01-28-15170518676496.jpg" alt="" /></p>
+
+<h2 id="ios中的脱壳工具">iOS中的脱壳工具</h2>
+
+<ul>
+  <li>iOS中有很多好用的脱壳工具
+    <ul>
+      <li>Clutch：https://github.com/KJCracks/Clutch</li>
+      <li>dumpdecrypted：https://github.com/stefanesser/dumpdecrypted/</li>
+      <li>AppCrackr、Crackulous（基本不用，常用前两种）</li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="如何验证可执行文件是否已经脱壳">如何验证可执行文件是否已经脱壳？</h2>
+
+<ul>
+  <li>将可执行的Mach-o文件拖入<code class="language-plaintext highlighter-rouge">Hopper Disassembler v4</code>当中 查看<code class="language-plaintext highlighter-rouge">Load Commands -&gt; LC_ENCRYPTION_INFO -&gt; Crypt ID</code>的值，0代表未加密</li>
+</ul>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-01-28-15170520564178.jpg" alt="" /></p>
+
+<ul>
+  <li>通过otool命令行也可以：<code class="language-plaintext highlighter-rouge">otool   -l   可执行文件路径   |   grep   crypt </code></li>
+</ul>
+
+<h2 id="clutch---配置">Clutch - 配置</h2>
+
+<ul>
+  <li>下载最新的Release版： https://github.com/KJCracks/Clutch/releases</li>
+</ul>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-01-28-15170521755298.jpg" alt="" /></p>
+
+<ul>
+  <li>建议去掉版本号，改名为Clutch</li>
+  <li>将Clutch文件拷贝到iPhone的/usr/bin目录</li>
+</ul>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-01-28-15170521587526.jpg" alt="" /></p>
+
+<ul>
+  <li>如果在iPhone上执行Clutch指令，权限不够，赋予“可执行的权限”
+<img src="http://otogtitz7.bkt.clouddn.com/2018-01-28-15170522024702.jpg" alt="" /></li>
+</ul>
+
+<h2 id="clutch--使用">Clutch – 使用</h2>
+
+<ul>
+  <li>列出已安装的APP：Clutch -i</li>
+</ul>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-01-28-15170522344555.jpg" alt="" /></p>
+
+<ul>
+  <li>输入APP序号或者Bundle Id进行脱壳操作：<code class="language-plaintext highlighter-rouge">Clutch -d APP序号或BundleId</code>
+<img src="http://otogtitz7.bkt.clouddn.com/2018-01-28-15170522669230.jpg" alt="" /></li>
+</ul>
+
+<p>或者</p>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-01-28-15170522849211.jpg" alt="" /></p>
+
+<ul>
+  <li>脱壳成功后会生成一个ipa文件
+<img src="http://otogtitz7.bkt.clouddn.com/2018-01-28-15170523045925.jpg" alt="" /></li>
+</ul>
+
+<h2 id="dumdecrypted">dumdecrypted</h2>
+
+<p>下载源代码，然后在源代码目录执行make指令进行编译，获得dylib动态库文件</p>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-01-28-15170523460875.jpg" alt="" /></p>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-01-28-15170523556274.jpg" alt="" /></p>
+
+<ul>
+  <li>将dylib文件拷贝到iPhone上（如果是root用户，建议放<code class="language-plaintext highlighter-rouge">/var/root</code>目录）</li>
+  <li>终端进入dylib所在的目录</li>
+  <li>使用环境变量<code class="language-plaintext highlighter-rouge">DYLD_INSERT_LIBRARIES</code>将dylib注入到需要脱壳的可执行文件（可执行文件路径可以通过<code class="language-plaintext highlighter-rouge">ps -A</code>查看获取）</li>
+</ul>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-01-28-15170524361390.jpg" alt="" /></p>
+
+<ul>
+  <li>.decrypted文件就是脱壳后的可执行文件</li>
+</ul>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-01-28-15170524639653.jpg" alt="" /></p>
+
+<h2 id="dumdecrypted--细节">dumdecrypted – 细节</h2>
+
+<ul>
+  <li>
+    <p>在使用过程中，可能会遇到以下错误
+<img src="http://otogtitz7.bkt.clouddn.com/2018-01-28-15170524940481.jpg" alt="" /></p>
+  </li>
+  <li>原因：对dylib所在的文件夹权限不够</li>
+  <li>解决方案：将dylib放在用户所在文件夹，比如
+    <ul>
+      <li>如果是root用户，请将dylib放在<code class="language-plaintext highlighter-rouge">/var/root</code>目录</li>
+      <li>如果是mobile用户，请将dylib放在<code class="language-plaintext highlighter-rouge">/var/mobile</code>目录</li>
+    </ul>
+  </li>
+</ul>
+
+:ET

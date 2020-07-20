@@ -1,0 +1,80 @@
+I"p
+<ul>
+  <li>行内样式</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;body&gt;
+&lt;!--行内样式--&gt;
+    &lt;div style="font-size: 30px; color: red; background-color: blue;"&gt;121221323231221&lt;/div&gt;
+    &lt;div style="font-size: 30px; color: red; background-color: blue;"&gt;121221323231221&lt;/div&gt;
+    &lt;div style="font-size: 30px; color: red; background-color: blue;"&gt;121221323231221&lt;/div&gt;
+    &lt;div style="font-size: 30px; color: red; background-color: blue;"&gt;121221323231221&lt;/div&gt;
+    &lt;div style="font-size: 30px; color: red; background-color: blue;"&gt;121221323231221&lt;/div&gt;
+    &lt;div style="font-size: 30px; color: red; background-color: blue;"&gt;121221323231221&lt;/div&gt;
+
+    &lt;p&gt;r43fdjvbdflvnadkjvadjvndfajkvndavnavnadfkvnadjk&lt;/p&gt;
+&lt;/body&gt;
+</code></pre></div></div>
+<p>显然这种样式是非常麻烦的，代码非常冗余，真正开发中基本不用。</p>
+
+<ul>
+  <li>页内样式</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;!-- 单个文件当中使用--&gt;
+    &lt;title&gt;&lt;/title&gt;
+    &lt;style&gt;
+        div{
+            color: green;
+            font-size: 40px;
+            background-color: red;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div&gt;111111111111111111&lt;/div&gt;
+    &lt;div&gt;111111111111111111&lt;/div&gt;
+    &lt;div&gt;3333333333333333&lt;/div&gt;
+    &lt;div&gt;111111111111111111&lt;/div&gt;
+    &lt;div&gt;555555555555555&lt;/div&gt;
+
+    &lt;p&gt;222222222222222222&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre></div></div>
+<ul>
+  <li>外部样式。(*这种样式在开发中比较常见)</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;title&gt;&lt;/title&gt;
+    &lt;link rel="stylesheet" href="css/index.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div&gt;3322222223232332323&lt;/div&gt;
+    &lt;p&gt;2222222222222222222222&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre></div></div>
+<p>另外需要单独建立一个css文件，可供整个工程使用</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>div{
+    color: brown;
+    font-size: 50px;
+}
+
+p{
+    background-color: yellow;
+    color: green;
+    font-size: 39px;
+}
+</code></pre></div></div>
+
+:ET

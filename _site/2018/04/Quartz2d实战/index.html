@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <title>Quartz2D实战-画板工具</title>
+  <meta name="description" content="  一直想让自己每天都能进步，但是学习这个事情一直都无法坚持，只有自己感觉到了紧迫感，才会敲起代码，研究自己以前没接触过的知识，写博客的目的就是希望能够和更多的朋友一起讨论，促进交流，共同进步！！！">
+  <meta name="author" content="leopardpan">
+
+  <meta name="keywords" content="iOS开发,岑志军的个人博客,reactNative,ListView,wifi列表,reactnative开发,数字货币,加密货币,solidity,fabric,ethereum,blockchain,hyperledger,区块链部落,从零到壹全栈部落,智能合约,超级账本,ICO,比特币,以太坊" />
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Quartz2D实战-画板工具">
+  <meta name="twitter:description" content="  一直想让自己每天都能进步，但是学习这个事情一直都无法坚持，只有自己感觉到了紧迫感，才会敲起代码，研究自己以前没接触过的知识，写博客的目的就是希望能够和更多的朋友一起讨论，促进交流，共同进步！！！">
+  
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Quartz2D实战-画板工具">
+  <meta property="og:description" content="  一直想让自己每天都能进步，但是学习这个事情一直都无法坚持，只有自己感觉到了紧迫感，才会敲起代码，研究自己以前没接触过的知识，写博客的目的就是希望能够和更多的朋友一起讨论，促进交流，共同进步！！！">
+  
+  <link rel="icon" type="image/png" href="/images/favicon.png" />
+  <link href="/images/favicon.png" rel="shortcut icon" type="image/png">
+  
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+
+  <link rel="canonical" href="http://localhost:4000/2018/04/Quartz2d%E5%AE%9E%E6%88%98/">
+  <link rel="alternate" type="application/rss+xml" title="岑志军的个人博客" href="http://localhost:4000/feed.xml">
+  
+  <meta name="google-site-verification" content="1-1ZlHoRvM0T2FqPbW2S-qLgYXN6rsn52kErlMPd_gw" />
+
+<!-- 站点统计 -->
+  <script 
+  async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+  </script>  
+
+<!-- 百度统计 -->
+  
+  <script>
+      var _hmt = _hmt || [];
+      (function() {
+        var hm = document.createElement("script");
+        hm.src = "//hm.baidu.com/hm.js?0352fdd0e57585d9a54ff3a6906ae365";
+        var s = document.getElementsByTagName("script")[0]; 
+        s.parentNode.insertBefore(hm, s);
+      })();
+  </script>
+  
+
+<!-- google 统计 -->
+  
+
+</head>
+
+
+  <body>
+
+    <span class="mobile btn-mobile-menu">        
+      <div class="nav_container">
+         <nav class="nav-menu-item" style = "float:right">
+            <i class="nav-menu-item">
+              <a href="/#blog" title="" class="blog-button">  博客主页
+              </a>
+            </i>
+            
+                <i class="nav-menu-item">
+
+                  <a href="/archive" title="archive" class="btn-mobile-menu__icon">
+                      所有文章
+                  </a>
+                </i>
+            
+                <i class="nav-menu-item">
+
+                  <a href="/tags" title="tags" class="btn-mobile-menu__icon">
+                      分类
+                  </a>
+                </i>
+            
+                <i class="nav-menu-item">
+
+                  <a href="/about" title="about" class="btn-mobile-menu__icon">
+                      关于我
+                  </a>
+                </i>
+            
+          </nav>
+      </div>
+    </span>
+    
+    <header class="panel-cover panel-cover--collapsed" style="background-image: url('/images/background-cover.jpg')">
+  <div class="panel-main">
+
+    <div class="panel-main__inner panel-inverted">
+    <div class="panel-main__content">
+        <!-- 头像效果-start -->
+        <div class="ih-item circle effect right_to_left">            
+            <a href="/#blog" title="前往 岑志军的个人博客 的主页" class="blog-button">
+                <div class="img"><img src="/images/avatar.jpg" alt="img"></div>
+                <div class="info">
+                    <div class="info-back">
+                        <h2> 
+                            
+                                czjDevloper
+                            
+                        </h2>
+                        <p>
+                           
+                                iOS / React-Native
+                            
+                        </p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <!-- 头像效果-end -->
+        <h1 class="panel-cover__title panel-title"><a href="/#blog" title="link to homepage for 岑志军的个人博客" class="blog-button">岑志军的个人博客</a></h1>
+        
+        <span class="panel-cover__subtitle panel-subtitle">我的博客</span>
+        
+        <hr class="panel-cover__divider" />
+        <p class="panel-cover__description">欢迎来到我的博客~</p>
+        <hr class="panel-cover__divider panel-cover__divider--secondary" />
+        
+        
+        
+
+        <div class="navigation-wrapper">
+          <div>
+            <nav class="cover-navigation cover-navigation--primary">
+              <ul class="navigation">
+                <li class="navigation__item"><a href="/#blog" title="" class="blog-button">博客主页</a></li>
+                
+                  <li class="navigation__item"><a href="/archive" title="archive">所有文章</a></li>
+                
+                  <li class="navigation__item"><a href="/tags" title="tags">分类</a></li>
+                
+                  <li class="navigation__item"><a href="/about" title="about">关于我</a></li>
+                
+              </ul>
+            </nav>
+          </div>          
+        </div>
+
+
+        </div>
+      </div>
+    </div>
+    
+    
+    <div class="panel-cover--overlay cover-clear"></div>
+    
+  </div>
+</header>
+
+
+    <div class="content-wrapper">
+        <div class="content-wrapper__inner">
+            <article class="post-container post-container--single" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <h1 class="post-title">Quartz2D实战-画板工具</h1>
+    <div class="post-meta">
+      <img src="/images/calendar.png" width="20px"/> 
+      <time datetime="2018-04-21 00:00:00 +0800" itemprop="datePublished" class="post-meta__date date">2018-04-21</time>  
+         
+      <span id="busuanzi_container_page_pv"> | 阅读：<span id="busuanzi_value_page_pv"></span>次</span>
+    </p>
+    </div>
+  </header>
+
+  <section class="post">
+    <blockquote>
+  <p>一直想让自己每天都能进步，但是学习这个事情一直都无法坚持，只有自己感觉到了紧迫感，才会敲起代码，研究自己以前没接触过的知识，写博客的目的就是希望能够和更多的朋友一起讨论，促进交流，共同进步！！！</p>
+</blockquote>
+
+<h2 id="什么是quartz2d">什么是Quartz2D</h2>
+
+<p>Quartz2D的API是纯C语言的，它是一个二维绘图引擎，同时支持iOS和Mac系统。Quartz2D的API来自于<code class="language-plaintext highlighter-rouge">Core Graphics</code>框架，数据类型和函数基本都以CG作为前缀：<code class="language-plaintext highlighter-rouge">CGContextRef</code>、<code class="language-plaintext highlighter-rouge">CGPathRef</code>等。实际开发中<code class="language-plaintext highlighter-rouge">UIKit</code>框架能够帮我们完成大部分UI，但是有些UI比较复杂，普通的UIView无法满足我们的开发需要，这是就可以利用<code class="language-plaintext highlighter-rouge">Quartz2D</code>技术画出我们想要的控件。</p>
+
+<h2 id="drawrect">DrawRect:</h2>
+
+<p>首先我们需要知道，<code class="language-plaintext highlighter-rouge">- (void)drawRect:(CGRect)rect</code>方法是在什么时候调用：
+<img src="http://otogtitz7.bkt.clouddn.com/2018-04-21-15242802130958.jpg" alt="" /></p>
+
+<p>我们发现该方法是在视图即将展示的时候调用的，在这个方法中可以获取到上下文，将试图绘制到View上，其实每一个View内部都有一个<code class="language-plaintext highlighter-rouge">layer</code>属性，这个方法中就可以了取得一个layer,所以我们绘制的东西其实是绘制到View的layer上，试图之所以能够显示东西，就是因为他的内部有一个layer</p>
+
+<p>所以之所以实现drawRect:方法，是因为，在这个方法当中可以获取到图形上下文，之后，才会View才会展示出来</p>
+
+<p><code class="language-plaintext highlighter-rouge">- (void)drawRect:(CGRect)rect</code>的调用时机：</p>
+
+<ul>
+  <li>当view第一次显示到屏幕上时（被加到UIWindow上显示出来）</li>
+  <li>调用view的<code class="language-plaintext highlighter-rouge">setNeedsDisplay</code>或者<code class="language-plaintext highlighter-rouge">setNeedsDisplayInRect:</code>时</li>
+</ul>
+
+<h2 id="图形上下文graphics-context">图形上下文（Graphics Context）</h2>
+
+<ul>
+  <li>保存绘图信息、绘图状态</li>
+  <li>决定绘制的输出目标（绘制到什么地方去？）
+    <ul>
+      <li>（输出目标可以是PDF文件、Bitmap或者显示器的窗口上）</li>
+    </ul>
+  </li>
+  <li>相同的一套绘图序列，指定不同的Graphics Context，就可将相同的图像绘制到不同的目标上</li>
+</ul>
+
+<p>绘制好的图形会保存到图像上下文中去，图像上下文中的绘制的图像又会显示在我们指定的输出目标当中</p>
+
+<p>Quartz2D提供的几种上下文类型：</p>
+
+<ul>
+  <li>Bitmap Graphics Context</li>
+  <li>PDF Graphics Context</li>
+  <li>Window Graphics Context</li>
+  <li>Layer Graphics Context</li>
+  <li>Printer Graphics Context</li>
+</ul>
+
+<h2 id="quartz2d绘图的基本步骤">Quartz2D绘图的基本步骤</h2>
+
+<ol>
+  <li>获得图形上下文</li>
+  <li>拼接路径（下面代码是搞一条线段，添加矩形、椭圆、圆弧的代码可以查看具体的APi，用法基本相同）</li>
+  <li>绘制路径</li>
+</ol>
+
+<p>代码示例：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>CGContextRef ctx = UIGraphicsGetCurrentContext();
+
+CGContextMoveToPoint(ctx, 10, 10);
+CGContextAddLineToPoint(ctx, 100, 100);
+
+CGContextStrokePath(ctx); // CGContextFillPath(ctx);
+</code></pre></div></div>
+
+<h2 id="图形上下文栈的操作">图形上下文栈的操作</h2>
+
+<p>将当前的上下文copy一份,保存到栈顶(那个栈叫做”图形上下文栈”，<strong>先进后出</strong>)</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>void CGContextSaveGState(CGContextRef c)
+</code></pre></div></div>
+
+<p>将栈顶的上下文出栈,替换掉当前的上下文</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>void CGContextRestoreGState(CGContextRef c)
+</code></pre></div></div>
+
+<h2 id="quartz2d的内存管理">Quartz2D的内存管理</h2>
+
+<ul>
+  <li>使用含有“Create”或“Copy”的函数创建的对象，使用完后必须释放，否则将导致内存泄露</li>
+  <li>使用不含有“Create”或“Copy”的函数获取的对象，则不需要释放</li>
+  <li>如果retain了一个对象，不再使用时，需要将其release掉</li>
+  <li>可以使用Quartz 2D的函数来指定retain和release一个对象。例如，如果创建了一个CGColorSpace对象，则使用函数CGColorSpaceRetain和CGColorSpaceRelease来retain和release对象。</li>
+  <li>也可以使用Core Foundation的CFRetain和CFRelease。<strong>注意不能传递NULL值给这些函数</strong></li>
+</ul>
+
+<h2 id="实战-画板工具">实战-画板工具</h2>
+
+<p>了解了<code class="language-plaintext highlighter-rouge">Quartz2D</code>的基本知识后，我们就可以运用这些知识，进行一些综合的练习.</p>
+
+<h4 id="主要代码如下">主要代码如下</h4>
+
+<ol>
+  <li>添加手势</li>
+</ol>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(pan:)];
+[self addGestureRecognizer:pan];
+</code></pre></div></div>
+
+<p>实现方法：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void)pan:(UIPanGestureRecognizer *)pan{
+    // 获取当前位置所在点
+    CGPoint curP = [pan locationInView:self];
+    
+    // 笔尖代码（这段代码可以去掉，主要是加了个笔尖，完善功能，提升用户体验）
+    {
+        //获取偏移量
+        //获取的偏移量是相对于最原始的点
+        CGPoint transP = [pan translationInView:self.pointView];
+        
+        [self.pointView setAlpha:1.f];
+        
+        CGFloat pointW = self.lineWidth + 5;
+        CGPoint pointP = CGPointMake(curP.x - pointW / 2, curP.y - pointW / 2);
+        
+        [self.pointView setFrame:(CGRect){pointP, self.lineWidth + 5, self.lineWidth + 5}];
+        [self.pointView.layer setCornerRadius:self.pointView.bounds.size.width / 2];
+        [self.pointView.layer setBorderWidth:1.f];
+        [self.pointView.layer setBorderColor:self.lineColor.CGColor];
+        
+        self.pointView.transform = CGAffineTransformTranslate(self.pointView.transform, transP.x, transP.y);
+        
+        //清0操作(不让偏移量进行累加,获取的是相对于上一次的值,每一次走的值.)
+        [pan setTranslation:CGPointMake(0, 0) inView:self.pointView];
+    }
+    
+    if (pan.state == UIGestureRecognizerStateBegan) {
+        
+        ZJBezierPath *path = [ZJBezierPath bezierPath];
+        path.lineWidth = self.lineWidth;
+        path.lineJoinStyle = kCGLineJoinRound;
+        path.lineCapStyle = kCGLineCapRound;
+        path.lineColor = self.lineColor;    // //颜色必须得要在drawRect方法当中进行绘制    继承系统类,添加属性我们自己的东西.
+        self.path = path;
+        
+        //设置路径的起点
+        [self.path moveToPoint:curP];
+        
+        [self.pathArray addObject:path];
+        
+    } else if (pan.state == UIGestureRecognizerStateChanged){
+        
+        //添加一根线到当前手指所在的点
+        [self.path addLineToPoint:curP];
+        
+        [self setNeedsDisplay];
+        
+    } else if (pan.state == UIGestureRecognizerStateEnded){
+        [self.pointView setAlpha:0.f];
+    }
+}
+</code></pre></div></div>
+
+<p>代码里都有详细注释，下面主要讲解一些属性的设置区别：</p>
+
+<p>lineJoinStyle：有三种样式</p>
+
+<p>主要是线条的交接处的样式</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>typedef CF_ENUM(int32_t, CGLineJoin) {
+    kCGLineJoinMiter,
+    kCGLineJoinRound,
+    kCGLineJoinBevel
+};
+</code></pre></div></div>
+
+<p>注意观察线条的连接处</p>
+
+<p>kCGLineJoinMiter：
+<img src="http://otogtitz7.bkt.clouddn.com/2018-04-21-15242842023166.jpg" alt="" /></p>
+
+<p>kCGLineJoinRound：
+<img src="http://otogtitz7.bkt.clouddn.com/2018-04-21-15242842734094.jpg" alt="" /></p>
+
+<p>kCGLineJoinBevel
+<img src="http://otogtitz7.bkt.clouddn.com/2018-04-21-15242841103834.jpg" alt="" /></p>
+
+<ol>
+  <li>实现<code class="language-plaintext highlighter-rouge">- (void)drawRect:(CGRect)rect</code>方法</li>
+</ol>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void)drawRect:(CGRect)rect {
+    
+    for (ZJBezierPath *path in self.pathArray) {
+        
+      // 绘制路径
+      [path.lineColor set];
+      [path stroke];
+}
+</code></pre></div></div>
+
+<p>我们发现我们并没有在该方法内部获取上下文、描述路径等操作就可以将路径绘制到view上去。重点看<code class="language-plaintext highlighter-rouge">[path stroke]</code>方法，其实这个方法内部已经帮我们实现了绘制视图的几个步骤：</p>
+
+<ol>
+  <li>获取上下文</li>
+  <li>描述路径</li>
+  <li>把路径添加到上下文</li>
+  <li>把上下文的内容渲染到View的layer</li>
+</ol>
+
+<p>伪代码如下：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>1. 获取上下文
+CGContextRef ctx = UIGraphicsGetCurrentContext();
+
+2. 描述路径
+UIBezierPath *path = [UIBezierPath bezierPathWithRect:CGRectMake(0, 0, 10, 10)];
+    
+3. 把路径添加到上下文
+CGContextAddPath(ctx, path.CGPath);
+    
+4. 把上下文的内容渲染到View的layer
+CGContextStrokePath(ctx);
+</code></pre></div></div>
+
+<h1 id="代码地址"><a href="https://github.com/czjwarrior/DailyPractice">代码地址</a></h1>
+
+<h2 id="最终效果图">最终效果图</h2>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-04-21-15242857269228.gif" alt="" /></p>
+
+
+
+  </section>
+</article>
+
+<section>
+
+            <div class="content-play">
+              <p><a href="javascript:void(0)" onclick="dashangToggle()" class="dashang" title="打赏，支持一下">打赏一个呗</a></p>
+              <div class="hide_box-play"></div>
+              <div class="shang_box-play">
+                <a class="shang_close-play" href="javascript:void(0)" onclick="dashangToggle()" title="关闭"><img src="/images/payimg/close.jpg" alt="取消" /></a>
+                <div class="shang_tit-play">
+                  <p>感谢您的支持，我会继续努力的!</p>
+                </div>
+                <div class="shang_payimg">
+                    <img src="/images/payimg/alipayimg.jpg" alt="扫码支持" title="扫一扫" />
+                </div>
+              <div class="shang_payimg">    
+                    <img src="/images/payimg/weipayimg.jpg" alt="扫码支持" title="扫一扫" />
+                </div>
+                <div class="pay_explain">扫码打赏，你说多少就多少</div>
+                <div class="shang_payselect">
+                  <div class="pay_item checked" data-id="alipay">
+                    <span class="pay_logo"><img src="/images/payimg/alipay.jpg" alt="支付宝" /></span>
+                  </div>
+                  <div class="pay_item" data-id="weipay">
+                    <span class="pay_logo"><img src="/images/payimg/wechat.jpg" alt="微信" /></span>
+                  </div>
+                </div>
+                <div class="shang_info-play">
+                  <p>打开<span id="shang_pay_txt">支付宝</span>扫一扫，即可进行扫码打赏哦</p>
+                </div>
+              </div>
+            </div>
+            <script type="text/javascript">
+            function dashangToggle(){
+              $(".hide_box-play").fadeToggle();
+              $(".shang_box-play").fadeToggle();
+            }
+            </script>
+
+            <div style="text-align:center;margin:50px 0; font:normal 14px/24px 'MicroSoft YaHei';"></div>
+
+            <style type="text/css">
+              .content-play{width:80%;margin-top: 20px;margin-bottom: 10px;height:40px;}
+              .hide_box-play{z-index:999;filter:alpha(opacity=50);background:#666;opacity: 0.5;-moz-opacity: 0.5;left:0;top:0;height:99%;width:100%;position:fixed;display:none;}
+              .shang_box-play{width:540px;height:540px;padding:10px;background-color:#fff;border-radius:10px;position:fixed;z-index:1000;left:50%;top:50%;margin-left:-280px;margin-top:-280px;border:1px dotted #dedede;display:none;}
+              .shang_box-play img{border:none;border-width:0;}
+              .dashang{display:block;width:100px;margin:5px auto;height:25px;line-height:25px;padding:10px;background-color:#E74851;color:#fff;text-align:center;text-decoration:none;border-radius:10px;font-weight:bold;font-size:16px;transition: all 0.3s;}
+              .dashang:hover{opacity:0.8;padding:15px;font-size:18px;}
+              .shang_close-play{float:right;display:inline-block;
+                margin-right: 10px;margin-top: 20px;
+              }
+              .shang_logo{display:block;text-align:center;margin:20px auto;}
+              .shang_tit-play{width: 100%;height: 75px;text-align: center;line-height: 66px;color: #a3a3a3;font-size: 16px;background: url('/images/payimg/cy-reward-title-bg.jpg');font-family: 'Microsoft YaHei';margin-top: 7px;margin-right:2px;}
+              .shang_tit-play p{color:#a3a3a3;text-align:center;font-size:16px;}
+              .shang_payimg{width:140px;padding:10px;padding-left: 80px; /*border:6px solid #EA5F00;**/margin:0 auto;border-radius:3px;height:140px;display:inline-block;}
+              .shang_payimg img{display:inline-block;margin-right:10px;float:left;text-align:center;width:140px;height:140px; }
+              .pay_explain{text-align:center;margin:10px auto;font-size:12px;color:#545454;}
+              .shang_payselect{text-align:center;margin:0 auto;margin-top:40px;cursor:pointer;height:60px;width:500px;margin-left:110px;}
+              .shang_payselect .pay_item{display:inline-block;margin-right:140px;float:left;}
+              .shang_info-play{clear:both;}
+              .shang_info-play p,.shang_info-play a{color:#C3C3C3;text-align:center;font-size:12px;text-decoration:none;line-height:2em;}
+            </style>
+
+       <ul class="pager">
+        
+        <li class="previous">
+            <a href="/2018/03/msgSend-02/" data-toggle="tooltip" data-placement="top" title="（4）OC中消息和消息转发-02">上一篇：  <span>（4）OC中消息和消息转发-02</span>
+            </a>
+        </li>
+        
+        
+        <li class="next">
+            <a href="/2018/04/autoPacking/" data-toggle="tooltip" data-placement="top" title="fastlane实现自动化打包">下一篇：  <span>fastlane实现自动化打包</span>
+            </a>
+        </li>
+        
+    </ul>
+</section>
+
+<section class="post-comments">
+
+
+    <!-- <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    <script src="https://img1.cache.netease.com/f2e/tie/yun/sdk/loader.js"></script>
+    <script>
+    var cloudTieConfig = {
+      url: document.location.href, 
+      sourceId: "",
+      productKey: "aa395cf7778f458492060f3f53301b7c",
+      target: "cloud-tie-wrapper"
+    };
+    var yunManualLoad = true;
+    Tie.loader("aHR0cHM6Ly9hcGkuZ2VudGllLjE2My5jb20vcGMvbGl2ZXNjcmlwdC5odG1s", true);
+    </script> -->
+
+    <script type="text/javascript" id="wumiiComments">
+      var wumiiPermaLink = "http://www.cenzhijun.top/2018/04/Quartz2d%E5%AE%9E%E6%88%98/"; //请用代码生成文章永久的链接
+      var wumiiTitle = "Quartz2D实战-画板工具"; //请用代码生成文章标题
+      var wumiiSitePrefix = "http://www.cenzhijun.top"; //安装无觅评论插件的网站的域名，如果是放在子域名上，请提供子域名，如"http://blog.wumii.com"。如果这里填写的域名不对，请自行改正。
+      var wumiiCommentParams = "&pf=JAVASCRIPT";
+
+    </script>
+    <script type="text/javascript" src="http://widget.wumii.cn/ext/cw/widget"></script>
+
+
+  
+</section>
+
+
+            <section class="footer">
+    <footer>
+        <div class = "footer_div">  
+        <nav class="cover-navigation navigation--social">
+          <ul class="navigation">
+
+          
+          <!-- Weibo -->
+          <li class="navigation__item_social">
+            <a href="http://weibo.com/3291155444" title="@3291155444 的微博" target="_blank">
+              <i class='social fa fa-weibo fa-2x'></i>
+              <span class="label">Weibo</span>
+            </a>
+          </li>
+          
+
+          
+          <!-- Github -->
+          <li class="navigation__item_social">
+            <a href="https://github.com/czjwarrior" title="@czjwarrior 的 Github" target="_blank">
+              <i class='social fa fa-github fa-2x'></i>
+              <span class="label">Github</span>
+            </a>
+          </li>
+          
+          
+          
+
+          
+
+          <!-- RSS -->
+          <li class="navigation__item_social">
+            <a href="/feed.xml" rel="author" title="RSS" target="_blank">
+              <i class='social fa fa-rss fa-2x'></i>
+              <span class="label">RSS</span>
+            </a>
+          </li>
+
+          
+          <!-- Email -->
+          <li class="navigation__item_social">
+            <a href="mailto:13621130170@163.com" title="Contact me">
+              <i class='social fa fa-envelope fa-2x'></i>
+              <span class="label">Email</span>
+            </a>
+          </li>
+          
+
+          </ul>
+        </nav>
+
+        </div>
+
+        <div class = "footer_div">  
+           <p class="copyright text-muted">
+            Copyright &copy; 岑志军的个人博客 2020
+            </p>
+        	<div align="right">
+    			<link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+
+          <!-- 访问统计 -->
+          <span id="busuanzi_container_site_pv">
+            本站总访问量
+            <span id="busuanzi_value_site_pv"></span>次
+          </span>
+
+        </div>
+        <div>
+    </footer>
+</section>
+
+        </div>
+    </div>
+    
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="/js/main.js"></script>
+
+<script type="text/javascript" src="/js/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+  </body>
+
+</html>

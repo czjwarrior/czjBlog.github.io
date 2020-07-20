@@ -1,0 +1,103 @@
+I"<blockquote>
+  <p><a href="http://www.cenzhijun.top/">欢迎访问我的个人博客</a></p>
+</blockquote>
+
+<p>1、首先判断当前通讯录是否存在这个联系人</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 判断通讯录是否存在某个联系人
++ (BOOL)isExistContactNameByName:(NSString *)contactName{
+    ABAddressBookRef addBook = nil;
+    
+    __block BOOL isExist = NO;
+    CFErrorRef error = nil;
+    addBook = ABAddressBookCreateWithOptions(NULL, &amp;error);
+    
+    dispatch_semaphore_t sema=dispatch_semaphore_create(0);
+    // 申请权限
+    ABAddressBookRequestAccessWithCompletion(addBook, ^(bool granted, CFErrorRef error) {
+        if (granted) {
+            CFArrayRef allPeople = ABAddressBookCopyArrayOfAllPeople(addBook);
+            CFIndex number = ABAddressBookGetPersonCount(addBook);
+            for (NSInteger index = 0; index &lt; number; index++) {
+                //获取联系人对象的引用
+                ABRecordRef  people = CFArrayGetValueAtIndex(allPeople, index);
+                //获取当前联系人名字
+                NSString*firstName=(__bridge NSString *)(ABRecordCopyValue(people, kABPersonFirstNameProperty));
+                
+                if ([firstName isEqualToString:contactName]) {
+                    isExist = YES;
+                }
+            }
+        }
+        dispatch_semaphore_signal(sema);
+    });
+    //等待信号触发
+    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+    
+    return isExist;
+}
+</code></pre></div></div>
+
+<p>2、判断是否存在这个联系人且有通讯录权限</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void)saveYdCallAnswerPhoneToAdrBook{
+    NSString *ydContactName = @"亿点连接呼转测试";
+    NSString *ydContactNote = @"这是亿点连接的电话测试号码";
+    if (![SSAdrBookHelper isExistContactNameByName:ydContactName] &amp;&amp;
+        ABAddressBookGetAuthorizationStatus() == kABAuthorizationStatusAuthorized) {
+        
+        [SSAdrBookHelper createAddBookRecordByPhoneArr:self.ydPhoneArray
+                                              andTitle:ydContactName
+                                               andNote:ydContactNote];
+    }
+}
+</code></pre></div></div>
+
+<p>3、存入联系人</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 往通讯录添加一条新联系人
++ (void)createAddBookRecordByPhoneArr:(NSArray *)phoneArr andTitle:(NSString *)title andNote:(NSString *)note{
+    CFErrorRef error = NULL;
+    if (!phoneArr || !title) {return;}
+    
+    ABAddressBookRef addressBook = ABAddressBookCreateWithOptions(NULL, &amp;error);
+    ABRecordRef newRecord = ABPersonCreate();
+
+    ABRecordSetValue(newRecord, kABPersonFirstNameProperty, (__bridge CFTypeRef)title, &amp;error);
+    
+    //创建一个多值属性(电话)
+    ABMutableMultiValueRef multi = ABMultiValueCreateMutable(kABMultiStringPropertyType);
+//    ABMultiValueAddValueAndLabel(multi, (__bridge CFTypeRef)obj, (__bridge CFStringRef)@"亿点连接呼转测试", NULL);
+    
+    [phoneArr enumerateObjectsUsingBlock:^(NSString *phone, NSUInteger idx, BOOL * _Nonnull stop) {
+    // 添加手机号码
+        ABMultiValueAddValueAndLabel(multi, (__bridge CFTypeRef)phone, kABPersonPhoneMobileLabel, NULL);
+    }];
+    
+    ABRecordSetValue(newRecord, kABPersonPhoneProperty, multi, &amp;error);
+    
+    //添加email
+//    ABMutableMultiValueRef multiEmail = ABMultiValueCreateMutable(kABMultiStringPropertyType);
+//    ABMultiValueAddValueAndLabel(multiEmail, (__bridge CFTypeRef)([self.infoDic objectForKey:@"email"]), kABWorkLabel, NULL);
+//    ABRecordSetValue(newRecord, kABPersonEmailProperty, multiEmail, &amp;error);
+    
+    // 添加备注
+    ABRecordSetValue(newRecord, kABPersonNoteProperty, (__bridge CFTypeRef)note, &amp;error);
+    
+    //添加记录到通讯录操作对象
+    ABAddressBookAddRecord(addressBook, newRecord, &amp;error);
+    
+    //保存通讯录操作对象
+    ABAddressBookSave(addressBook, &amp;error);
+
+    CFRelease(multi);
+    CFRelease(newRecord);
+    CFRelease(addressBook);
+}
+</code></pre></div></div>
+
+<p>效果如下：</p>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2017-11-13-contact.png" alt="" /></p>
+
+:ET

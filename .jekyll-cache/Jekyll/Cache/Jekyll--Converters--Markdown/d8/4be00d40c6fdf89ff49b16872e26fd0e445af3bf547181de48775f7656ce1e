@@ -1,0 +1,148 @@
+I"�<h2 id="什么是cycript">什么是Cycript</h2>
+
+<p>Cycript是Objective-C++、ES6（JavaScript）、Java等语法的混合物</p>
+
+<ul>
+  <li>可以用来探索、修改、调试正在运行的Mac\iOS APP</li>
+  <li>官网： http://www.cycript.org/</li>
+  <li>文档： http://www.cycript.org/manual/</li>
+  <li>通过Cydia安装Cycript，即可在iPhone上调试运行中的APP</li>
+</ul>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-01-22-15166098213735.jpg" alt="" /></p>
+
+<h2 id="cycript的开启和关闭">Cycript的开启和关闭</h2>
+
+<ul>
+  <li>开启
+    <ul>
+      <li>cycript</li>
+      <li>cycript -p 进程ID</li>
+      <li>cycript -p 进程名称</li>
+    </ul>
+  </li>
+</ul>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-01-22-15166099407954.jpg" alt="" /></p>
+
+<ul>
+  <li>取消输入：Ctrl + C</li>
+  <li>退出：Ctrl + D</li>
+  <li>清屏：Command + R</li>
+</ul>
+
+<h2 id="ps命令">ps命令</h2>
+
+<ul>
+  <li>安装adv-cmds</li>
+</ul>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-01-22-15166100367048.jpg" alt="" /></p>
+
+<p>ps命令是process status的缩写，使用ps命令可以列出系统当前的进程</p>
+
+<ul>
+  <li>列出所有的进程
+    <ul>
+      <li>ps –A</li>
+      <li>ps aux</li>
+    </ul>
+  </li>
+  <li>搜索关键词
+    <ul>
+      <li>
+        <table>
+          <tbody>
+            <tr>
+              <td>ps –A</td>
+              <td>grep 关键词</td>
+            </tr>
+          </tbody>
+        </table>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="常用语法1">常用语法1</h2>
+
+<ul>
+  <li>UIApp （[UIApplication sharedApplication]）</li>
+</ul>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-01-22-15166101582794.jpg" alt="" /></p>
+
+<ul>
+  <li>定义变量
+    <ul>
+      <li>var 变量名 = 变量值</li>
+    </ul>
+  </li>
+  <li>用内存地址获取对象
+    <ul>
+      <li><code class="language-plaintext highlighter-rouge">#内存地址</code></li>
+    </ul>
+  </li>
+  <li>ObjectiveC.classes
+    <ul>
+      <li>已加载的所有OC类</li>
+    </ul>
+  </li>
+  <li>查看对象的所有成员变量
+    <ul>
+      <li><code class="language-plaintext highlighter-rouge">*对象</code></li>
+    </ul>
+  </li>
+</ul>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-01-22-15166102765712.jpg" alt="" /></p>
+
+<h2 id="常用语法2">常用语法2</h2>
+
+<ul>
+  <li>递归打印view的所有子控件（跟LLDB一样的函数）
+    <ul>
+      <li>view.recursiveDescription().toString()</li>
+    </ul>
+  </li>
+  <li>筛选出某种类型的对象
+    <ul>
+      <li>choose(UIViewController)</li>
+      <li>choose(UITableViewCell)</li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="封装cycript---cy文件编写">封装Cycript - .cy文件编写</h2>
+
+<ul>
+  <li>我们可以将常用的Cycript代码封装在一个.cy文件中</li>
+  <li>exports参数名固定，用于向外提供接口</li>
+</ul>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-01-22-15166104113604.jpg" alt="" /></p>
+
+<h2 id="封装cycript---存放和使用cy文件">封装Cycript - 存放和使用.cy文件</h2>
+
+<p>将.cy文件存放到/usr/lib/cycript0.9目录下</p>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-01-22-15166104607678.jpg" alt="" /></p>
+
+<p>在Cycript中引用.cy文件，并使用它提供的接口</p>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-01-22-15166104821399.jpg" alt="" /></p>
+
+<h2 id="cycript库">Cycript库</h2>
+
+<ul>
+  <li>https://github.com/CoderMJLee/mjcript</li>
+  <li>具体用法参考mjcript.cy文件</li>
+</ul>
+
+<h2 id="利用python打印字符">利用python打印字符</h2>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-01-22-15166105772382.jpg" alt="" /></p>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-01-22-15166105824565.jpg" alt="" /></p>
+
+:ET

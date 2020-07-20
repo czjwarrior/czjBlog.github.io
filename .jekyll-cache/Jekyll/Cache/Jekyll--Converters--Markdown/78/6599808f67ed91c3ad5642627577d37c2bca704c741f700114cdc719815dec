@@ -1,0 +1,171 @@
+I"�<blockquote>
+  <p>最近几天学了几个ReactNative组件，总觉得单纯的学几个组件进步慢，所以我打算做一些综合性的小案例，练习下实战，我从网上找到<a href="http://www.jianshu.com/p/85a691b6d5b2">一个小案例</a>
+，感觉挺好，也学习了很多，代码内容可能不太一样，主要区别是：我把RN官方不推荐或者已经放弃了的组件进行了替换，如果有需要的可以互相参考下</p>
+</blockquote>
+
+<p>接着上篇案例开始写，这篇文章将会讲解如何怎样利用WebView加载HTML文件。</p>
+
+<p>在<code class="language-plaintext highlighter-rouge">WYNewsDetail.js</code>文件写如下代码：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>import React, { Component } from 'react';
+import {
+    StyleSheet,
+    Text,
+    View,
+    WebView
+} from 'react-native';
+
+import Request from '../Utils/WYRequest';
+
+export default class WYNewsDetail extends Component {
+  static navigationOptions = ({ navigation }) =&gt; ({
+    title: navigation.state.params.title,
+  });
+
+  constructor(props){
+    super(props);
+
+    this.state = {
+      docid:'',
+    };
+  }
+
+  componentDidMount() {
+    const {params} = this.props.navigation.state;
+
+    this.setState({
+      docid: params.docid,
+      html: '',
+    });
+
+    var url_api = 'http://c.m.163.com/nc/article/' + params.docid + '/full.html';
+    Request.get(url_api, (responseData) =&gt; {
+
+      // 取出数据
+      var allData = responseData[this.state.docid];
+
+      var body = allData['body'];
+      // 取出图片
+      var img = allData['img'];
+      for (var i = 0; i &lt; img.length; i++) {
+        var item = img[i];
+        var ref = item.ref;
+        var src = item.src;
+        var newImg = '&lt;img src="'+ src +'" width="100%"&gt;';
+        body = body.replace(ref, newImg);
+
+        console.log('====================================');
+        console.log(ref, src);
+        console.log('====================================');
+      }
+
+      // 更新UI
+      this.setState({
+        html: body,
+      });
+    }, (error) =&gt; {
+      alert(error);
+    });
+  }
+
+  render() {
+    return (
+      &lt;WebView
+        automaticallyAdjustContentInsets={true}
+        // source=  加载网页
+        source=
+        javaScriptEnabled={true}
+        domStorageEnabled={true}
+        startInLoadingState={true}
+      /&gt;
+    );
+  }
+}
+
+const styles = StyleSheet.create({
+  background: {
+    backgroundColor: 'red',
+    flex: 1,
+    justifyContent: 'center',
+    alignItems:'center'
+  },
+
+  textStyle: {
+    fontSize:30,
+  }
+});
+</code></pre></div></div>
+
+<p>主要知识点：</p>
+<ul>
+  <li>界面传值</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>static navigationOptions = ({ navigation }) =&gt; ({
+    title: navigation.state.params.title,
+  });
+  
+componentDidMount() {
+    const {params} = this.props.navigation.state;
+
+    this.setState({
+      docid: params.docid,
+      html: '',
+    });
+</code></pre></div></div>
+
+<p>还有一个bug，就是当界面跳转的时候，左上角返回按钮和文字依旧是系统的蓝色，如何修改颜色，<a href="http://www.jianshu.com/p/2f575cc35780">就用到了自定义功能了</a></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>const StackOptions = ({navigation}) =&gt; {
+    console.log(navigation);
+    let {state,goBack} = navigation;
+
+    // 用来判断是否隐藏或显示header
+    const visible= state.params.isVisible;
+    let header;
+    if (visible === true){
+        header = null;
+    }
+    const headerStyle = {backgroundColor:'#4ECBFC'};
+    const headerTitle = state.params.title;
+    const headerTitleStyle = {fontSize:FONT_SIZE(20),color:'white',fontWeight:'500'}
+    const headerBackTitle = false;
+    const headerLeft = (
+        &lt;Button
+            isCustom={true}
+            customView={
+                            &lt;Icon
+                                name='ios-arrow-back'
+                                size={30}
+                                color='white'
+                                style=
+                            /&gt;
+                        }
+            onPress={()=&gt;{goBack()}}
+        /&gt;
+    );
+    return {headerStyle,headerTitle,headerTitleStyle,headerBackTitle,headerLeft,header}
+};
+</code></pre></div></div>
+
+<p>通过下面的方式调用：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>const MyApp = StackNavigator({
+    MyTab: {
+        screen: MyTab,
+    },
+    Detail: {
+        screen: Detail,
+        navigationOptions: ({navigation}) =&gt; StackOptions({navigation})
+    },
+)};
+
+</code></pre></div></div>
+
+<h2 id="至此第一个小案例就做完了">至此第一个小案例就做完了</h2>
+
+<h2 id="效果图">效果图</h2>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2017-08-22.gif" alt="" /></p>
+
+:ET

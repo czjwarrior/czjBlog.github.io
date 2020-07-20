@@ -1,0 +1,118 @@
+I"�<h3 id="1创建工程">1、创建工程</h3>
+
+<p><img src="/images/posts/imessage/imessage01.jpg" alt="" /></p>
+
+<h3 id="2工程创建完成后的目录结构">2、工程创建完成后的目录结构</h3>
+
+<p><img src="/images/posts/imessage/imessage02.jpg" alt="" /></p>
+
+<p>###3、接下来开始写代码</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//
+//  MessagesViewController.swift
+//  MessagesExtension
+//
+//  Created by 岑志军 on 2016/9/28.
+//  Copyright © 2016年 cen. All rights reserved.
+//
+
+
+/*
+ 虽然没有严格限制,但是苹果建议的表情文件大小:
+ 1. Small: 100 x 100 pt @3x scale (300 x 300 pixel image)
+ 2. Medium: 136 x 136 pt @3x scale (378 x 378 pixel image)
+ 3. Large: 206 x 206 pt @3x scale (618 x 618 pixel image)
+
+ 表情包的大小:
+ 1. 文件中images不可以大于500kb;
+ 2. iamge不可以小于100 x 100 pt (300 x 300 pixels).
+ 3. iamge不可以大于206 x 206 pt (618 x 618 pixels).
+ 4. 图片格式必须是 PNG, APNG, JPEG, GIF ;
+
+
+ MessageExtension文件
+ 1. MessagesViewController.swift : iMessage app的程序入口;
+ 2. MainInterface.storyboard: 可视化操作;
+ 3. Assets.xcassets: 图片集合;
+ 4. Info.plist : 配置一些扩展信息;
+ */
+
+import UIKit
+import Messages
+
+class MessagesViewController: MSMessagesAppViewController {
+
+
+    // 创建一个MSSticker数组来存储我们的表情包
+    var stickers = [MSSticker]()
+
+    /*
+     case small 小图模式
+     case regular 中图
+     case large   大图
+     */
+     // 要想显示图片表情,必须要初始化一个MSStickerBrowserViewController作为根视图,代码如下
+    private func setupStickerBrowser() {
+        let controller = MSStickerBrowserViewController(stickerSize: .small)
+
+        addChildViewController(controller)
+        view.addSubview(controller.view)
+
+        // 设置数据源
+        controller.stickerBrowserView.dataSource = self
+
+        // 布局
+        view.topAnchor.constraint(equalTo: controller.view.topAnchor).isActive = true
+        view.bottomAnchor.constraint(equalTo: controller.view.bottomAnchor).isActive = true
+        view.leftAnchor.constraint(equalTo: controller.view.leftAnchor).isActive = true
+        view.rightAnchor.constraint(equalTo: controller.view.rightAnchor).isActive = true
+    }
+
+    // 5.加载表情包,上面设置了数据源,所以我们要加载图片(数据)
+    private func loadStickers() {
+        for i in 1...31 {
+            let str = String(format: "%02d", i)
+            print(str)
+            if let url = Bundle.main.url(forResource: str, withExtension: "gif") {
+
+                do {
+                    let sticker = try MSSticker(contentsOfFileURL: url, localizedDescription: "")
+                    stickers.append(sticker)
+                } catch {
+                    print(error)
+                }
+
+            }
+
+        }
+    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        // Do any additional setup after loading the view.
+        // 初始化本地表情包
+        loadStickers()
+        // 创建本地表情包控制器
+        setupStickerBrowser()
+    }
+}
+
+// 实现MSStickerBrowserViewController数据源方法
+extension MessagesViewController: MSStickerBrowserViewDataSource{
+    // 一共有多少个
+    func numberOfStickers(in stickerBrowserView: MSStickerBrowserView) -&gt; Int {
+        return stickers.count
+    }
+
+    // 每一个要显示什么
+    func stickerBrowserView(_ stickerBrowserView: MSStickerBrowserView, stickerAt index: Int) -&gt; MSSticker {
+        return stickers[index]
+    }
+}
+</code></pre></div></div>
+
+<h2 id="最后大功告成">最后大功告成：</h2>
+
+<p><img src="/images/posts/imessage/imessage03.gif" alt="" /></p>
+
+:ET

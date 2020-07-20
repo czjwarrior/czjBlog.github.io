@@ -1,0 +1,70 @@
+I"v<p>最近刚开始学习HTML5，记录一下自己学习的笔记，方便以后查阅： 
+首先选择器的常用分类：</p>
+
+<ul>
+  <li>标签选择器</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>div{
+       color: red;
+   }
+</code></pre></div></div>
+<ul>
+  <li>类选择器</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>.one{
+       color: yellow;
+    }
+</code></pre></div></div>
+<ul>
+  <li>id选择器，注意id是唯一的标示，不能用于其他标签</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#main{
+       font-size: 40px;
+     }
+</code></pre></div></div>
+<ul>
+  <li>后代选择器</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#test1 div{
+            color: black;
+            font-size: 50px;
+        }
+</code></pre></div></div>
+
+<ul>
+  <li>属性选择器</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>div[name]{
+            color: blue;
+        }
+</code></pre></div></div>
+
+<p>Demo练习：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;body&gt;
+    &lt;div id="main"&gt;11111111111111&lt;/div&gt;
+    &lt;div&gt;11111111111111&lt;/div&gt;
+    &lt;div&gt;11111111111111&lt;/div&gt;
+
+    &lt;p&gt;2222222222222&lt;/p&gt;
+
+    &lt;div class="one"&gt;2222222222&lt;/div&gt;
+    &lt;p class="one"&gt;4444444444444&lt;/p&gt;
+
+    &lt;div id="test1"&gt;
+        &lt;p&gt;
+            &lt;div&gt;3434343424234&lt;/div&gt;
+        &lt;/p&gt;
+    &lt;/div&gt;
+
+    &lt;div name="cen"&gt;98989898&lt;/div&gt;
+    &lt;div&gt;77777777777&lt;/div&gt;
+&lt;/body&gt;
+</code></pre></div></div>
+
+:ET

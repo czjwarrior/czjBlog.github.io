@@ -1,0 +1,241 @@
+I"�!<h2 id="安装签名工具ldid">安装签名工具ldid</h2>
+<ul>
+  <li>先确保安装了<a href="https://brew.sh/">brew</a></li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+</code></pre></div></div>
+
+<ul>
+  <li>利用<code class="language-plaintext highlighter-rouge">brew</code>安装<code class="language-plaintext highlighter-rouge">ldid</code></li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ brew install ldid
+</code></pre></div></div>
+
+<h2 id="修改环境变量">修改环境变量</h2>
+
+<ul>
+  <li>编辑用户的配置文件</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ vim ~/.bash_profile
+</code></pre></div></div>
+
+<ul>
+  <li>在<code class="language-plaintext highlighter-rouge">.bash_profile</code>文件后面加入以下2行</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>export THEOS=~/theos
+export PATH=$THEOS/bin:$PATH
+</code></pre></div></div>
+
+<ul>
+  <li>让<code class="language-plaintext highlighter-rouge">.bash_profile</code>配置的环境变量立即生效（或者重新打开终端）</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ source ~/.bash_profile
+</code></pre></div></div>
+
+<h2 id="下载theos">下载theos</h2>
+
+<ul>
+  <li>建议在<code class="language-plaintext highlighter-rouge">$THEOS</code>目录下载代码（也就是刚才配置的<code class="language-plaintext highlighter-rouge">~/theos</code>）</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ git clone --recursive https://github.com/theos/theos.git $THEOS
+</code></pre></div></div>
+
+<h2 id="新建tweak项目">新建tweak项目</h2>
+
+<ul>
+  <li>cd到一个存放项目代码的文件夹（比如桌面）</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ cd ~/Desktop
+$ nic.pl
+</code></pre></div></div>
+<ul>
+  <li>选择<code class="language-plaintext highlighter-rouge">[11.] iphone/tweak</code></li>
+</ul>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-01-28-15171339273450.jpg" alt="" /></p>
+
+<ul>
+  <li>填写项目信息
+    <ul>
+      <li>Project Name (项目名称)</li>
+      <li>Package Name（项目ID，可随便写）</li>
+      <li>Author/Maintainer Name
+        <ul>
+          <li>作者</li>
+          <li>直接回车就行，默认Mac上的用户名</li>
+        </ul>
+      </li>
+      <li>[iphone/tweak] MobileSubstrate Bundle filter
+        <ul>
+          <li>需要修改的APP的Bundle identifier</li>
+          <li>可以通过<code class="language-plaintext highlighter-rouge">Cycript</code>查看APP的Bundle identifier</li>
+        </ul>
+      </li>
+      <li>[iphone/tweak] List of applications to terminate upon installation
+        <ul>
+          <li>直接回车就行</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="编辑makefile">编辑Makefile</h2>
+
+<ul>
+  <li>在前面加入环境变量，写清楚通过哪个IP和端口访问手机
+    <ul>
+      <li>THEOS_DEVICE_IP</li>
+      <li>THEOS_DEVICE_PORT</li>
+    </ul>
+  </li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>export THEOS_DEVICE_IP=127.0.0.1
+export THEOS_DEVICE_PORT=10010
+
+
+include $(THEOS)/makefiles/common.mk
+
+TWEAK_NAME = tingtweak2
+tingtweak2_FILES = Tweak.xm
+
+include $(THEOS_MAKE_PATH)/tweak.mk
+
+after-install::
+	install.exec "killall -9 SpringBoard"
+</code></pre></div></div>
+
+<p>如果不希望每个项目的Makefile都编写IP和端口环境变量，也可以添加到用户的配置文件中，编辑完毕后<code class="language-plaintext highlighter-rouge">$ source ~/.bash_profile</code>(或者重启终端)</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ vim ~/.bash_profile
+export THEOS=~/theos
+export PATH=$THEOS/bin:$PATH
+export THEOS_DEVICE_IP=127.0.0.1
+export THEOS_DEVICE_PORT=10010
+$ source ~/.bash_profile
+</code></pre></div></div>
+
+<h2 id="编写代码">编写代码</h2>
+
+<ul>
+  <li>打开<code class="language-plaintext highlighter-rouge">Tweak.xm</code>文件</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>%hook XMSoundPatchImageView
+
+- (id)initWithFrame:(struct CGRect)arg1{
+	return nil;
+}
+
+%end
+
+%hook XMAdAnimationViewTwo
+
+- (id)initWithFrame:(struct CGRect)arg1{
+	return nil;
+}
+
+%end
+</code></pre></div></div>
+
+<h2 id="编译-打包-安装">编译-打包-安装</h2>
+
+<ul>
+  <li>编译</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>make
+</code></pre></div></div>
+
+<ul>
+  <li>打包成<code class="language-plaintext highlighter-rouge">deb</code></li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>make package
+</code></pre></div></div>
+
+<ul>
+  <li>安装</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>make install
+</code></pre></div></div>
+
+<h2 id="可能遇到的问题">可能遇到的问题</h2>
+
+<h4 id="make-package的错误"><code class="language-plaintext highlighter-rouge">make package</code>的错误</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> $ make package
+  Can't locate IO/Compress/Lzma.pm in @INC (you may need to install the
+  IO::Compress::Lzma module) (@INC contains: /Library/Perl/5.18/darwin-
+  thread-multi-2level /Library/Perl/5.18 /Network/Library/Perl/5.18/darwin-
+  thread-multi-2level /Network/Library/Perl/5.18 /Library/Perl/Updates/5.18.2
+  /System/Library/Perl/5.18/darwin-thread-multi-2level
+  /System/Library/Perl/5.18 /System/Library/Perl/Extras/5.18/darwin-thread-
+  multi-2level /System/Library/Perl/Extras/5.18 .) at
+  /Users/mj/theos/bin/dm.pl line 12.
+  BEGIN failed--compilation aborted at /Users/mj/theos/bin/dm.pl line 12.
+  make: *** [internal-package] Error 2
+</code></pre></div></div>
+
+<ul>
+  <li>是因为打包压缩方式有问题，改成<code class="language-plaintext highlighter-rouge">gzip</code>压缩就行了
+    <ul>
+      <li>修改<code class="language-plaintext highlighter-rouge">dm.pl</code>文件，用<code class="language-plaintext highlighter-rouge">#</code>号注释掉下面两句</li>
+    </ul>
+  </li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ vim $THEOS/vendor/dm.pl/dm.pl
+#use IO::Compress::Lzma;
+#use IO::Compress::Xz;
+</code></pre></div></div>
+
+<ul>
+  <li>修改<code class="language-plaintext highlighter-rouge">deb.mk</code>文件第6行的压缩方式为<code class="language-plaintext highlighter-rouge">gzip</code></li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ vim $THEOS/makefiles/package/deb.mk
+           _THEOS_PLATFORM_DPKG_DEB_COMPRESSION ?= gzip
+</code></pre></div></div>
+
+<h4 id="make的错误">make的错误</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ make
+  Error: You do not have an SDK in
+  /Library/Developer/CommandLineTools/Platforms/iPhoneOS.platform/Developer/S
+  DKs
+</code></pre></div></div>
+
+<ul>
+  <li>是因为多个Xcode导致路径（可能安装了多个xcode）,需要指定以下xcode</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ sudo xcode-select --switch
+/Applications/Xcode.app/Contents/Developer/
+</code></pre></div></div>
+
+<ul>
+  <li>之前编译过，有会有以下提示</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ make
+  &gt; Making all for tweak xxx...
+  make[2]: Nothing to be done for `internal-library-compile'. 
+</code></pre></div></div>
+
+<p>这是因为缓存导致的，但是不影响操作，如需出现原来的打印，可以<code class="language-plaintext highlighter-rouge">clean</code>一下</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ make clean
+$ make
+</code></pre></div></div>
+
+:ET

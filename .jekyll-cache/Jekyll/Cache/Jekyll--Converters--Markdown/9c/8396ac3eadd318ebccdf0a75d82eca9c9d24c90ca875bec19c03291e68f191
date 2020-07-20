@@ -1,0 +1,8 @@
+I"<p>```
+// 获取网络环境的方法</p>
+<ul>
+  <li>(NSString *)networktype{
+  NSArray *subviews = [[[[UIApplication sharedApplication] valueForKey:@”statusBar”] valueForKey:@”foregroundView”]subviews];
+  NSNumber *dataNetworkItemView = nil;</li>
+</ul>
+:ET

@@ -1,0 +1,74 @@
+I"x<p>一、默认情况下，所有的网页标签都在标准流布局中，从上到下，从左到右。
+脱离标准流的方法有：</p>
+
+<ul>
+  <li>float属性</li>
+  <li>position属性和left、right、top、bottom属性</li>
+</ul>
+
+<p>1、float属性的常用取值有：</p>
+
+<ul>
+  <li>left：脱离标准流，浮动在父标签的最左边</li>
+  <li>right：脱离标准流，浮动在父标签的最右边</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;title&gt;&lt;/title&gt;
+    &lt;style&gt;
+        .one{
+            background-color: red;
+            width: 100px;
+
+            float: right;
+        }
+        .two{
+            background-color: yellow;
+            width: 90px;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="one"&gt;11111111111&lt;/div&gt;
+    &lt;div class="two"&gt;111111111111&lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre></div></div>
+
+<p>2、position属性取值</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;title&gt;&lt;/title&gt;
+    &lt;style&gt;
+        .one{
+            background-color: red;
+            width: 500px;
+            height: 400px;
+            margin: 50px;
+            position: relative;
+        }
+        .two{
+            background-color: yellow;
+            width: 100px;
+            height: 90px;
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="one"&gt;
+        &lt;div class="two"&gt;111111&lt;/div&gt;
+    &lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre></div></div>
+
+:ET

@@ -1,0 +1,25 @@
+I"D<p>1、给UIlabel添加一个分类即可，代码如下：</p>
+
+<ul>
+  <li>必须导入这个头文件：CoreText/CoreText.h</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- (void)changeAlignmentRightandLeft{
+
+    CGRect textSize = [self.text boundingRectWithSize:CGSizeMake(self.frame.size.width, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingTruncatesLastVisibleLine |NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName : self.font} context:nil];
+
+    CGFloat margin = (self.frame.size.width - textSize.size.width) / (self.text.length - 1);
+
+    NSNumber *number = [NSNumber numberWithFloat:margin];
+    NSMutableAttributedString *attributeString = [[NSMutableAttributedString alloc]initWithString:self.text];
+    [attributeString addAttribute:(id)kCTKernAttributeName value:number range:NSMakeRange(0, self.text.length - 1)];
+    self.attributedText = attributeString;
+
+}
+</code></pre></div></div>
+
+<p>效果如下：</p>
+
+<p><img src="/images/posts/label-align.jpg" alt="" /></p>
+
+:ET

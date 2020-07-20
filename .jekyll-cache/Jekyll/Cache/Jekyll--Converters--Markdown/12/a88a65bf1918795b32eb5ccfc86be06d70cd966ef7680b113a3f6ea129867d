@@ -1,0 +1,6 @@
+I"�<p>```
+// 1. 创建一个二维码滤镜实例(CIFilter)
+    CIFilter *filter = [CIFilter filterWithName:@”CIQRCodeGenerator”];
+    // 滤镜恢复默认设置
+    [filter setDefaults];</p>
+:ET

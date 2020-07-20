@@ -1,0 +1,80 @@
+I"�<p>现在好多应有都具备扫码功能，为了减少用户操作，一般会在光线比较暗的时候，自动打开闪光灯：</p>
+
+<p>1、导入头文件</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#import &lt;AVFoundation/AVFoundation.h&gt;
+#import &lt;ImageIO/ImageIO.h&gt;
+</code></pre></div></div>
+
+<p>2、创建设备、输入输出流</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 1.获取硬件设备
+    AVCaptureDevice *device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
+
+    // 2.创建输入流
+    AVCaptureDeviceInput *input = [[AVCaptureDeviceInput alloc]initWithDevice:device error:nil];
+
+    // 3.创建设备输出流
+    AVCaptureVideoDataOutput *output = [[AVCaptureVideoDataOutput alloc] init];
+    [output setSampleBufferDelegate:self queue:dispatch_get_main_queue()];
+
+
+    // AVCaptureSession属性
+    self.session = [[AVCaptureSession alloc]init];
+    // 设置为高质量采集率
+    [self.session setSessionPreset:AVCaptureSessionPresetHigh];
+    // 添加会话输入和输出
+    if ([self.session canAddInput:input]) {
+        [self.session addInput:input];
+    }
+    if ([self.session canAddOutput:output]) {
+        [self.session addOutput:output];
+    }
+
+    // 9.启动会话
+    [self.session startRunning];
+</code></pre></div></div>
+
+<p>3、实现代理方法</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#pragma mark - AVCaptureVideoDataOutputSampleBufferDelegate
+
+- (void)captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection{
+    CFDictionaryRef metadataDict = CMCopyDictionaryOfAttachments(NULL,sampleBuffer, kCMAttachmentMode_ShouldPropagate);
+    NSDictionary *metadata = [[NSMutableDictionary alloc] initWithDictionary:(__bridge NSDictionary*)metadataDict];
+    CFRelease(metadataDict);
+    NSDictionary *exifMetadata = [[metadata objectForKey:(NSString *)kCGImagePropertyExifDictionary] mutableCopy];
+    float brightnessValue = [[exifMetadata objectForKey:(NSString *)kCGImagePropertyExifBrightnessValue] floatValue];
+    // brightnessValue 值代表光线强度，值越小代表光线越暗
+    if (brightnessValue &lt;= -2 &amp;&amp; !_isAutoOpen) {
+        _isAutoOpen = YES;
+        [self.torchBtn setSelected:YES];
+        [self turnTorchOn:YES];
+    }
+}
+</code></pre></div></div>
+
+<p>4、开启关闭闪光灯</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// 打开/关闭手电筒
+- (void)turnTorchOn:(BOOL)on{
+    if ([self.device hasTorch] &amp;&amp; [self.device hasFlash]){
+
+        [self.device lockForConfiguration:nil];
+        if (on) {
+            [self.device setTorchMode:AVCaptureTorchModeOn];
+            [self.device setFlashMode:AVCaptureFlashModeOn];
+        } else {
+            [self.device setTorchMode:AVCaptureTorchModeOff];
+            [self.device setFlashMode:AVCaptureFlashModeOff];
+        }
+        [self.device unlockForConfiguration];
+    } else {
+        [SSAlertView showWithTitle:@"提示" message:@"当前设备没有闪光灯，不能提供手电筒功能" commitTitle:@"我知道了" cancelTitle:nil commitAction:nil cancelBlock:nil];
+    }
+}
+</code></pre></div></div>
+
+<h2 id="大功告成">大功告成！！！</h2>
+
+:ET

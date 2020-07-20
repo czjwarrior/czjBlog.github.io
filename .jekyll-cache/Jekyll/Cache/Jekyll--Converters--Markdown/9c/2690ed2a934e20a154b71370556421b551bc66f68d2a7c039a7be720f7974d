@@ -1,0 +1,143 @@
+I"�<h3 id="react-navigation分为三个部分"><code class="language-plaintext highlighter-rouge">react-navigation</code>分为三个部分</h3>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">StackNavigator</code>类似顶部导航条，用来跳转页面和传递参数。</li>
+  <li><code class="language-plaintext highlighter-rouge">TabNavigator</code> 类似底部标签栏，用来区分模块。</li>
+  <li><code class="language-plaintext highlighter-rouge">DrawerNavigator</code> 抽屉，类似从App左侧滑出一个页面，具体我没有使用过，在这里不做讲解。</li>
+</ul>
+
+<h3 id="tabnavigator的基本用法">TabNavigator的基本用法</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>const TabNav = TabNavigator(
+  {
+    MainTab: {
+      screen: HomePage,
+      path: '/',
+      navigationOptions: {
+        title: '首页',
+        // tabBarLabel: '首页',
+        tabBarIcon: ({ tintColor, focused }) =&gt; (
+          focused
+                    ?
+                    &lt;Image
+                        source={require('../images/tab_icon_homes@2x.png')}
+                    /&gt;
+                    :
+                    &lt;Image
+                        source={require('../images/tab_icon_home@2x.png')}
+                    /&gt;
+        ),
+      },
+    },
+    MinePage: {
+      screen: MinePage,
+      path: '/settings',
+      navigationOptions: {
+        title: '我的',
+        tabBarIcon: ({ tintColor, focused }) =&gt; (
+        focused
+                    ?
+                    &lt;Image
+                        source={require('../images/tab_icon_usercenters@2x.png')}
+                    /&gt;
+                    :
+                    &lt;Image
+                        source={require('../images/tab_icon_usercenter@2x.png')}
+                    /&gt;
+        ),
+      },
+    },
+  },
+  {
+    tabBarPosition: 'bottom',
+    animationEnabled: false,
+    swipeEnabled: false,
+    tabBarOptions:{
+        activeTintColor: '#5c6de5', // 改变tabBar选中字体颜色
+        // inactiveTintColor: '#CC9999', // 文字和图片默认颜色
+        // showIcon: true, // android 默认不显示 icon, 需要设置为 true 才会显示
+        // indicatorStyle: {
+        //     height: 0
+        // }, // android 中TabBar下面会显示一条线，高度设为 0 后就不显示线了， 不知道还有没有其它方法隐藏？？？
+        // style: {
+        //     backgroundColor: '#FFFF99', // TabBar 背景色
+        // },
+        // labelStyle: {
+        //     fontSize: 12, // 文字大小
+        // },
+    }
+  }
+);
+</code></pre></div></div>
+
+<h3 id="stacknavigator的基本用法"><code class="language-plaintext highlighter-rouge">StackNavigator</code>的基本用法</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>const StacksOverTabs = StackNavigator({
+  Root: {
+    screen: TabNav,
+  },
+  TwoPage: {
+    screen: TwoPage,
+    navigationOptions: {
+      title: '二级页面',
+    },
+  },
+  Profile: {
+    screen: FirstPage,
+    path: '/people/:name',
+    navigationOptions: ({ navigation }) =&gt; {
+      title: `${navigation.state.params.name}'s Profile!`;
+    },
+  },
+});
+
+export default StacksOverTabs;
+</code></pre></div></div>
+
+<h3 id="界面之间跳转">界面之间跳转</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>const MyNavScreen = ({ navigation, banner }) =&gt; (
+  &lt;ScrollView&gt;
+    &lt;SampleText&gt;{banner}&lt;/SampleText&gt;
+    &lt;Button
+    // 界面之间传值
+      onPress={() =&gt; navigation.navigate('Profile', { name: 'Jordan' })}
+      title="去第一个页面"
+    /&gt;
+    &lt;Button
+      onPress={() =&gt; navigation.navigate('TwoPage')}
+      title="去二级页面"
+    /&gt;
+    &lt;Button
+      onPress={() =&gt; navigation.navigate('MinePage')}
+      title="去我的页面"
+    /&gt;
+    &lt;Button onPress={() =&gt; navigation.goBack(null)} title="返回" /&gt;
+  &lt;/ScrollView&gt;
+);
+
+const HomePage = ({ navigation }) =&gt; (
+  &lt;MyNavScreen banner="我是首页" navigation={navigation} /&gt;
+);
+
+const FirstPage = ({ navigation }) =&gt; (
+  &lt;MyNavScreen
+    banner={`${navigation.state.params.name}s Profile`}
+    navigation={navigation}
+  /&gt;
+);
+
+const TwoPage = ({ navigation }) =&gt; (
+  &lt;MyNavScreen banner="我是二级页面" navigation={navigation} /&gt;
+);
+
+const MinePage = ({ navigation }) =&gt; (
+  &lt;MyNavScreen banner="我是我的页面" navigation={navigation} /&gt;
+);
+</code></pre></div></div>
+
+<p>效果图：</p>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/react-native-navigator.png" alt="" /></p>
+
+:ET

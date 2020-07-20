@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <title>fastlane实现自动化打包</title>
+  <meta name="description" content="  正常产品开发完成之后，我们都需要给测试人员打包，又是测试包，又是生产包的，打一次包需要浪费十几分钟的时间，甚至有时候，你刚打完包，产品过来告诉你某个地方需要微调一下（麻蛋，这个时候是不是想弄死他），但是没办法，只好改完bug，继续打包，就这样可能一上午或者一下午就这样浪费了，所以有一个能够自动化打包的工具不仅...">
+  <meta name="author" content="leopardpan">
+
+  <meta name="keywords" content="iOS开发,岑志军的个人博客,reactNative,ListView,wifi列表,reactnative开发,数字货币,加密货币,solidity,fabric,ethereum,blockchain,hyperledger,区块链部落,从零到壹全栈部落,智能合约,超级账本,ICO,比特币,以太坊" />
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="fastlane实现自动化打包">
+  <meta name="twitter:description" content="  正常产品开发完成之后，我们都需要给测试人员打包，又是测试包，又是生产包的，打一次包需要浪费十几分钟的时间，甚至有时候，你刚打完包，产品过来告诉你某个地方需要微调一下（麻蛋，这个时候是不是想弄死他），但是没办法，只好改完bug，继续打包，就这样可能一上午或者一下午就这样浪费了，所以有一个能够自动化打包的工具不仅...">
+  
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="fastlane实现自动化打包">
+  <meta property="og:description" content="  正常产品开发完成之后，我们都需要给测试人员打包，又是测试包，又是生产包的，打一次包需要浪费十几分钟的时间，甚至有时候，你刚打完包，产品过来告诉你某个地方需要微调一下（麻蛋，这个时候是不是想弄死他），但是没办法，只好改完bug，继续打包，就这样可能一上午或者一下午就这样浪费了，所以有一个能够自动化打包的工具不仅...">
+  
+  <link rel="icon" type="image/png" href="/images/favicon.png" />
+  <link href="/images/favicon.png" rel="shortcut icon" type="image/png">
+  
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+
+  <link rel="canonical" href="http://localhost:4000/2018/04/autoPacking/">
+  <link rel="alternate" type="application/rss+xml" title="岑志军的个人博客" href="http://localhost:4000/feed.xml">
+  
+  <meta name="google-site-verification" content="1-1ZlHoRvM0T2FqPbW2S-qLgYXN6rsn52kErlMPd_gw" />
+
+<!-- 站点统计 -->
+  <script 
+  async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+  </script>  
+
+<!-- 百度统计 -->
+  
+  <script>
+      var _hmt = _hmt || [];
+      (function() {
+        var hm = document.createElement("script");
+        hm.src = "//hm.baidu.com/hm.js?0352fdd0e57585d9a54ff3a6906ae365";
+        var s = document.getElementsByTagName("script")[0]; 
+        s.parentNode.insertBefore(hm, s);
+      })();
+  </script>
+  
+
+<!-- google 统计 -->
+  
+
+</head>
+
+
+  <body>
+
+    <span class="mobile btn-mobile-menu">        
+      <div class="nav_container">
+         <nav class="nav-menu-item" style = "float:right">
+            <i class="nav-menu-item">
+              <a href="/#blog" title="" class="blog-button">  博客主页
+              </a>
+            </i>
+            
+                <i class="nav-menu-item">
+
+                  <a href="/archive" title="archive" class="btn-mobile-menu__icon">
+                      所有文章
+                  </a>
+                </i>
+            
+                <i class="nav-menu-item">
+
+                  <a href="/tags" title="tags" class="btn-mobile-menu__icon">
+                      分类
+                  </a>
+                </i>
+            
+                <i class="nav-menu-item">
+
+                  <a href="/about" title="about" class="btn-mobile-menu__icon">
+                      关于我
+                  </a>
+                </i>
+            
+          </nav>
+      </div>
+    </span>
+    
+    <header class="panel-cover panel-cover--collapsed" style="background-image: url('/images/background-cover.jpg')">
+  <div class="panel-main">
+
+    <div class="panel-main__inner panel-inverted">
+    <div class="panel-main__content">
+        <!-- 头像效果-start -->
+        <div class="ih-item circle effect right_to_left">            
+            <a href="/#blog" title="前往 岑志军的个人博客 的主页" class="blog-button">
+                <div class="img"><img src="/images/avatar.jpg" alt="img"></div>
+                <div class="info">
+                    <div class="info-back">
+                        <h2> 
+                            
+                                czjDevloper
+                            
+                        </h2>
+                        <p>
+                           
+                                iOS / React-Native
+                            
+                        </p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <!-- 头像效果-end -->
+        <h1 class="panel-cover__title panel-title"><a href="/#blog" title="link to homepage for 岑志军的个人博客" class="blog-button">岑志军的个人博客</a></h1>
+        
+        <span class="panel-cover__subtitle panel-subtitle">我的博客</span>
+        
+        <hr class="panel-cover__divider" />
+        <p class="panel-cover__description">欢迎来到我的博客~</p>
+        <hr class="panel-cover__divider panel-cover__divider--secondary" />
+        
+        
+        
+
+        <div class="navigation-wrapper">
+          <div>
+            <nav class="cover-navigation cover-navigation--primary">
+              <ul class="navigation">
+                <li class="navigation__item"><a href="/#blog" title="" class="blog-button">博客主页</a></li>
+                
+                  <li class="navigation__item"><a href="/archive" title="archive">所有文章</a></li>
+                
+                  <li class="navigation__item"><a href="/tags" title="tags">分类</a></li>
+                
+                  <li class="navigation__item"><a href="/about" title="about">关于我</a></li>
+                
+              </ul>
+            </nav>
+          </div>          
+        </div>
+
+
+        </div>
+      </div>
+    </div>
+    
+    
+    <div class="panel-cover--overlay cover-clear"></div>
+    
+  </div>
+</header>
+
+
+    <div class="content-wrapper">
+        <div class="content-wrapper__inner">
+            <article class="post-container post-container--single" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <h1 class="post-title">fastlane实现自动化打包</h1>
+    <div class="post-meta">
+      <img src="/images/calendar.png" width="20px"/> 
+      <time datetime="2018-04-26 00:00:00 +0800" itemprop="datePublished" class="post-meta__date date">2018-04-26</time>  
+         
+      <span id="busuanzi_container_page_pv"> | 阅读：<span id="busuanzi_value_page_pv"></span>次</span>
+    </p>
+    </div>
+  </header>
+
+  <section class="post">
+    <blockquote>
+  <p>正常产品开发完成之后，我们都需要给测试人员打包，又是测试包，又是生产包的，打一次包需要浪费十几分钟的时间，甚至有时候，你刚打完包，产品过来告诉你某个地方需要微调一下（麻蛋，这个时候是不是想弄死他），但是没办法，只好改完bug，继续打包，就这样可能一上午或者一下午就这样浪费了，所以有一个能够自动化打包的工具不仅能够为我们节省大量的时间，<strong>还可以让我们能够装逼</strong>。。。。。（这是重点）</p>
+</blockquote>
+
+<p>其实自动化打包的工具有很多，比较流行的有<code class="language-plaintext highlighter-rouge">Jenkins</code>和<code class="language-plaintext highlighter-rouge">fastlane</code>，原来尝试过<code class="language-plaintext highlighter-rouge">Jenkins</code>,感觉这个工具比较麻烦，需要配置的东西非常多，还需要仓库地址等等很多信息，不像<code class="language-plaintext highlighter-rouge">fastlane</code>感觉是傻瓜式的，非常简单，目前<a href="https://github.com/fastlane/fastlane">Github上已经超过两万star了</a>，而且团队人员众多，下面步入正题！！！</p>
+
+<h2 id="安装前的准备工作">安装前的准备工作</h2>
+
+<ol>
+  <li>首先确认是否安装了ruby，终端查看下ruby版本</li>
+</ol>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ruby -v
+</code></pre></div></div>
+
+<ol>
+  <li>确认是否安装了Xcode命令行工具</li>
+</ol>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>xcode-select  --install
+</code></pre></div></div>
+
+<p>如果出现
+<img src="http://otogtitz7.bkt.clouddn.com/2018-04-26-15247254544910.jpg" alt="" />
+表示已经安装成功</p>
+
+<p>如果出现：
+<img src="http://otogtitz7.bkt.clouddn.com/2018-04-26-15247255157977.jpg" alt="" /></p>
+
+<p>就点击安装就行了。。。</p>
+
+<p>下面就正式开始安装fastlane了</p>
+
+<h2 id="安装步骤">安装步骤</h2>
+
+<ol>
+  <li>安装fastlane</li>
+</ol>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo gem install fastlane
+</code></pre></div></div>
+
+<ol>
+  <li>切换到工程目录初始化</li>
+</ol>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>fastlane init
+</code></pre></div></div>
+
+<p>初始化的过程中会出现下面的选项：
+<img src="http://otogtitz7.bkt.clouddn.com/2018-04-26-0280EF1C30306802E173DFDFD724032A.jpg" alt="0280EF1C30306802E173DFDFD724032A" /></p>
+
+<p>第一个选项的意思是：自动截屏。这个功能能帮我们自动截取APP中的截图，并添加手机边框（如果需要的话）
+第二个选项的意思是：自动发布beta版本用于TestFlight
+第二个选项的意思是：自动发布到AppStore
+第二个选项的意思是：手动设置</p>
+
+<p>我在这里选的是第四个（大家可根据自己需要选择），截图如下：</p>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-04-26-ACA6B6119DF13E2F16A1A6512563A32F.jpg" alt="ACA6B6119DF13E2F16A1A6512563A32F" /></p>
+
+<p>紧接着一直点击<code class="language-plaintext highlighter-rouge">enter</code>键，知道安装成功会出现如下截图</p>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-04-26-D51E2EB4B604605AE7C5B86951DCE6E8.jpg" alt="D51E2EB4B604605AE7C5B86951DCE6E8" /></p>
+
+<p>安装成功之后，会在我们的工程目录生成一个<code class="language-plaintext highlighter-rouge">fastlane</code>文件夹：
+<img src="http://otogtitz7.bkt.clouddn.com/2018-04-26-15247263009632.jpg" alt="" /></p>
+
+<p>然后此时，我们需要自己编辑<code class="language-plaintext highlighter-rouge">Appfile</code>和<code class="language-plaintext highlighter-rouge">Fastfile</code>两个文件:</p>
+
+<p>首先看<code class="language-plaintext highlighter-rouge">Appfile</code>文件，我的如下：
+<img src="http://otogtitz7.bkt.clouddn.com/2018-04-26-15247264551130.jpg" alt="" /></p>
+
+<p>然后是<code class="language-plaintext highlighter-rouge">Fastfile</code>文件：
+<img src="http://otogtitz7.bkt.clouddn.com/2018-04-26-15247266906282.jpg" alt="" /></p>
+
+<p>其中的<code class="language-plaintext highlighter-rouge">firim</code>是指定到上传到<code class="language-plaintext highlighter-rouge">fir</code>的，如果只是单纯的想把包打出来可以不写哪一行。</p>
+
+<p>这样的话就可以顺利打包了。。。
+执行打包命令：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>fastlane betaDebug
+</code></pre></div></div>
+
+<p>打包成功截图如下：
+<img src="http://otogtitz7.bkt.clouddn.com/2018-04-26-15247289369146.jpg" alt="" /></p>
+
+<h2 id="自动上传至fir或者蒲公英">自动上传至<code class="language-plaintext highlighter-rouge">fir</code>或者蒲公英</h2>
+
+<p>但是，如果想将自己打好的包直接上传到<code class="language-plaintext highlighter-rouge">fir</code>或者蒲公英等平台，请看下面的步骤：</p>
+
+<p>执行如下命令安装<code class="language-plaintext highlighter-rouge">fir</code>插件：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>fastlane add_plugin fir
+</code></pre></div></div>
+
+<p>自动上传到<code class="language-plaintext highlighter-rouge">fir</code>还需执行如下命令：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gem install fir-cli
+</code></pre></div></div>
+
+<p>如果是蒲公英平台，安装如下插件：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>fastlane add_plugin pgyer
+</code></pre></div></div>
+
+<p>此时<code class="language-plaintext highlighter-rouge">fastlane</code>文件夹会变成如下结构：
+注意：<code class="language-plaintext highlighter-rouge">package</code>文件夹是在第一次打包的时候生成的
+<img src="http://otogtitz7.bkt.clouddn.com/2018-04-26-15247270913064.jpg" alt="" /></p>
+
+<p>此时执行打包命令,就可以自动打包，并上传至<code class="language-plaintext highlighter-rouge">fir</code>了。</p>
+
+<p>安装完插件之后<code class="language-plaintext highlighter-rouge">Pluginfile</code>文件内容如下：（<strong>注意</strong>：你安装了什么插件，就会在该文件中显示）
+<img src="http://otogtitz7.bkt.clouddn.com/2018-04-26-15247278181731.jpg" alt="" /></p>
+
+<p>上传<code class="language-plaintext highlighter-rouge">fir</code>成功截图如下：
+<img src="http://otogtitz7.bkt.clouddn.com/2018-04-26-15247271925792.jpg" alt="" /></p>
+
+<p>生成的<code class="language-plaintext highlighter-rouge">ipa</code>包和<code class="language-plaintext highlighter-rouge">dysm</code>文件如下：
+<img src="http://otogtitz7.bkt.clouddn.com/2018-04-26-15247276440903.jpg" alt="" /></p>
+
+<p>至此，自动化打包安装过程结束，下面记录下我遇到的坑。</p>
+
+<h2 id="遇到的坑">遇到的坑</h2>
+
+<ul>
+  <li><strong>错误一</strong></li>
+</ul>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-04-26-908AA24D21E5040D79E27747E6D621AD.jpg" alt="908AA24D21E5040D79E27747E6D621AD" /></p>
+
+<p>我遇到这个问题的原因是，证书没有匹配对，修改<code class="language-plaintext highlighter-rouge">Fastfile</code>文件，仔细查看下<code class="language-plaintext highlighter-rouge">export_method</code>参数是否配对就行了。。。</p>
+
+<ul>
+  <li><strong>错误二</strong></li>
+</ul>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-04-26-D7ADA2F6C1CCA094D0E07D81EF414DE3.jpg" alt="D7ADA2F6C1CCA094D0E07D81EF414DE3" /></p>
+
+<p>错误指出的很明显，请一定要记住<code class="language-plaintext highlighter-rouge">:</code>后面一定要紧跟自己写的名称</p>
+
+<ul>
+  <li><strong>错误三</strong></li>
+</ul>
+
+<p>打包成功了，但是上传至<code class="language-plaintext highlighter-rouge">fir</code>一直失败
+忘记截图了，大概报错说明如下：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Could not find action, lane or variable 'firim'
+</code></pre></div></div>
+
+<p>我原先看文档，看到有人将<code class="language-plaintext highlighter-rouge">Gemfile</code>和<code class="language-plaintext highlighter-rouge">Gemfile.lock</code>文件拖到<code class="language-plaintext highlighter-rouge">fastlane</code>文件夹里面了，但是自动生成的话是在这个文件夹外面的，但是我想着放到一个文件夹里面方便管理，就这样报错了，所以记住，它生成在哪你就放在哪就行。</p>
+
+<p>报错原因是，没有找到<code class="language-plaintext highlighter-rouge">firim</code>这个action，可以在终端下面查看是否安装了这个<code class="language-plaintext highlighter-rouge">action</code></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>fastlane actions [firim]
+</code></pre></div></div>
+
+<p>如果安装了，会显示如下：
+<img src="http://otogtitz7.bkt.clouddn.com/2018-04-26-15247287834633.jpg" alt="" /></p>
+
+<p>如果没有安装，会提示没找到，这个时候重新安装下插件就好了。</p>
+
+<h2 id="shell脚本打包">shell脚本打包</h2>
+
+<p>除了借助一些开源框架外，我原来也用过<code class="language-plaintext highlighter-rouge">shell</code>脚本打包，无非是自己写一个脚本，里面包含很多的打包命令，但是还是感觉没有<code class="language-plaintext highlighter-rouge">fastlane</code>简单方便，有兴趣的可以参考<a href="https://github.com/stackhou/AutoPacking-iOS">GitHub上的这个</a>，写的比较详细</p>
+
+<h2 id="总结">总结</h2>
+
+<p>至此，利用<code class="language-plaintext highlighter-rouge">fastlane</code>自动化打包就算告一段落了，但是<a href="https://docs.fastlane.tools/">fastlane官网</a>还提供了很多的语法说明，感兴趣的可以参考下，另外说明下，由于我是最近才开始用，所以一般给测试人员打包的时候我都是用<code class="language-plaintext highlighter-rouge">fastlane</code>，真正要上线提交AppStore的时候，我还是用Xcode，毕竟放心。提交到App Store还没用过，有什么坑我也不知道，如果有人实践过，欢迎评论区互相交流（另外，觉得写得不错的，请点赞❤️❤️❤️！！！哈哈）</p>
+
+<hr />
+
+<p>我的博客即将搬运同步至腾讯云+社区，邀请大家一同入驻：https://cloud.tencent.com/developer/support-plan?invite_code=1denjdl5jafn</p>
+
+
+
+  </section>
+</article>
+
+<section>
+
+            <div class="content-play">
+              <p><a href="javascript:void(0)" onclick="dashangToggle()" class="dashang" title="打赏，支持一下">打赏一个呗</a></p>
+              <div class="hide_box-play"></div>
+              <div class="shang_box-play">
+                <a class="shang_close-play" href="javascript:void(0)" onclick="dashangToggle()" title="关闭"><img src="/images/payimg/close.jpg" alt="取消" /></a>
+                <div class="shang_tit-play">
+                  <p>感谢您的支持，我会继续努力的!</p>
+                </div>
+                <div class="shang_payimg">
+                    <img src="/images/payimg/alipayimg.jpg" alt="扫码支持" title="扫一扫" />
+                </div>
+              <div class="shang_payimg">    
+                    <img src="/images/payimg/weipayimg.jpg" alt="扫码支持" title="扫一扫" />
+                </div>
+                <div class="pay_explain">扫码打赏，你说多少就多少</div>
+                <div class="shang_payselect">
+                  <div class="pay_item checked" data-id="alipay">
+                    <span class="pay_logo"><img src="/images/payimg/alipay.jpg" alt="支付宝" /></span>
+                  </div>
+                  <div class="pay_item" data-id="weipay">
+                    <span class="pay_logo"><img src="/images/payimg/wechat.jpg" alt="微信" /></span>
+                  </div>
+                </div>
+                <div class="shang_info-play">
+                  <p>打开<span id="shang_pay_txt">支付宝</span>扫一扫，即可进行扫码打赏哦</p>
+                </div>
+              </div>
+            </div>
+            <script type="text/javascript">
+            function dashangToggle(){
+              $(".hide_box-play").fadeToggle();
+              $(".shang_box-play").fadeToggle();
+            }
+            </script>
+
+            <div style="text-align:center;margin:50px 0; font:normal 14px/24px 'MicroSoft YaHei';"></div>
+
+            <style type="text/css">
+              .content-play{width:80%;margin-top: 20px;margin-bottom: 10px;height:40px;}
+              .hide_box-play{z-index:999;filter:alpha(opacity=50);background:#666;opacity: 0.5;-moz-opacity: 0.5;left:0;top:0;height:99%;width:100%;position:fixed;display:none;}
+              .shang_box-play{width:540px;height:540px;padding:10px;background-color:#fff;border-radius:10px;position:fixed;z-index:1000;left:50%;top:50%;margin-left:-280px;margin-top:-280px;border:1px dotted #dedede;display:none;}
+              .shang_box-play img{border:none;border-width:0;}
+              .dashang{display:block;width:100px;margin:5px auto;height:25px;line-height:25px;padding:10px;background-color:#E74851;color:#fff;text-align:center;text-decoration:none;border-radius:10px;font-weight:bold;font-size:16px;transition: all 0.3s;}
+              .dashang:hover{opacity:0.8;padding:15px;font-size:18px;}
+              .shang_close-play{float:right;display:inline-block;
+                margin-right: 10px;margin-top: 20px;
+              }
+              .shang_logo{display:block;text-align:center;margin:20px auto;}
+              .shang_tit-play{width: 100%;height: 75px;text-align: center;line-height: 66px;color: #a3a3a3;font-size: 16px;background: url('/images/payimg/cy-reward-title-bg.jpg');font-family: 'Microsoft YaHei';margin-top: 7px;margin-right:2px;}
+              .shang_tit-play p{color:#a3a3a3;text-align:center;font-size:16px;}
+              .shang_payimg{width:140px;padding:10px;padding-left: 80px; /*border:6px solid #EA5F00;**/margin:0 auto;border-radius:3px;height:140px;display:inline-block;}
+              .shang_payimg img{display:inline-block;margin-right:10px;float:left;text-align:center;width:140px;height:140px; }
+              .pay_explain{text-align:center;margin:10px auto;font-size:12px;color:#545454;}
+              .shang_payselect{text-align:center;margin:0 auto;margin-top:40px;cursor:pointer;height:60px;width:500px;margin-left:110px;}
+              .shang_payselect .pay_item{display:inline-block;margin-right:140px;float:left;}
+              .shang_info-play{clear:both;}
+              .shang_info-play p,.shang_info-play a{color:#C3C3C3;text-align:center;font-size:12px;text-decoration:none;line-height:2em;}
+            </style>
+
+       <ul class="pager">
+        
+        <li class="previous">
+            <a href="/2018/04/Quartz2d%E5%AE%9E%E6%88%98/" data-toggle="tooltip" data-placement="top" title="Quartz2D实战-画板工具">上一篇：  <span>Quartz2D实战-画板工具</span>
+            </a>
+        </li>
+        
+        
+        <li class="next">
+            <a href="/2018/05/create-podspec/" data-toggle="tooltip" data-placement="top" title="使用Cocoapods创建私有库">下一篇：  <span>使用Cocoapods创建私有库</span>
+            </a>
+        </li>
+        
+    </ul>
+</section>
+
+<section class="post-comments">
+
+
+    <!-- <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    <script src="https://img1.cache.netease.com/f2e/tie/yun/sdk/loader.js"></script>
+    <script>
+    var cloudTieConfig = {
+      url: document.location.href, 
+      sourceId: "",
+      productKey: "aa395cf7778f458492060f3f53301b7c",
+      target: "cloud-tie-wrapper"
+    };
+    var yunManualLoad = true;
+    Tie.loader("aHR0cHM6Ly9hcGkuZ2VudGllLjE2My5jb20vcGMvbGl2ZXNjcmlwdC5odG1s", true);
+    </script> -->
+
+    <script type="text/javascript" id="wumiiComments">
+      var wumiiPermaLink = "http://www.cenzhijun.top/2018/04/autoPacking/"; //请用代码生成文章永久的链接
+      var wumiiTitle = "fastlane实现自动化打包"; //请用代码生成文章标题
+      var wumiiSitePrefix = "http://www.cenzhijun.top"; //安装无觅评论插件的网站的域名，如果是放在子域名上，请提供子域名，如"http://blog.wumii.com"。如果这里填写的域名不对，请自行改正。
+      var wumiiCommentParams = "&pf=JAVASCRIPT";
+
+    </script>
+    <script type="text/javascript" src="http://widget.wumii.cn/ext/cw/widget"></script>
+
+
+  
+</section>
+
+
+            <section class="footer">
+    <footer>
+        <div class = "footer_div">  
+        <nav class="cover-navigation navigation--social">
+          <ul class="navigation">
+
+          
+          <!-- Weibo -->
+          <li class="navigation__item_social">
+            <a href="http://weibo.com/3291155444" title="@3291155444 的微博" target="_blank">
+              <i class='social fa fa-weibo fa-2x'></i>
+              <span class="label">Weibo</span>
+            </a>
+          </li>
+          
+
+          
+          <!-- Github -->
+          <li class="navigation__item_social">
+            <a href="https://github.com/czjwarrior" title="@czjwarrior 的 Github" target="_blank">
+              <i class='social fa fa-github fa-2x'></i>
+              <span class="label">Github</span>
+            </a>
+          </li>
+          
+          
+          
+
+          
+
+          <!-- RSS -->
+          <li class="navigation__item_social">
+            <a href="/feed.xml" rel="author" title="RSS" target="_blank">
+              <i class='social fa fa-rss fa-2x'></i>
+              <span class="label">RSS</span>
+            </a>
+          </li>
+
+          
+          <!-- Email -->
+          <li class="navigation__item_social">
+            <a href="mailto:13621130170@163.com" title="Contact me">
+              <i class='social fa fa-envelope fa-2x'></i>
+              <span class="label">Email</span>
+            </a>
+          </li>
+          
+
+          </ul>
+        </nav>
+
+        </div>
+
+        <div class = "footer_div">  
+           <p class="copyright text-muted">
+            Copyright &copy; 岑志军的个人博客 2020
+            </p>
+        	<div align="right">
+    			<link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+
+          <!-- 访问统计 -->
+          <span id="busuanzi_container_site_pv">
+            本站总访问量
+            <span id="busuanzi_value_site_pv"></span>次
+          </span>
+
+        </div>
+        <div>
+    </footer>
+</section>
+
+        </div>
+    </div>
+    
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="/js/main.js"></script>
+
+<script type="text/javascript" src="/js/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+  </body>
+
+</html>

@@ -1,0 +1,52 @@
+I"<blockquote>
+  <p>最近开发的时候发现一些常用的命令总是记不住，用到的时候又要Google，感觉好麻烦，整理一下常用的一些命令</p>
+</blockquote>
+
+<ul>
+  <li>创建项目</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>react-native init WYNews
+</code></pre></div></div>
+<p>但是最近发现初始化完毕之后，运行项目会报错<code class="language-plaintext highlighter-rouge">Print: Entry, ":CFBundleIdentifier", Does Not Exist
+</code>
+暂时解决方案是指定ReactNative版本：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>react-native init WYNews --version 0.47.1
+</code></pre></div></div>
+
+<p>现在好像不行了，网上有些方法是这样的，亲测可用：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>react-native init MyApp –version 0.44.3
+</code></pre></div></div>
+
+<ul>
+  <li>查看当前ReactNative版本</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>react-native --version
+</code></pre></div></div>
+
+<p>输出内容：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>react-native-cli: 2.0.1
+react-native: 0.47.1
+</code></pre></div></div>
+
+<ul>
+  <li>运行项目</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>react-native run-ios
+</code></pre></div></div>
+
+<ul>
+  <li>指定模拟器设备需要添加<code class="language-plaintext highlighter-rouge">--simulator</code>参数，默认iPhone 6</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>react-native run-ios --simulator "iPhone 7"
+</code></pre></div></div>
+
+<p>可以运行命令<code class="language-plaintext highlighter-rouge">xcrun simctl list devices</code>查看可用设备类型</p>
+
+:ET

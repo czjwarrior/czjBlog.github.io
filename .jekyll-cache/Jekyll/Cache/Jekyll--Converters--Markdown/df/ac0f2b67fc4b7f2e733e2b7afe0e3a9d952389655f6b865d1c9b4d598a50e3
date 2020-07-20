@@ -1,0 +1,404 @@
+I"�D<p>前一段时间有朋友问了下面的这个问题，我给出的回答是这样的：</p>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-03-26-15220365281833.jpg" alt="" /></p>
+
+<p>其实上面回答的方法调用也都是基于以前对runtime的理解，和自己试验出来的结果，但是，回答完这个问题之后，抱着探究到底的精神（其实是这几天产品没提什么需求，有点儿闲），问了自己一个问题：你怎么知道是底层调用的是这几个方法？？。。。又是一番查资料，验证问题。。。下面正式开始分析：</p>
+
+<ul>
+  <li>首先新建一个Person类，代码如下：</li>
+</ul>
+
+<p>Person.h</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#import &lt;Foundation/Foundation.h&gt;
+
+@interface Person : NSObject
+
+- (void)eat;
+
+@end
+</code></pre></div></div>
+
+<p>Person.m</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#import "Person.h"
+
+@implementation Person
+
+- (void)eat{
+    NSLog(@"Person eat=======");
+}
+
+@end
+</code></pre></div></div>
+
+<p>很简单的一个类</p>
+
+<p>在main函数里面调用<code class="language-plaintext highlighter-rouge">eat</code>方法：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Person *p = [[Person alloc] init];
+        
+[p eat];
+</code></pre></div></div>
+
+<p>将<code class="language-plaintext highlighter-rouge">main.m</code>代码转换成c++代码：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> xcrun -sdk iphoneos clang -arch arm64 -rewrite-objc main.m -o main.cpp
+</code></pre></div></div>
+<p>在<code class="language-plaintext highlighter-rouge">main.cpp</code>文件当中查看底层实现：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>int main(int argc, const char * argv[]) {
+    /* @autoreleasepool */ { __AtAutoreleasePool __autoreleasepool; 
+
+        Person *p = ((Person *(*)(id, SEL))(void *)objc_msgSend)((id)((Person *(*)(id, SEL))(void *)objc_msgSend)((id)objc_getClass("Person"), sel_registerName("alloc")), sel_registerName("init"));
+
+        ((void (*)(id, SEL))(void *)objc_msgSend)((id)p, sel_registerName("eat"));
+
+    }
+    return 0;
+}
+</code></pre></div></div>
+
+<p>通过这些代码我们发现，OC中方法调用本质上就是给对象发消息，上面给对象发消息的代码可以简写成：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>objc_msgSend(p, @selector(eat));
+</code></pre></div></div>
+
+<p>上面方法调用的意思就是：给<code class="language-plaintext highlighter-rouge">p</code>对象发送名为<code class="language-plaintext highlighter-rouge">eat</code>的消息，所以OC中给对象发消息本质上都是调用<code class="language-plaintext highlighter-rouge">objc_msgSend</code>方法，接着看下苹果官方文档对这个方法的定义（我是用的Dash查看的）：</p>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-03-26-15220439314182.jpg" alt="" /></p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">self</code> ：指向接收消息的类实例的指针。简单来说就是消息的接收者。</li>
+  <li><code class="language-plaintext highlighter-rouge">op</code>：处理消息的方法选择器，也就是我们常见的<code class="language-plaintext highlighter-rouge">@selector()</code>。</li>
+  <li><code class="language-plaintext highlighter-rouge">...</code>：包含方法参数的可变参数列表，</li>
+</ul>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-03-26-15220443215386.jpg" alt="" /></p>
+
+<p>翻译如下：</p>
+
+<p>当遇到方法调用时，编译器生成对其中一个函数的调用。当向superclass发消息的时候调用的是<code class="language-plaintext highlighter-rouge">objc_msgSendSuper</code>，向其他对象发消息的时候调用<code class="language-plaintext highlighter-rouge">objc_msgSend</code>，方法返回值是一个结构体的时候调用的是<code class="language-plaintext highlighter-rouge">objc_msgSendSuper_stret</code>和<code class="language-plaintext highlighter-rouge">objc_msgSend_stret</code>。</p>
+
+<p>接下来我们再看下<code class="language-plaintext highlighter-rouge">objc_msgSend</code>的底层实现，<a href="https://opensource.apple.com/tarballs/objc4/">objc 源码</a>，发现底层是用汇编代码实现的（表示很蛋疼）：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ENTRY _objc_msgSend
+	UNWIND _objc_msgSend, NoFrame
+	MESSENGER_START
+
+	NilTest	NORMAL
+
+	GetIsaFast NORMAL		// r10 = self-&gt;isa  
+	CacheLookup NORMAL, CALL	// calls IMP on success
+
+	NilTestReturnZero NORMAL
+
+	GetIsaSupport NORMAL
+
+// cache miss: go search the method lists
+LCacheMiss:
+	// isa still in r10
+	MESSENGER_END_SLOW
+	jmp	__objc_msgSend_uncached
+
+	END_ENTRY _objc_msgSend
+</code></pre></div></div>
+
+<p>由于本人汇编就懂几个简单的指令，所以就做简单分析：</p>
+
+<p>首先，<code class="language-plaintext highlighter-rouge">GetIsaFast</code>获取对象的isa指针，接着通过<code class="language-plaintext highlighter-rouge">CacheLookup</code>从缓存查找方法的实现，会调用<code class="language-plaintext highlighter-rouge">cache_getImp(Class cls, SEL sel)</code>，如果缓存中没有查到也就是<code class="language-plaintext highlighter-rouge">cache miss</code>，会跳到<code class="language-plaintext highlighter-rouge">__objc_msgSend_uncached</code>方法：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>STATIC_ENTRY __objc_msgSend_uncached
+	UNWIND __objc_msgSend_uncached, FrameWithNoSaves
+	
+	// THIS IS NOT A CALLABLE C FUNCTION
+	// Out-of-band r10 is the searched class
+
+	// r10 is already the class to search
+	MethodTableLookup NORMAL	// r11 = IMP
+	jmp	*%r11			// goto *imp
+
+	END_ENTRY __objc_msgSend_uncached
+</code></pre></div></div>
+
+<p>在这个方法里面又会调用<code class="language-plaintext highlighter-rouge">MethodTableLookup</code>查找方法列表：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>.macro MethodTableLookup
+
+	push	%rbp
+	mov	%rsp, %rbp
+	
+	sub	$$0x80+8, %rsp		// +8 for alignment
+
+	movdqa	%xmm0, -0x80(%rbp)
+	push	%rax			// might be xmm parameter count
+	movdqa	%xmm1, -0x70(%rbp)
+	push	%a1
+	movdqa	%xmm2, -0x60(%rbp)
+	push	%a2
+	movdqa	%xmm3, -0x50(%rbp)
+	push	%a3
+	movdqa	%xmm4, -0x40(%rbp)
+	push	%a4
+	movdqa	%xmm5, -0x30(%rbp)
+	push	%a5
+	movdqa	%xmm6, -0x20(%rbp)
+	push	%a6
+	movdqa	%xmm7, -0x10(%rbp)
+
+	// _class_lookupMethodAndLoadCache3(receiver, selector, class)
+   ...
+   ...
+   省略
+</code></pre></div></div>
+
+<p>在<code class="language-plaintext highlighter-rouge">MethodTableLookup</code>里面又调用了<code class="language-plaintext highlighter-rouge">_class_lookupMethodAndLoadCache3</code>方法：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/***********************************************************************
+* _class_lookupMethodAndLoadCache.
+* Method lookup for dispatchers ONLY. OTHER CODE SHOULD USE lookUpImp().
+* This lookup avoids optimistic cache scan because the dispatcher 
+* already tried that.
+**********************************************************************/
+IMP _class_lookupMethodAndLoadCache3(id obj, SEL sel, Class cls)
+{
+    return lookUpImpOrForward(cls, sel, obj, 
+                              YES/*initialize*/, NO/*cache*/, YES/*resolver*/);
+}
+</code></pre></div></div>
+
+<p>接下来看一下<code class="language-plaintext highlighter-rouge">lookUpImpOrForward</code>的实现</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>IMP lookUpImpOrForward(Class cls, SEL sel, id inst, 
+                       bool initialize, bool cache, bool resolver)
+{
+    IMP imp = nil;
+    bool triedResolver = NO;
+
+    runtimeLock.assertUnlocked();
+
+    // Optimistic cache lookup
+    if (cache) {
+        imp = cache_getImp(cls, sel);
+        if (imp) return imp;
+    }
+
+    // runtimeLock is held during isRealized and isInitialized checking
+    // to prevent races against concurrent realization.
+
+    // runtimeLock is held during method search to make
+    // method-lookup + cache-fill atomic with respect to method addition.
+    // Otherwise, a category could be added but ignored indefinitely because
+    // the cache was re-filled with the old value after the cache flush on
+    // behalf of the category.
+
+    runtimeLock.read();
+
+    if (!cls-&gt;isRealized()) {
+        // Drop the read-lock and acquire the write-lock.
+        // realizeClass() checks isRealized() again to prevent
+        // a race while the lock is down.
+        runtimeLock.unlockRead();
+        runtimeLock.write();
+
+        realizeClass(cls);
+
+        runtimeLock.unlockWrite();
+        runtimeLock.read();
+    }
+
+    if (initialize  &amp;&amp;  !cls-&gt;isInitialized()) {
+        runtimeLock.unlockRead();
+        _class_initialize (_class_getNonMetaClass(cls, inst));
+        runtimeLock.read();
+        // If sel == initialize, _class_initialize will send +initialize and 
+        // then the messenger will send +initialize again after this 
+        // procedure finishes. Of course, if this is not being called 
+        // from the messenger then it won't happen. 2778172
+    }
+
+    
+ retry:    
+    runtimeLock.assertReading();
+
+    // Try this class's cache.
+
+    imp = cache_getImp(cls, sel);
+    if (imp) goto done;
+
+    // Try this class's method lists.
+    {
+        Method meth = getMethodNoSuper_nolock(cls, sel);
+        if (meth) {
+            log_and_fill_cache(cls, meth-&gt;imp, sel, inst, cls);
+            imp = meth-&gt;imp;
+            goto done;
+        }
+    }
+
+    // Try superclass caches and method lists.
+    {
+        unsigned attempts = unreasonableClassCount();
+        for (Class curClass = cls-&gt;superclass;
+             curClass != nil;
+             curClass = curClass-&gt;superclass)
+        {
+            // Halt if there is a cycle in the superclass chain.
+            if (--attempts == 0) {
+                _objc_fatal("Memory corruption in class list.");
+            }
+            
+            // Superclass cache.
+            imp = cache_getImp(curClass, sel);
+            if (imp) {
+                if (imp != (IMP)_objc_msgForward_impcache) {
+                    // Found the method in a superclass. Cache it in this class.
+                    log_and_fill_cache(cls, imp, sel, inst, curClass);
+                    goto done;
+                }
+                else {
+                    // Found a forward:: entry in a superclass.
+                    // Stop searching, but don't cache yet; call method 
+                    // resolver for this class first.
+                    break;
+                }
+            }
+            
+            // Superclass method list.
+            Method meth = getMethodNoSuper_nolock(curClass, sel);
+            if (meth) {
+                log_and_fill_cache(cls, meth-&gt;imp, sel, inst, curClass);
+                imp = meth-&gt;imp;
+                goto done;
+            }
+        }
+    }
+
+    // No implementation found. Try method resolver once.
+
+    if (resolver  &amp;&amp;  !triedResolver) {
+        runtimeLock.unlockRead();
+        _class_resolveMethod(cls, sel, inst);
+        runtimeLock.read();
+        // Don't cache the result; we don't hold the lock so it may have 
+        // changed already. Re-do the search from scratch instead.
+        triedResolver = YES;
+        goto retry;
+    }
+
+    // No implementation found, and method resolver didn't help. 
+    // Use forwarding.
+
+    imp = (IMP)_objc_msgForward_impcache;
+    cache_fill(cls, sel, imp, inst);
+
+ done:
+    runtimeLock.unlockRead();
+
+    return imp;
+}
+</code></pre></div></div>
+
+<p>我们重点看<code class="language-plaintext highlighter-rouge">// No implementation found. Try method resolver once.</code>下面的代码，如果依然没有找到方法的实现，会调用<code class="language-plaintext highlighter-rouge">_class_resolveMethod</code>方法：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>void _class_resolveMethod(Class cls, SEL sel, id inst)
+{
+    if (! cls-&gt;isMetaClass()) {
+        // try [cls resolveInstanceMethod:sel]
+        _class_resolveInstanceMethod(cls, sel, inst);
+    } 
+    else {
+        // try [nonMetaClass resolveClassMethod:sel]
+        // and [cls resolveInstanceMethod:sel]
+        _class_resolveClassMethod(cls, sel, inst);
+        if (!lookUpImpOrNil(cls, sel, inst, 
+                            NO/*initialize*/, YES/*cache*/, NO/*resolver*/)) 
+        {
+            _class_resolveInstanceMethod(cls, sel, inst);
+        }
+    }
+}
+</code></pre></div></div>
+
+<p>在这个方法里面，我们可以清楚地看到，首先会判断该对象是否是元类对象，如果不是，会调用<code class="language-plaintext highlighter-rouge">_class_resolveInstanceMethod</code>方法，否则会调用<code class="language-plaintext highlighter-rouge">_class_resolveClassMethod</code>方法。如果还没有找到对应的IMP方法实现：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// No implementation found, and method resolver didn't help. 
+// Use forwarding.
+</code></pre></div></div>
+
+<p>接下来就会用到消息转发，调用这个方法<code class="language-plaintext highlighter-rouge">_objc_msgForward_impcache</code></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/********************************************************************
+*
+* id _objc_msgForward(id self, SEL _cmd,...);
+*
+* _objc_msgForward and _objc_msgForward_stret are the externally-callable
+*   functions returned by things like method_getImplementation().
+* _objc_msgForward_impcache is the function pointer actually stored in
+*   method caches.
+*
+********************************************************************/
+
+	STATIC_ENTRY __objc_msgForward_impcache
+	// Method cache version
+
+	// THIS IS NOT A CALLABLE C FUNCTION
+	// Out-of-band condition register is NE for stret, EQ otherwise.
+
+	MESSENGER_START
+	nop
+	MESSENGER_END_SLOW
+	
+	jne	__objc_msgForward_stret
+	jmp	__objc_msgForward
+
+	END_ENTRY __objc_msgForward_impcache
+	
+	
+	ENTRY __objc_msgForward
+	// Non-stret version
+
+	movq	__objc_forward_handler(%rip), %r11
+	jmp	*%r11
+
+	END_ENTRY __objc_msgForward
+
+
+	ENTRY __objc_msgForward_stret
+	// Struct-return version
+
+	movq	__objc_forward_stret_handler(%rip), %r11
+	jmp	*%r11
+
+	END_ENTRY __objc_msgForward_stret
+	...
+   ...
+   省略
+</code></pre></div></div>
+
+<p>从description可以看到<code class="language-plaintext highlighter-rouge">__objc_msgForward_impcache</code>实际上是一个存储在方法缓存当中的函数指针，当某种类型的对象处理消息的过程中，无论怎样都找不到对应的IMP实现时，会将它作为sel对应的imp记入缓存。所以，从严格意义上来讲<code class="language-plaintext highlighter-rouge">_class_resolveInstanceMethod</code>和<code class="language-plaintext highlighter-rouge">_class_resolveClassMethod</code>并不是由<code class="language-plaintext highlighter-rouge">__objc_msgForward_impcache</code>触发的，并不能算作消息转发的后续步骤，消息转发后，该对象如果再次遇到同名消息是，会直接从缓存中找到对应的IMP,即<code class="language-plaintext highlighter-rouge">_objc_msgForward_impcache</code>，此时我们需要重写<code class="language-plaintext highlighter-rouge">- (id)forwardingTargetForSelector:(SEL)aSelector</code>方法，重定向到别的类当中找到方法的实现。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>imp = (IMP)_objc_msgForward_impcache;
+cache_fill(cls, sel, imp, inst);
+</code></pre></div></div>
+
+<p>官方文档截图：
+<img src="http://otogtitz7.bkt.clouddn.com/2018-03-26-15220568983751.jpg" alt="" /></p>
+
+<p>主要看下官方文档里面的Discussion：
+<img src="http://otogtitz7.bkt.clouddn.com/2018-03-26-15220569597686.jpg" alt="" /></p>
+
+<p>官方文档写的非常清楚：当你只想将消息重定向到另一个类时，用这个方法非常有用，因为它比常规的转发快一个数量级,他转发的目标是捕获<code class="language-plaintext highlighter-rouge">NSInvocation</code>。也有人将这种方式称为<code class="language-plaintext highlighter-rouge">Fast Forwarding</code>，因为这一步不会创建<code class="language-plaintext highlighter-rouge">NSInvocation</code>对象。</p>
+
+<p>今天先写这么多，还没完呢，上网查了好多资料，好多网上资料苹果的源代码都是老的，跟最新代码不太一样，也费了我很多时间，下一篇文章将会介绍如何通过<code class="language-plaintext highlighter-rouge">regular forwarding</code>也有人叫<code class="language-plaintext highlighter-rouge">Normal Forwarding</code>，动态添加方法实现。。。。</p>
+
+<p><br /><br /><br /></p>
+
+<hr />
+
+<p><strong>References:</strong></p>
+
+<ul>
+  <li>https://lpd-ios.github.io/2017/12/19/ObjC-Message/</li>
+</ul>
+
+:ET

@@ -1,0 +1,8 @@
+I"�<h2 id="打开iterm在默认菜单中选择make-iterm2-default-term">打开iTerm，在默认菜单中选择”Make iTerm2 Default Term”</h2>
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-01-17-default-iterm2.jpg" alt="2018-01-17-default-iter" /></p>
+
+<h2 id="如果使用了go2shell快捷启动的话设置默认iterm2在终端输入如下命令open--a-go2shell---args-config回车选择iterm-2如图">如果使用了Go2Shell快捷启动的话,设置默认iTerm2，在终端输入如下命令<code class="language-plaintext highlighter-rouge">open -a Go2Shell --args config</code>,回车，选择iTerm 2，如图：</h2>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-01-17-iTerm2.jpg" alt="" /></p>
+
+:ET

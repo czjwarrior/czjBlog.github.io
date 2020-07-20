@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <title>iOS逆向-ipa包重签名及非越狱手机安装多个微信</title>
+  <meta name="description" content="  前一段时间学了点儿逆向相关的一些东西，但是都是基于越狱手机上的操作，给视频类应用去广告之类的。随着苹果生态圈的逐渐完善、及苹果对自身系统的保护越来越严格，导致现在的iPhone手机并不像以前那样存在大量的越狱用户。">
+  <meta name="author" content="leopardpan">
+
+  <meta name="keywords" content="iOS开发,岑志军的个人博客,reactNative,ListView,wifi列表,reactnative开发,数字货币,加密货币,solidity,fabric,ethereum,blockchain,hyperledger,区块链部落,从零到壹全栈部落,智能合约,超级账本,ICO,比特币,以太坊" />
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="iOS逆向-ipa包重签名及非越狱手机安装多个微信">
+  <meta name="twitter:description" content="  前一段时间学了点儿逆向相关的一些东西，但是都是基于越狱手机上的操作，给视频类应用去广告之类的。随着苹果生态圈的逐渐完善、及苹果对自身系统的保护越来越严格，导致现在的iPhone手机并不像以前那样存在大量的越狱用户。">
+  
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="iOS逆向-ipa包重签名及非越狱手机安装多个微信">
+  <meta property="og:description" content="  前一段时间学了点儿逆向相关的一些东西，但是都是基于越狱手机上的操作，给视频类应用去广告之类的。随着苹果生态圈的逐渐完善、及苹果对自身系统的保护越来越严格，导致现在的iPhone手机并不像以前那样存在大量的越狱用户。">
+  
+  <link rel="icon" type="image/png" href="/images/favicon.png" />
+  <link href="/images/favicon.png" rel="shortcut icon" type="image/png">
+  
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+
+  <link rel="canonical" href="http://localhost:4000/2018/05/wechat-hook/">
+  <link rel="alternate" type="application/rss+xml" title="岑志军的个人博客" href="http://localhost:4000/feed.xml">
+  
+  <meta name="google-site-verification" content="1-1ZlHoRvM0T2FqPbW2S-qLgYXN6rsn52kErlMPd_gw" />
+
+<!-- 站点统计 -->
+  <script 
+  async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+  </script>  
+
+<!-- 百度统计 -->
+  
+  <script>
+      var _hmt = _hmt || [];
+      (function() {
+        var hm = document.createElement("script");
+        hm.src = "//hm.baidu.com/hm.js?0352fdd0e57585d9a54ff3a6906ae365";
+        var s = document.getElementsByTagName("script")[0]; 
+        s.parentNode.insertBefore(hm, s);
+      })();
+  </script>
+  
+
+<!-- google 统计 -->
+  
+
+</head>
+
+
+  <body>
+
+    <span class="mobile btn-mobile-menu">        
+      <div class="nav_container">
+         <nav class="nav-menu-item" style = "float:right">
+            <i class="nav-menu-item">
+              <a href="/#blog" title="" class="blog-button">  博客主页
+              </a>
+            </i>
+            
+                <i class="nav-menu-item">
+
+                  <a href="/archive" title="archive" class="btn-mobile-menu__icon">
+                      所有文章
+                  </a>
+                </i>
+            
+                <i class="nav-menu-item">
+
+                  <a href="/tags" title="tags" class="btn-mobile-menu__icon">
+                      分类
+                  </a>
+                </i>
+            
+                <i class="nav-menu-item">
+
+                  <a href="/about" title="about" class="btn-mobile-menu__icon">
+                      关于我
+                  </a>
+                </i>
+            
+          </nav>
+      </div>
+    </span>
+    
+    <header class="panel-cover panel-cover--collapsed" style="background-image: url('/images/background-cover.jpg')">
+  <div class="panel-main">
+
+    <div class="panel-main__inner panel-inverted">
+    <div class="panel-main__content">
+        <!-- 头像效果-start -->
+        <div class="ih-item circle effect right_to_left">            
+            <a href="/#blog" title="前往 岑志军的个人博客 的主页" class="blog-button">
+                <div class="img"><img src="/images/avatar.jpg" alt="img"></div>
+                <div class="info">
+                    <div class="info-back">
+                        <h2> 
+                            
+                                czjDevloper
+                            
+                        </h2>
+                        <p>
+                           
+                                iOS / React-Native
+                            
+                        </p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <!-- 头像效果-end -->
+        <h1 class="panel-cover__title panel-title"><a href="/#blog" title="link to homepage for 岑志军的个人博客" class="blog-button">岑志军的个人博客</a></h1>
+        
+        <span class="panel-cover__subtitle panel-subtitle">我的博客</span>
+        
+        <hr class="panel-cover__divider" />
+        <p class="panel-cover__description">欢迎来到我的博客~</p>
+        <hr class="panel-cover__divider panel-cover__divider--secondary" />
+        
+        
+        
+
+        <div class="navigation-wrapper">
+          <div>
+            <nav class="cover-navigation cover-navigation--primary">
+              <ul class="navigation">
+                <li class="navigation__item"><a href="/#blog" title="" class="blog-button">博客主页</a></li>
+                
+                  <li class="navigation__item"><a href="/archive" title="archive">所有文章</a></li>
+                
+                  <li class="navigation__item"><a href="/tags" title="tags">分类</a></li>
+                
+                  <li class="navigation__item"><a href="/about" title="about">关于我</a></li>
+                
+              </ul>
+            </nav>
+          </div>          
+        </div>
+
+
+        </div>
+      </div>
+    </div>
+    
+    
+    <div class="panel-cover--overlay cover-clear"></div>
+    
+  </div>
+</header>
+
+
+    <div class="content-wrapper">
+        <div class="content-wrapper__inner">
+            <article class="post-container post-container--single" itemscope itemtype="http://schema.org/BlogPosting">
+  <header class="post-header">
+    <h1 class="post-title">iOS逆向-ipa包重签名及非越狱手机安装多个微信</h1>
+    <div class="post-meta">
+      <img src="/images/calendar.png" width="20px"/> 
+      <time datetime="2018-05-29 00:00:00 +0800" itemprop="datePublished" class="post-meta__date date">2018-05-29</time>  
+         
+      <span id="busuanzi_container_page_pv"> | 阅读：<span id="busuanzi_value_page_pv"></span>次</span>
+    </p>
+    </div>
+  </header>
+
+  <section class="post">
+    <blockquote>
+  <p>前一段时间学了点儿逆向相关的一些东西，但是都是基于越狱手机上的操作，给视频类应用去广告之类的。随着苹果生态圈的逐渐完善、及苹果对自身系统的保护越来越严格，导致现在的iPhone手机并不像以前那样存在大量的越狱用户。</p>
+</blockquote>
+
+<p>前段时间我自己申请了个微信小号，申请小号的目的就是原来微信号好友中乱七八糟的人实在太多，感觉自己的朋友圈都是一些无关紧要的垃圾信息，曾经关闭了一段时间的朋友圈，但是最近遇到了好多技术上很强的同行，还想了解大佬们的动态。于是我就想着申请了个小号，但是麻烦来了，iPhone手机并不像安卓手机那样存在着微信多开之类的应用，将自己手机越狱吧成本太高，于是就想着通过技术手段安装多个微信，下面步入正题：</p>
+
+<h2 id="为什么要重签名">为什么要重签名</h2>
+
+<p>其实我们平时开发的App，程序运行主要就是加载一个<code class="language-plaintext highlighter-rouge">Mach-o</code>可执行文件。当我们将程序打包成<code class="language-plaintext highlighter-rouge">ipa</code>文件，上传到App Store的时候，期间就是进行了一些加壳操作，比如：数字证书签名等。重签名的目的就是将别人的程序重新签上我们的证书信息。也可以简单理解为将别人的加密文件解密，加上我们自己的加密算法。</p>
+
+<h4 id="逆向当中的一些专业术语">逆向当中的一些专业术语</h4>
+
+<ul>
+  <li>加壳：利用特殊算法（iOS中数字证书），对可执行文件的编码进行改变，以达到保护程序代码的目的</li>
+  <li>脱壳：摘掉壳程序，将未加密的可执行文件<code class="language-plaintext highlighter-rouge">Mach-o</code>还原出来</li>
+</ul>
+
+<h4 id="查看应用是否加壳">查看应用是否加壳</h4>
+
+<p>将下载好的<code class="language-plaintext highlighter-rouge">ipa</code>包解压缩之后，拿到里面的<code class="language-plaintext highlighter-rouge">Mach-o</code>文件，<code class="language-plaintext highlighter-rouge">cd</code>到所在目录，执行如下命令：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>otool -l 可执行文件路径 | grep crypt
+</code></pre></div></div>
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-05-29-15276021774171.jpg" alt="" /></p>
+
+<p>其中<code class="language-plaintext highlighter-rouge">cryptid</code>代码是否加壳，<code class="language-plaintext highlighter-rouge">1</code>代表加壳，<code class="language-plaintext highlighter-rouge">0</code>代表已脱壳。我们发现打印了两遍，其实代表着该可执行文件支持两种架构<code class="language-plaintext highlighter-rouge">armv7</code>和<code class="language-plaintext highlighter-rouge">arm64</code>.</p>
+
+<h4 id="查看应用支持哪种架构">查看应用支持哪种架构</h4>
+
+<p>终端下执行如下命令查看架构信息</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>lipo -info 文件路径
+</code></pre></div></div>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-05-29-15276023773959.jpg" alt="" /></p>
+
+<p>除了查看架构信息，还可以利用该指令导出某种特定架构、合并多种架构：</p>
+
+<ul>
+  <li>导出特定架构</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>lipo 文件路径 -thin 架构类型 -output 输出文件路径
+</code></pre></div></div>
+
+<ul>
+  <li>合并多种架构</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>lipo 文件路径1 文件路径2 -output 输出文件路径
+</code></pre></div></div>
+
+<h4 id="怎么给应用脱壳">怎么给应用脱壳</h4>
+
+<p>给应用脱壳有两种途径：</p>
+
+<ul>
+  <li>一、直接从一些第三方应用商店里面下载你想脱壳的应用，例如：<code class="language-plaintext highlighter-rouge">PP助手</code>、<code class="language-plaintext highlighter-rouge">iTools</code>等</li>
+  <li>二、自己脱壳，利用<code class="language-plaintext highlighter-rouge">GitHub</code>上开源的一些工具，常用的有<a href="https://github.com/KJCracks/Clutch/releases">Clutch</a>、<a href="https://github.com/stefanesser/dumpdecrypted/">dumdecrypted</a>。具体如何使用，请自行Google</li>
+  <li></li>
+</ul>
+
+<p><strong>前期准备工作：</strong></p>
+
+<ul>
+  <li>一台iPhone，越不越狱都行</li>
+  <li>开发者证书或者企业证书（个人账号也行，但是应用安装上之后，有效期只有7天）</li>
+  <li>电脑安装 <a href="https://dantheman827.github.io/ios-app-signer/">iOS App Signer</a></li>
+</ul>
+
+<p>其实重签名的方式有很多，比如：可以利用<code class="language-plaintext highlighter-rouge">sigh resign</code>命令，在终端下操作，还可以借助一些逆向相关的重签名工具，本文采用<code class="language-plaintext highlighter-rouge">iOS App Signer</code></p>
+
+<p>了解以上基本概念之后，下面正式开始史上最详细的重签名过程，以微信为例：</p>
+
+<h2 id="第一步准备好脱壳后的微信app">第一步：准备好脱壳后的微信App</h2>
+
+<p>我是直接从<code class="language-plaintext highlighter-rouge">PP助手</code>上下载的，感兴趣的可以自己手动脱壳</p>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-05-29-CC5D0564776F714701F45AE5846D3464.jpg" alt="CC5D0564776F714701F45AE5846D3464" /></p>
+
+<h2 id="第二步将对用的ipa文件解压修改一些东西">第二步：将对用的<code class="language-plaintext highlighter-rouge">ipa</code>文件解压，修改一些东西</h2>
+
+<p>注意：个人证书不能重签<code class="language-plaintext highlighter-rouge">Extension</code>文件，所以要删除<code class="language-plaintext highlighter-rouge">ipa</code>包中包含的相应文件，包括<code class="language-plaintext highlighter-rouge">Watch</code>里面的<code class="language-plaintext highlighter-rouge">Extension</code>，为了方便一般直接将<code class="language-plaintext highlighter-rouge">Watch</code>文件删除：</p>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-05-29-C00C57F8EB9509B60FDCD8006DF3E719.jpg" alt="C00C57F8EB9509B60FDCD8006DF3E719" /></p>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-05-29-34293DFAD48B9B855A066721DC0D358B.jpg" alt="34293DFAD48B9B855A066721DC0D358B" /></p>
+
+<h2 id="第三步利用ios-app-signer给微信重签名">第三步：利用<code class="language-plaintext highlighter-rouge">iOS App Signer</code>给微信重签名</h2>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-05-29-D063FFD5907B3090DE0494AF05978BDB.jpg" alt="D063FFD5907B3090DE0494AF05978BDB" /></p>
+
+<ul>
+  <li>第一项：对应的<code class="language-plaintext highlighter-rouge">.ipa</code>或者<code class="language-plaintext highlighter-rouge">.app</code>路径</li>
+  <li>第二项：我们自己的签名证书</li>
+  <li>第三项：证书对应的<code class="language-plaintext highlighter-rouge">Profile</code>文件，默认项<code class="language-plaintext highlighter-rouge">Re-Sign Only</code>是无效的，选择证书下存在的<code class="language-plaintext highlighter-rouge">Profile</code>文件）</li>
+  <li>第四项：重签名之后的<code class="language-plaintext highlighter-rouge">Bundle identifier</code>（选择了<code class="language-plaintext highlighter-rouge">Profile</code>文件，一般会自动填写）</li>
+  <li>下面几项可以随便写</li>
+</ul>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-05-29-25441B7BB39F6BADE92ECA6187C0F6AA.jpg" alt="25441B7BB39F6BADE92ECA6187C0F6AA" /></p>
+
+<p>签名完毕之后对应的文件夹下会生成重签名之后的<code class="language-plaintext highlighter-rouge">ipa</code>包</p>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-05-29-F2804E382DD16002B001BAA1F927AA3C.jpg" alt="F2804E382DD16002B001BAA1F927AA3" /></p>
+
+<p><strong>注意：</strong>利用<code class="language-plaintext highlighter-rouge">iOS App Signer</code>重签名，在删除掉相应的<code class="language-plaintext highlighter-rouge">Extension</code>，选择路径的时候，一定要选择<code class="language-plaintext highlighter-rouge">Payload</code>文件夹下对应的<code class="language-plaintext highlighter-rouge">.app</code>文件，否则会报找不到<code class="language-plaintext highlighter-rouge">Payload</code>文件夹的错误：</p>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-05-29-4C2E14FA5CA3D81E4BEC2F44D9D93647.jpg" alt="4C2E14FA5CA3D81E4BEC2F44D9D93647" /></p>
+
+<h2 id="安装重签名之后的微信">安装重签名之后的微信</h2>
+
+<p>可以用<code class="language-plaintext highlighter-rouge">PP助手安装</code>，也可以用<code class="language-plaintext highlighter-rouge">Xcode</code>安装，我采用<code class="language-plaintext highlighter-rouge">Xocde</code>安装：</p>
+
+<p><img src="http://upload-images.jianshu.io/upload_images/423503-33808e5a3de12398.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="install-wechat" /></p>
+
+<p>不出意外地话，第二个微信就成功的安装到了你的手机上。如果装不上的话，基本上大部分原因就是证书不对。。。</p>
+
+<h2 id="最终效果">最终效果</h2>
+
+<p>多个证书可以多次重新签名，安装多个相同的应用</p>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-05-29-wechat_hook_01.jpg" alt="wechat_hook_01" /></p>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-05-29-wechat_hook_02.jpg" alt="wechat_hook_02" /></p>
+
+<p>这篇文章图有点儿多。。。。。</p>
+
+<p><strong>注意：重签名方式安装的微信，是对微信APP的一种破解，会被官方认定为非安全软件，有被封号的危险</strong>。但是这种方式对破解各种其他软件都是有用的，利用逆向相关的知识，我们可以利用这种知识做很多我们想做的事儿！！！（不要做非法的事情哈！）</p>
+
+<h2 id="遇到的坑">遇到的坑</h2>
+
+<ul>
+  <li>错误一：
+<img src="http://otogtitz7.bkt.clouddn.com/2018-06-04-988D211E9B6C6BEF7659DAA8854AAFBD.jpg" alt="988D211E9B6C6BEF7659DAA8854AAFBD" /></li>
+</ul>
+
+<p><strong>解决办法：</strong>证书不对，仔细检查下证书</p>
+
+<ul>
+  <li>错误二
+<img src="http://otogtitz7.bkt.clouddn.com/2018-06-04-BD2A4E9CB954AB66E6598ED5CCA85F8B.jpg" alt="BD2A4E9CB954AB66E6598ED5CCA85F8B" /></li>
+</ul>
+
+<p><strong>解决办法：</strong>删除<code class="language-plaintext highlighter-rouge">ipa</code>包里面的<code class="language-plaintext highlighter-rouge">watch</code>相关的文件</p>
+
+<h2 id="总结">总结</h2>
+
+<p>过程其实很简单，我始终认为借助一些工具能完成的东西，都是很简单的，因为不需要敲代码。总算给自己iPhone装上了多个微信，原来还打算买个安卓手机呢，哈哈，给自己省了一大笔钱。。。</p>
+
+
+
+  </section>
+</article>
+
+<section>
+
+            <div class="content-play">
+              <p><a href="javascript:void(0)" onclick="dashangToggle()" class="dashang" title="打赏，支持一下">打赏一个呗</a></p>
+              <div class="hide_box-play"></div>
+              <div class="shang_box-play">
+                <a class="shang_close-play" href="javascript:void(0)" onclick="dashangToggle()" title="关闭"><img src="/images/payimg/close.jpg" alt="取消" /></a>
+                <div class="shang_tit-play">
+                  <p>感谢您的支持，我会继续努力的!</p>
+                </div>
+                <div class="shang_payimg">
+                    <img src="/images/payimg/alipayimg.jpg" alt="扫码支持" title="扫一扫" />
+                </div>
+              <div class="shang_payimg">    
+                    <img src="/images/payimg/weipayimg.jpg" alt="扫码支持" title="扫一扫" />
+                </div>
+                <div class="pay_explain">扫码打赏，你说多少就多少</div>
+                <div class="shang_payselect">
+                  <div class="pay_item checked" data-id="alipay">
+                    <span class="pay_logo"><img src="/images/payimg/alipay.jpg" alt="支付宝" /></span>
+                  </div>
+                  <div class="pay_item" data-id="weipay">
+                    <span class="pay_logo"><img src="/images/payimg/wechat.jpg" alt="微信" /></span>
+                  </div>
+                </div>
+                <div class="shang_info-play">
+                  <p>打开<span id="shang_pay_txt">支付宝</span>扫一扫，即可进行扫码打赏哦</p>
+                </div>
+              </div>
+            </div>
+            <script type="text/javascript">
+            function dashangToggle(){
+              $(".hide_box-play").fadeToggle();
+              $(".shang_box-play").fadeToggle();
+            }
+            </script>
+
+            <div style="text-align:center;margin:50px 0; font:normal 14px/24px 'MicroSoft YaHei';"></div>
+
+            <style type="text/css">
+              .content-play{width:80%;margin-top: 20px;margin-bottom: 10px;height:40px;}
+              .hide_box-play{z-index:999;filter:alpha(opacity=50);background:#666;opacity: 0.5;-moz-opacity: 0.5;left:0;top:0;height:99%;width:100%;position:fixed;display:none;}
+              .shang_box-play{width:540px;height:540px;padding:10px;background-color:#fff;border-radius:10px;position:fixed;z-index:1000;left:50%;top:50%;margin-left:-280px;margin-top:-280px;border:1px dotted #dedede;display:none;}
+              .shang_box-play img{border:none;border-width:0;}
+              .dashang{display:block;width:100px;margin:5px auto;height:25px;line-height:25px;padding:10px;background-color:#E74851;color:#fff;text-align:center;text-decoration:none;border-radius:10px;font-weight:bold;font-size:16px;transition: all 0.3s;}
+              .dashang:hover{opacity:0.8;padding:15px;font-size:18px;}
+              .shang_close-play{float:right;display:inline-block;
+                margin-right: 10px;margin-top: 20px;
+              }
+              .shang_logo{display:block;text-align:center;margin:20px auto;}
+              .shang_tit-play{width: 100%;height: 75px;text-align: center;line-height: 66px;color: #a3a3a3;font-size: 16px;background: url('/images/payimg/cy-reward-title-bg.jpg');font-family: 'Microsoft YaHei';margin-top: 7px;margin-right:2px;}
+              .shang_tit-play p{color:#a3a3a3;text-align:center;font-size:16px;}
+              .shang_payimg{width:140px;padding:10px;padding-left: 80px; /*border:6px solid #EA5F00;**/margin:0 auto;border-radius:3px;height:140px;display:inline-block;}
+              .shang_payimg img{display:inline-block;margin-right:10px;float:left;text-align:center;width:140px;height:140px; }
+              .pay_explain{text-align:center;margin:10px auto;font-size:12px;color:#545454;}
+              .shang_payselect{text-align:center;margin:0 auto;margin-top:40px;cursor:pointer;height:60px;width:500px;margin-left:110px;}
+              .shang_payselect .pay_item{display:inline-block;margin-right:140px;float:left;}
+              .shang_info-play{clear:both;}
+              .shang_info-play p,.shang_info-play a{color:#C3C3C3;text-align:center;font-size:12px;text-decoration:none;line-height:2em;}
+            </style>
+
+       <ul class="pager">
+        
+        <li class="previous">
+            <a href="/2018/05/kvo/" data-toggle="tooltip" data-placement="top" title="KVO详解及底层实现">上一篇：  <span>KVO详解及底层实现</span>
+            </a>
+        </li>
+        
+        
+        <li class="next">
+            <a href="/2018/07/take-pic-ocr/" data-toggle="tooltip" data-placement="top" title="iOS模仿系统相机拍照你不曾注意过的细节">下一篇：  <span>iOS模仿系统相机拍照你不曾注意过的细节</span>
+            </a>
+        </li>
+        
+    </ul>
+</section>
+
+<section class="post-comments">
+
+
+    <!-- <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    <script src="https://img1.cache.netease.com/f2e/tie/yun/sdk/loader.js"></script>
+    <script>
+    var cloudTieConfig = {
+      url: document.location.href, 
+      sourceId: "",
+      productKey: "aa395cf7778f458492060f3f53301b7c",
+      target: "cloud-tie-wrapper"
+    };
+    var yunManualLoad = true;
+    Tie.loader("aHR0cHM6Ly9hcGkuZ2VudGllLjE2My5jb20vcGMvbGl2ZXNjcmlwdC5odG1s", true);
+    </script> -->
+
+    <script type="text/javascript" id="wumiiComments">
+      var wumiiPermaLink = "http://www.cenzhijun.top/2018/05/wechat-hook/"; //请用代码生成文章永久的链接
+      var wumiiTitle = "iOS逆向-ipa包重签名及非越狱手机安装多个微信"; //请用代码生成文章标题
+      var wumiiSitePrefix = "http://www.cenzhijun.top"; //安装无觅评论插件的网站的域名，如果是放在子域名上，请提供子域名，如"http://blog.wumii.com"。如果这里填写的域名不对，请自行改正。
+      var wumiiCommentParams = "&pf=JAVASCRIPT";
+
+    </script>
+    <script type="text/javascript" src="http://widget.wumii.cn/ext/cw/widget"></script>
+
+
+  
+</section>
+
+
+            <section class="footer">
+    <footer>
+        <div class = "footer_div">  
+        <nav class="cover-navigation navigation--social">
+          <ul class="navigation">
+
+          
+          <!-- Weibo -->
+          <li class="navigation__item_social">
+            <a href="http://weibo.com/3291155444" title="@3291155444 的微博" target="_blank">
+              <i class='social fa fa-weibo fa-2x'></i>
+              <span class="label">Weibo</span>
+            </a>
+          </li>
+          
+
+          
+          <!-- Github -->
+          <li class="navigation__item_social">
+            <a href="https://github.com/czjwarrior" title="@czjwarrior 的 Github" target="_blank">
+              <i class='social fa fa-github fa-2x'></i>
+              <span class="label">Github</span>
+            </a>
+          </li>
+          
+          
+          
+
+          
+
+          <!-- RSS -->
+          <li class="navigation__item_social">
+            <a href="/feed.xml" rel="author" title="RSS" target="_blank">
+              <i class='social fa fa-rss fa-2x'></i>
+              <span class="label">RSS</span>
+            </a>
+          </li>
+
+          
+          <!-- Email -->
+          <li class="navigation__item_social">
+            <a href="mailto:13621130170@163.com" title="Contact me">
+              <i class='social fa fa-envelope fa-2x'></i>
+              <span class="label">Email</span>
+            </a>
+          </li>
+          
+
+          </ul>
+        </nav>
+
+        </div>
+
+        <div class = "footer_div">  
+           <p class="copyright text-muted">
+            Copyright &copy; 岑志军的个人博客 2020
+            </p>
+        	<div align="right">
+    			<link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+
+          <!-- 访问统计 -->
+          <span id="busuanzi_container_site_pv">
+            本站总访问量
+            <span id="busuanzi_value_site_pv"></span>次
+          </span>
+
+        </div>
+        <div>
+    </footer>
+</section>
+
+        </div>
+    </div>
+    
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="/js/main.js"></script>
+
+<script type="text/javascript" src="/js/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+  </body>
+
+</html>

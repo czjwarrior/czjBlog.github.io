@@ -1,0 +1,39 @@
+I"!<p>Reveal是一款调试iOS程序UI界面的神器</p>
+
+<ul>
+  <li>官网：https://revealapp.com</li>
+  <li>下载：https://revealapp.com/download/</li>
+  <li>建议下载至少Reveal4版本，支持USB连接调试，速度快。低版本的只能WiFi连接调试</li>
+</ul>
+
+<p>调试环境配置</p>
+
+<ul>
+  <li>iPhone上安装Reveal Loader</li>
+  <li>安装完Reveal Loader后，打开【设置】，选择需要调试的APP</li>
+</ul>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-01-28-15170495730063.jpg" alt="" /></p>
+
+<p>找到Mac的Reveal中的<code class="language-plaintext highlighter-rouge">RevealServer</code>文件，覆盖iPhone的<code class="language-plaintext highlighter-rouge">/Library/RHRevealLoader/RevealServer</code>文件</p>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-01-28-15170496337957.jpg" alt="" /></p>
+
+<p>重启SpringBoard或者重启手机，可以在iPhone上输入终端命令</p>
+
+<ul>
+  <li>重启SpringBoard：killall SpringBoard</li>
+  <li>重启手机：reboot</li>
+</ul>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-01-28-15170496752227.jpg" alt="" /></p>
+
+<h2 id="有可能遇到的小问题">有可能遇到的小问题</h2>
+
+<p>安装Reveal Loader的时候，遇到了一个小问题，安装完毕提示缺少依赖：
+<img src="http://otogtitz7.bkt.clouddn.com/2018-01-28-15170497719182.jpg" alt="" /></p>
+
+<h4 id="解决方法是">解决方法是：</h4>
+<p>删除掉bigboss源，重新安装，之后下载<code class="language-plaintext highlighter-rouge">Reveal2Loader</code>就可以了</p>
+
+:ET

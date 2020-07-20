@@ -1,0 +1,64 @@
+I"�<blockquote>
+  <p><a href="http://www.cenzhijun.top/">欢迎访问我的个人博客</a></p>
+</blockquote>
+
+<p>首先在需要引入Swift的文件中导入头文件<code class="language-plaintext highlighter-rouge">#import "工程名-Swift.h"</code></p>
+
+<ul>
+  <li>OC跳转Swift页面：</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#import "ViewController.h"
+#import "OCAndSwift-Swift.h"        // 引入头文件
+
+@interface ViewController ()
+
+@end
+
+@implementation ViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view, typically from a nib.
+}
+
+- (IBAction)btnClicked:(id)sender {
+    
+    // Swift文件
+    ChildViewController *vc = [[ChildViewController alloc] initWithNibName:@"ChildViewController" bundle:nil];
+    
+    [self.navigationController pushViewController:vc animated:YES];
+    
+}
+</code></pre></div></div>
+
+<ul>
+  <li>Swift跳转OC页面：</li>
+</ul>
+
+<p>首先创建Swift文件的时候回创建一个<code class="language-plaintext highlighter-rouge">工程名-Bridging-Header.h</code>文件，在这个文件中将需要用到的OC文件导入到这里！！！</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>import UIKit
+
+class ChildViewController: UIViewController {
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        // Do any additional setup after loading the view.
+    }
+
+    @IBAction func btnClicked(_ sender: Any) {
+        let twoVC = ChildTwoViewController(nibName:"ChildTwoViewController", bundle: nil)
+        
+        self.navigationController?.pushViewController(twoVC, animated: true)
+        
+        
+    }
+</code></pre></div></div>
+
+<h2 id="哈哈大功告成">哈哈，大功告成！！！</h2>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2017-12-07-SwiftAndOC.gif" alt="" /></p>
+
+:ET

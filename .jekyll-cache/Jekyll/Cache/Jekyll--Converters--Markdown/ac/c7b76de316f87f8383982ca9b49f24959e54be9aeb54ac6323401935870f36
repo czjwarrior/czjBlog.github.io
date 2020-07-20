@@ -1,0 +1,45 @@
+I"7
+<p>解决插件失效的办法</p>
+
+<p><code class="language-plaintext highlighter-rouge">defaults read /Applications Xcode.app/Contents/Info DVTPlugInCompatibilityUUID</code></p>
+
+<p><code class="language-plaintext highlighter-rouge">/Users/(mymac)/Library/Application Support/Developer/Shared/Xcode/Plug-ins</code></p>
+
+<p>iMac开机静音</p>
+
+<p><code class="language-plaintext highlighter-rouge">sudo nvram SystemAudioVolume=</code></p>
+
+<p>开机恢复声音</p>
+
+<p><code class="language-plaintext highlighter-rouge">sudo nvram -d SystemAudioVolume</code></p>
+
+<p>iOS开发 判断各个设备型号（放大模式和标准模式）</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//#define IS_OS_8_OR_LATER     ([[[ UIDevice currentDevice ] systemVersion ] floatValue ]  &gt;=  8.0 )
+//#define IS_IPAD ( UI_USER_INTERFACE_IDIOM ()  ==  UIUserInterfaceIdiomPad )
+//#define IS_IPHONE ( UI_USER_INTERFACE_IDIOM ()  ==  UIUserInterfaceIdiomPhone )
+//#define IS_IPHONE_5 ( IS_IPHONE &amp;&amp;  ([[ UIScreen mainScreen ] bounds ]. size . height ==  568.0 )  &amp;&amp;  (( IS_OS_8_OR_LATER &amp;&amp;  [ UIScreen mainScreen ]. nativeScale ==  [ UIScreen mainScreen ]. scale )  ||  ! IS_OS_8_OR_LATER ))
+//#define IS_STANDARD_IPHONE_6 ( IS_IPHONE &amp;&amp;  [[ UIScreen mainScreen ] bounds ]. size . height ==  667.0   &amp;&amp; IS_OS_8_OR_LATER &amp;&amp;  [ UIScreen mainScreen ]. nativeScale ==  [ UIScreen mainScreen ]. scale )
+//#define IS_ZOOMED_IPHONE_6 ( IS_IPHONE &amp;&amp;  [[ UIScreen mainScreen ] bounds ]. size . height ==  568.0  &amp;&amp; IS_OS_8_OR_LATER &amp;&amp;  [ UIScreen mainScreen ]. nativeScale &gt;  [ UIScreen mainScreen ]. scale )
+//#define IS_STANDARD_IPHONE_6_PLUS ( IS_IPHONE &amp;&amp;  [[ UIScreen mainScreen ] bounds ]. size . height ==  736.0 )
+//#define IS_ZOOMED_IPHONE_6_PLUS ( IS_IPHONE &amp;&amp;  [[ UIScreen mainScreen ] bounds ]. size . height ==  667.0  &amp;&amp; IS_OS_8_OR_LATER &amp;&amp;  [ UIScreen mainScreen ]. nativeScale &lt;  [ UIScreen mainScreen ]. scale )
+// /
+</code></pre></div></div>
+
+<p>解决cocoaPod更新慢的问题：</p>
+
+<p><code class="language-plaintext highlighter-rouge">pod update --verbose --no-repo-update</code></p>
+
+<p>mac显示隐藏文件</p>
+
+<p><code class="language-plaintext highlighter-rouge">defaults write com.apple.finder AppleShowAllFiles -bool true</code></p>
+
+<p>重启finder</p>
+
+<p>不显示隐藏文件</p>
+
+<p><code class="language-plaintext highlighter-rouge">defaults write com.apple.finder AppleShowAllFiles -bool false</code></p>
+
+<p>重启finder</p>
+
+:ET

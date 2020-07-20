@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <title>岑志军的个人博客</title>
+  <meta name="description" content="欢迎来到我的博客~">
+  <meta name="author" content="leopardpan">
+
+  <meta name="keywords" content="iOS开发,岑志军的个人博客,reactNative,ListView,wifi列表,reactnative开发,数字货币,加密货币,solidity,fabric,ethereum,blockchain,hyperledger,区块链部落,从零到壹全栈部落,智能合约,超级账本,ICO,比特币,以太坊" />
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="岑志军的个人博客">
+  <meta name="twitter:description" content="欢迎来到我的博客~">
+  
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="岑志军的个人博客">
+  <meta property="og:description" content="欢迎来到我的博客~">
+  
+  <link rel="icon" type="image/png" href="/images/favicon.png" />
+  <link href="/images/favicon.png" rel="shortcut icon" type="image/png">
+  
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+
+  <link rel="canonical" href="http://localhost:4000/">
+  <link rel="alternate" type="application/rss+xml" title="岑志军的个人博客" href="http://localhost:4000/feed.xml">
+  
+  <meta name="google-site-verification" content="1-1ZlHoRvM0T2FqPbW2S-qLgYXN6rsn52kErlMPd_gw" />
+
+<!-- 站点统计 -->
+  <script 
+  async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+  </script>  
+
+<!-- 百度统计 -->
+  
+  <script>
+      var _hmt = _hmt || [];
+      (function() {
+        var hm = document.createElement("script");
+        hm.src = "//hm.baidu.com/hm.js?0352fdd0e57585d9a54ff3a6906ae365";
+        var s = document.getElementsByTagName("script")[0]; 
+        s.parentNode.insertBefore(hm, s);
+      })();
+  </script>
+  
+
+<!-- google 统计 -->
+  
+
+</head>
+
+
+  <body>
+
+    <span class="mobile btn-mobile-menu">        
+      <div class="nav_container">
+         <nav class="nav-menu-item" style = "float:right">
+            <i class="nav-menu-item">
+              <a href="/#blog" title="" class="blog-button">  博客主页
+              </a>
+            </i>
+            
+                <i class="nav-menu-item">
+
+                  <a href="/archive" title="archive" class="btn-mobile-menu__icon">
+                      所有文章
+                  </a>
+                </i>
+            
+                <i class="nav-menu-item">
+
+                  <a href="/tags" title="tags" class="btn-mobile-menu__icon">
+                      分类
+                  </a>
+                </i>
+            
+                <i class="nav-menu-item">
+
+                  <a href="/about" title="about" class="btn-mobile-menu__icon">
+                      关于我
+                  </a>
+                </i>
+            
+          </nav>
+      </div>
+    </span>
+    
+    <header class="panel-cover " style="background-image: url('/images/background-cover.jpg')">
+  <div class="panel-main">
+
+    <div class="panel-main__inner panel-inverted">
+    <div class="panel-main__content">
+        <!-- 头像效果-start -->
+        <div class="ih-item circle effect right_to_left">            
+            <a href="/#blog" title="前往 岑志军的个人博客 的主页" class="blog-button">
+                <div class="img"><img src="/images/avatar.jpg" alt="img"></div>
+                <div class="info">
+                    <div class="info-back">
+                        <h2> 
+                            
+                                czjDevloper
+                            
+                        </h2>
+                        <p>
+                           
+                                iOS / React-Native
+                            
+                        </p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <!-- 头像效果-end -->
+        <h1 class="panel-cover__title panel-title"><a href="/#blog" title="link to homepage for 岑志军的个人博客" class="blog-button">岑志军的个人博客</a></h1>
+        
+        <span class="panel-cover__subtitle panel-subtitle">我的博客</span>
+        
+        <hr class="panel-cover__divider" />
+        <p class="panel-cover__description">欢迎来到我的博客~</p>
+        <hr class="panel-cover__divider panel-cover__divider--secondary" />
+        
+        
+        
+
+        <div class="navigation-wrapper">
+          <div>
+            <nav class="cover-navigation cover-navigation--primary">
+              <ul class="navigation">
+                <li class="navigation__item"><a href="/#blog" title="" class="blog-button">博客主页</a></li>
+                
+                  <li class="navigation__item"><a href="/archive" title="archive">所有文章</a></li>
+                
+                  <li class="navigation__item"><a href="/tags" title="tags">分类</a></li>
+                
+                  <li class="navigation__item"><a href="/about" title="about">关于我</a></li>
+                
+              </ul>
+            </nav>
+          </div>          
+        </div>
+
+
+        </div>
+      </div>
+    </div>
+    
+    
+    <div class="panel-cover--overlay cover-clear"></div>
+    
+  </div>
+</header>
+
+
+    <div class="content-wrapper">
+        <div class="content-wrapper__inner">
+            <div class="main-post-list hidden">
+
+  <ol class="post-list">
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2019/05/masonry/" title="访问 Masonry">Masonry</a></h2>
+      <p class="excerpt">Masonry 实现原理及链式调用分析  Masonry is a light-weight layout framework which wraps AutoLayout with a nicer syntax. Masonry has its own layout DSL which provides a chainable way of describing your NSLayoutConstraints which results in layout code that is m...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2019-05-27 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2019-05-27</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right"></span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2019/05/masonry/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2018/07/take-pic-ocr/" title="访问 iOS模仿系统相机拍照你不曾注意过的细节">iOS模仿系统相机拍照你不曾注意过的细节</a></h2>
+      <p class="excerpt">  距离上次写博客竟然过了一个月了，一方面是最近项目比较忙，另一方面是实在是有点儿懈怠了，强烈谴责一下自己。其实我最近在看一些技术书籍，发现一些好的书真心对自己帮助很大，看书的过程，好多原来模糊的概念、问题，都能感觉恍然大悟。当提笔想总结成一篇文章的时候，发现网上早已经有大量的优秀文章出现，所以就不敢献丑了。今天写的一篇文章，是最近自己项目中用到的，不算什么难点，只是感觉有必要记录一下。需求由于我们APP集成了有道翻译的SDK，需要将拍出来的图片翻译成对应的语言，但是有道的SDK目前还做的...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2018-07-01 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2018-07-01</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">iOS</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2018/07/take-pic-ocr/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2018/05/wechat-hook/" title="访问 iOS逆向-ipa包重签名及非越狱手机安装多个微信">iOS逆向-ipa包重签名及非越狱手机安装多个微信</a></h2>
+      <p class="excerpt">  前一段时间学了点儿逆向相关的一些东西，但是都是基于越狱手机上的操作，给视频类应用去广告之类的。随着苹果生态圈的逐渐完善、及苹果对自身系统的保护越来越严格，导致现在的iPhone手机并不像以前那样存在大量的越狱用户。前段时间我自己申请了个微信小号，申请小号的目的就是原来微信号好友中乱七八糟的人实在太多，感觉自己的朋友圈都是一些无关紧要的垃圾信息，曾经关闭了一段时间的朋友圈，但是最近遇到了好多技术上很强的同行，还想了解大佬们的动态。于是我就想着申请了个小号，但是麻烦来了，iPhone手机并...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2018-05-29 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2018-05-29</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">iOS</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2018/05/wechat-hook/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2018/05/kvo/" title="访问 KVO详解及底层实现">KVO详解及底层实现</a></h2>
+      <p class="excerpt">什么是KVO??KVO就是NSKeyValueObserving，请看官方文档的解释：大概翻译如下：一种非正式协议，通知其他对象的指定属性发生了改变。简单理解就是，可以监听一个对象的某个属性是否发生改变。那么问题来了，什么是非正式协议？？有正式协议吗？？麻蛋，本来想找官方文档的，找了半天没找到。从Stackoverflow找到了答案，貌似原来官方文档的链接失效了大概翻译如下：非正式协议：非正式协议是NSObject的一个类别Category，几乎所有的对象都隐含的采用（类别是OC的语言特性...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2018-05-20 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2018-05-20</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">iOS</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2018/05/kvo/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2018/05/data-security/" title="访问 数据安全及各种加密算法对比">数据安全及各种加密算法对比</a></h2>
+      <p class="excerpt">平时开发中不仅会遇到各种需要保护用户隐私的情况，而且还有可能需要对公司核心数据进行保护，这时候加密隐私数据就成为了必要。然而市场上存在着各种各样的抓包工具及解密算法，甚至一些公司有专门的逆向部门，这就加大了数据安全的风险，本文将通过以下几个方面对各种加密算法进行分析对比：  Base64编码（基础）  单项散列函数 MD5、SHA1、SHA256、SHA512等  消息认证码 HMAC-MD5、HMAC-SHA1                              对称加密 DES ...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2018-05-14 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2018-05-14</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">iOS底层</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2018/05/data-security/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2018/05/create-podspec/" title="访问 使用Cocoapods创建私有库">使用Cocoapods创建私有库</a></h2>
+      <p class="excerpt">  五一之后，公司要求对代码进行整理，同时进行代码管理、自动化打包等标准化流程，这些东西一直是我想搞的，这次有了公司的支持，操作起来也更顺利了，代码管理、自动化打包会找时间写一篇博客，这次主要记录利用Cocoapods将多个项目中共用的代码抽离出私有库，方便其他项目的引用，也算是组件化的第一步吧。抽离出私有库的时候，参考了很多的博客，遇到了很多的问题，主要参考了这篇博客。为什么要进行代码抽离很多公司不止有一个产品，当项目达到两个及以上的时候，就需要考虑代码的共用（理想情况下）。由于我们公司...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2018-05-10 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2018-05-10</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">iOS</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2018/05/create-podspec/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2018/04/autoPacking/" title="访问 fastlane实现自动化打包">fastlane实现自动化打包</a></h2>
+      <p class="excerpt">  正常产品开发完成之后，我们都需要给测试人员打包，又是测试包，又是生产包的，打一次包需要浪费十几分钟的时间，甚至有时候，你刚打完包，产品过来告诉你某个地方需要微调一下（麻蛋，这个时候是不是想弄死他），但是没办法，只好改完bug，继续打包，就这样可能一上午或者一下午就这样浪费了，所以有一个能够自动化打包的工具不仅能够为我们节省大量的时间，还可以让我们能够装逼。。。。。（这是重点）其实自动化打包的工具有很多，比较流行的有Jenkins和fastlane，原来尝试过Jenkins,感觉这个工具...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2018-04-26 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2018-04-26</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">iOS</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2018/04/autoPacking/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2018/04/Quartz2d%E5%AE%9E%E6%88%98/" title="访问 Quartz2D实战-画板工具">Quartz2D实战-画板工具</a></h2>
+      <p class="excerpt">  一直想让自己每天都能进步，但是学习这个事情一直都无法坚持，只有自己感觉到了紧迫感，才会敲起代码，研究自己以前没接触过的知识，写博客的目的就是希望能够和更多的朋友一起讨论，促进交流，共同进步！！！什么是Quartz2DQuartz2D的API是纯C语言的，它是一个二维绘图引擎，同时支持iOS和Mac系统。Quartz2D的API来自于Core Graphics框架，数据类型和函数基本都以CG作为前缀：CGContextRef、CGPathRef等。实际开发中UIKit框架能够帮我们完成大...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2018-04-21 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2018-04-21</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">iOS</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2018/04/Quartz2d%E5%AE%9E%E6%88%98/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2018/03/msgSend-02/" title="访问 （4）OC中消息和消息转发-02">（4）OC中消息和消息转发-02</a></h2>
+      <p class="excerpt">上篇文章讲到，如果通过_class_resolveInstanceMethod和- (id)forwardingTargetForSelector:(SEL)aSelector还是没找到IMP,也就是方法的实现，那我们只能手动添加方法的实现，也就是上篇文章提到的regular forwarding或者Normal Forwarding：我们先看一下方法的调用过程都执行了哪些方法？首先我们把方法实现注释掉。首先在方法调用的地方打一个断点，然后在控制台执行call (void)instrume...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2018-03-28 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2018-03-28</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">iOS底层</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2018/03/msgSend-02/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2018/03/msgSend-01/" title="访问 （3）OC中消息和消息转发-01">（3）OC中消息和消息转发-01</a></h2>
+      <p class="excerpt">前一段时间有朋友问了下面的这个问题，我给出的回答是这样的：其实上面回答的方法调用也都是基于以前对runtime的理解，和自己试验出来的结果，但是，回答完这个问题之后，抱着探究到底的精神（其实是这几天产品没提什么需求，有点儿闲），问了自己一个问题：你怎么知道是底层调用的是这几个方法？？。。。又是一番查资料，验证问题。。。下面正式开始分析：  首先新建一个Person类，代码如下：Person.h#import &lt;Foundation/Foundation.h&gt;@interface...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2018-03-26 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2018-03-26</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">iOS底层</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2018/03/msgSend-01/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2018/03/NSNumber%E5%8F%8ATagged-Pointer/" title="访问 （2）NSNumber及Tagged Pointer">（2）NSNumber及Tagged Pointer</a></h2>
+      <p class="excerpt">根据上一篇文章的总结，我们很容易发现@interface Student : NSObject{    @public    int _age;    int _no;}一个Student对象在64位架构下占了16个字节，其中isa占8个字节，两个int变量分别占了4个字节，但是这种方式适合所有OC对象吗？？哈哈，并不是。。。今天早上有朋友问NSNumber为啥占用8个字节（64bit），请看NSNumber头文件，发现如下代码：@property (readonly) char char...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2018-03-22 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2018-03-22</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">iOS底层</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2018/03/NSNumber%E5%8F%8ATagged-Pointer/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2018/03/Objective-C%E7%9A%84%E6%9C%AC%E8%B4%A8/" title="访问 （1）Objective-C的本质">（1）Objective-C的本质</a></h2>
+      <p class="excerpt">众说周知，我们平时编写的OC代码，底层都是C/C++实现的我们可以通过一个终端指令，将我们的OC代码转换成C/C++代码xcrun -sdk iphoneos clang -arch arm64 -rewrite-objc 文件名 -o 输出的CPP文件例如：xcrun -sdk iphoneos clang -arch arm64 -rewrite-objc main.m -o main.cpp思考一：OC的对象、类都是基于C/C++什么数据结构实现的？？首先看下面代码：#import ...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2018-03-13 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2018-03-13</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">iOS底层</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2018/03/Objective-C%E7%9A%84%E6%9C%AC%E8%B4%A8/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2018/01/theos/" title="访问 （7）theos安装">（7）theos安装</a></h2>
+      <p class="excerpt">安装签名工具ldid  先确保安装了brew$ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"  利用brew安装ldid$ brew install ldid修改环境变量  编辑用户的配置文件$ vim ~/.bash_profile  在.bash_profile文件后面加入以下2行export THEOS=~/theosexport P...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2018-01-28 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2018-01-28</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">逆向</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2018/01/theos/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2018/01/%E8%84%B1%E5%A3%B3/" title="访问 （6）脱壳">（6）脱壳</a></h2>
+      <p class="excerpt">加壳  什么是加壳？          利用特殊的算法，对可执行文件的编码进行改变（比如压缩、加密），以达到保护程序代码的目的      脱壳  什么是脱壳？          摘掉壳程序，将未加密的可执行文件还原出来（有些人也称为“砸壳”）        脱壳主要有2种方法：硬脱壳、动态脱壳iOS中的脱壳工具  iOS中有很多好用的脱壳工具          Clutch：https://github.com/KJCracks/Clutch      dumpdecrypted：http...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2018-01-27 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2018-01-27</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">逆向</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2018/01/%E8%84%B1%E5%A3%B3/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2018/01/reveal/" title="访问 （4）Reveal真机调试">（4）Reveal真机调试</a></h2>
+      <p class="excerpt">Reveal是一款调试iOS程序UI界面的神器  官网：https://revealapp.com  下载：https://revealapp.com/download/  建议下载至少Reveal4版本，支持USB连接调试，速度快。低版本的只能WiFi连接调试调试环境配置  iPhone上安装Reveal Loader  安装完Reveal Loader后，打开【设置】，选择需要调试的APP找到Mac的Reveal中的RevealServer文件，覆盖iPhone的/Library/RH...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2018-01-27 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2018-01-27</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">逆向</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2018/01/reveal/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2018/01/mach-o/" title="访问 （5）初识Mach-O">（5）初识Mach-O</a></h2>
+      <p class="excerpt">APP从开发到安装到手机的过程1  MJRefreshExample.app中的MJRefreshExample文件是iOS中的可执行文件，文件格式是Mach-OAPP从开发到安装到手机的过程2逆向APP的思路  界面分析          Cycript、Reveal        代码分析          对Mach-O文件的静态分析      MachOView、class-dump、Hopper Disassembler、ida等        动态调试          对运行...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2018-01-27 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2018-01-27</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">逆向</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2018/01/mach-o/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2018/01/Cycript/" title="访问 （3）Cycript">（3）Cycript</a></h2>
+      <p class="excerpt">什么是CycriptCycript是Objective-C++、ES6（JavaScript）、Java等语法的混合物  可以用来探索、修改、调试正在运行的Mac\iOS APP  官网： http://www.cycript.org/  文档： http://www.cycript.org/manual/  通过Cydia安装Cycript，即可在iPhone上调试运行中的APPCycript的开启和关闭  开启          cycript      cycript -p 进程ID...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2018-01-22 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2018-01-22</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">逆向</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2018/01/Cycript/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2018/01/%E9%80%86%E5%90%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/" title="访问 （2）逆向环境搭建">（2）逆向环境搭建</a></h2>
+      <p class="excerpt">Mac远程登录到iPhone  我们经常在Mac的终端上，通过敲一些命令行来完成一些操作  iOS和Mac OS X都是基于Darwin（苹果的一个基于Unix的开源系统内核），所以iOS中同样支持终端的命令行操作  在逆向工程中，我们经常会通过命令行来操纵iPhone  为了能够让Mac终端中的命令行能作用在iPhone上，我们得让Mac和iPhone建立连接  通过Mac远程登录到iPhone的方式建立连接SSH、OpenSSH  SSH          Secure Shell的缩...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2018-01-21 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2018-01-21</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">逆向</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2018/01/%E9%80%86%E5%90%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2018/01/%E6%90%AD%E5%BB%BA%E8%B6%8A%E7%8B%B1%E7%8E%AF%E5%A2%83/" title="访问 （1）越狱环境搭建">（1）越狱环境搭建</a></h2>
+      <p class="excerpt">什么是iOS Jailbreak（iOS越狱）利用iOS系统漏洞，获取iOS系统的最高权限（Root），解开各种限制（合法行为）Jailbreak优缺点：      优点          自由安装各种实用的插件、主题、APP      修改系统APP的一些默认行为      自由安装非AppSore来源的APP      灵活管理文件系统，让iPhone可以像U盘那样灵活      给开发者提供了逆向工程的环境            缺点          不予保修      费电，越狱...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2018-01-21 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2018-01-21</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">逆向</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2018/01/%E6%90%AD%E5%BB%BA%E8%B6%8A%E7%8B%B1%E7%8E%AF%E5%A2%83/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2018/01/iTerm2/" title="访问 设置iTerm2为默认终端">设置iTerm2为默认终端</a></h2>
+      <p class="excerpt">打开iTerm，在默认菜单中选择”Make iTerm2 Default Term”如果使用了Go2Shell快捷启动的话,设置默认iTerm2，在终端输入如下命令open -a Go2Shell --args config,回车，选择iTerm 2，如图：&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2018-01-17 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2018-01-17</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">小知识</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2018/01/iTerm2/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+  </ol>
+
+  <hr class="post-list__divider " />
+
+<nav class="pagination" role="navigation">
+
+	<!-- 百度搜索 -->
+	<script type="text/javascript">(function(){document.write(unescape('%3Cdiv id="bdcs"%3E%3C/div%3E'));var bdcs = document.createElement('script');bdcs.type = 'text/javascript';bdcs.async = true;bdcs.src = 'http://znsv.baidu.com/customer_search/api/js?sid=12441349038163667913' + '&plate_url=' + encodeURIComponent(window.location.href) + '&t=' + Math.ceil(new Date()/3600000);var s = document.getElementsByTagName('script')[0];s.parentNode.insertBefore(bdcs, s);})();
+	</script>
+	
+    
+    <span class="pagination__page-number">1 / 4</span>
+    
+        <a class="older-posts pagination__older btn btn-small btn-tertiary" href="/page/2/#blog">更早 &rarr;</a>
+    
+</nav>
+
+
+</div>
+
+            <section class="footer">
+    <footer>
+        <div class = "footer_div">  
+        <nav class="cover-navigation navigation--social">
+          <ul class="navigation">
+
+          
+          <!-- Weibo -->
+          <li class="navigation__item_social">
+            <a href="http://weibo.com/3291155444" title="@3291155444 的微博" target="_blank">
+              <i class='social fa fa-weibo fa-2x'></i>
+              <span class="label">Weibo</span>
+            </a>
+          </li>
+          
+
+          
+          <!-- Github -->
+          <li class="navigation__item_social">
+            <a href="https://github.com/czjwarrior" title="@czjwarrior 的 Github" target="_blank">
+              <i class='social fa fa-github fa-2x'></i>
+              <span class="label">Github</span>
+            </a>
+          </li>
+          
+          
+          
+
+          
+
+          <!-- RSS -->
+          <li class="navigation__item_social">
+            <a href="/feed.xml" rel="author" title="RSS" target="_blank">
+              <i class='social fa fa-rss fa-2x'></i>
+              <span class="label">RSS</span>
+            </a>
+          </li>
+
+          
+          <!-- Email -->
+          <li class="navigation__item_social">
+            <a href="mailto:13621130170@163.com" title="Contact me">
+              <i class='social fa fa-envelope fa-2x'></i>
+              <span class="label">Email</span>
+            </a>
+          </li>
+          
+
+          </ul>
+        </nav>
+
+        </div>
+
+        <div class = "footer_div">  
+           <p class="copyright text-muted">
+            Copyright &copy; 岑志军的个人博客 2020
+            </p>
+        	<div align="right">
+    			<link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+
+          <!-- 访问统计 -->
+          <span id="busuanzi_container_site_pv">
+            本站总访问量
+            <span id="busuanzi_value_site_pv"></span>次
+          </span>
+
+        </div>
+        <div>
+    </footer>
+</section>
+
+        </div>
+    </div>
+    
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="/js/main.js"></script>
+
+<script type="text/javascript" src="/js/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+  </body>
+
+</html>

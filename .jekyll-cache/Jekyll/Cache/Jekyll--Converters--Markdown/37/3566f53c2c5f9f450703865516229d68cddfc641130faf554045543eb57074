@@ -1,0 +1,2 @@
+I"�<p>检查代码是否有leak的时候，发现NSURLSession存在leak，最后发现必须session请求完成后，立即释放，代码如下：</p>
+:ET

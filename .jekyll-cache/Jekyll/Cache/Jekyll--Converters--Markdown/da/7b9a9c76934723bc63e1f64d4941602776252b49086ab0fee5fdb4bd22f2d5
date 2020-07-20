@@ -1,0 +1,124 @@
+I"�<p>ReactNative中有专门实现轮播图的模块<code class="language-plaintext highlighter-rouge">react-native-swiper</code></p>
+
+<ul>
+  <li>安装组件</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>npm i react-native-swiper --save
+</code></pre></div></div>
+
+<ul>
+  <li>导入组件</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>import Swiper from 'react-native-swiper';
+</code></pre></div></div>
+
+<ul>
+  <li>详细代码</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>import React, { Component } from 'react';
+import {
+  AppRegistry,
+  StyleSheet,
+  Text,
+  Image,
+  View
+} from 'react-native';
+
+import Swiper from 'react-native-swiper';
+import Dimensions from 'Dimensions';
+
+// 屏幕宽度
+var screenWidth = Dimensions.get('window').width;
+
+export default class ScrollViewDemo extends Component {
+
+  // 构造
+  constructor(props){
+        super(props);
+        this.state = {
+            isShow: false,
+            items:[]
+        }
+    }
+  render() {
+        let H = 200;
+        if (this.state.isShow) {
+            return(
+                &lt;View style=&gt;
+
+                    &lt;Swiper 
+                      autoplay = {true} 
+                      height = {H} 
+                      showsPagination = {true} 
+                      dotColor="white"
+                      activeDotColor='yellow' horizontal={true}&gt;
+                        {
+                            this.state.items.map((item, index) =&gt; {
+                                //cover: 等比例放大; center:不变; contain:不变; stretch:填充;
+                                return (&lt;Image style= key = {index} resizeMode='cover' source={item}/&gt;)
+                            })
+                        }
+
+                    &lt;/Swiper&gt;
+                    &lt;Text style={styles.title}&gt;
+                        滚动视图
+                    &lt;/Text&gt;
+                &lt;/View&gt;
+            );
+        }else {
+            return(
+                &lt;View style=/&gt;
+            );
+        }
+    }
+
+  componentDidMount() {
+        var item;
+        for (let i = 0; i &lt; 3; i++){
+            switch (i){
+                case 0:{
+                    item = require('./images/1.jpg');
+                    break;
+                }
+                case 1:{
+                    item = require('./images/2.jpg');
+                    break;
+                }
+                default:{
+                    item = require('./images/3.jpg');
+                    break;
+                }
+            }
+            this.state.items.push(item);
+
+        }
+        console.log(this.state.items + '111');
+        this.setState({
+            isShow: true,
+            items: this.state.items
+        })
+    }
+}
+
+const styles = StyleSheet.create({
+  
+  title: {
+    marginTop: 30,
+    position: 'absolute',
+    fontSize: 32, 
+    backgroundColor:'transparent'
+  },
+
+});
+
+AppRegistry.registerComponent('ScrollViewDemo', () =&gt; ScrollViewDemo);
+</code></pre></div></div>
+
+<p>效果图：</p>
+
+<p><img src="/images/posts/2017-08-15-scrollView.gif" alt="" /></p>
+
+:ET

@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <title>岑志军的个人博客</title>
+  <meta name="description" content="欢迎来到我的博客~">
+  <meta name="author" content="leopardpan">
+
+  <meta name="keywords" content="iOS开发,岑志军的个人博客,reactNative,ListView,wifi列表,reactnative开发,数字货币,加密货币,solidity,fabric,ethereum,blockchain,hyperledger,区块链部落,从零到壹全栈部落,智能合约,超级账本,ICO,比特币,以太坊" />
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="岑志军的个人博客">
+  <meta name="twitter:description" content="欢迎来到我的博客~">
+  
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="岑志军的个人博客">
+  <meta property="og:description" content="欢迎来到我的博客~">
+  
+  <link rel="icon" type="image/png" href="/images/favicon.png" />
+  <link href="/images/favicon.png" rel="shortcut icon" type="image/png">
+  
+  <link rel="stylesheet" href="/css/main.css">
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+
+  <link rel="canonical" href="http://localhost:4000/page/2/">
+  <link rel="alternate" type="application/rss+xml" title="岑志军的个人博客" href="http://localhost:4000/feed.xml">
+  
+  <meta name="google-site-verification" content="1-1ZlHoRvM0T2FqPbW2S-qLgYXN6rsn52kErlMPd_gw" />
+
+<!-- 站点统计 -->
+  <script 
+  async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+  </script>  
+
+<!-- 百度统计 -->
+  
+  <script>
+      var _hmt = _hmt || [];
+      (function() {
+        var hm = document.createElement("script");
+        hm.src = "//hm.baidu.com/hm.js?0352fdd0e57585d9a54ff3a6906ae365";
+        var s = document.getElementsByTagName("script")[0]; 
+        s.parentNode.insertBefore(hm, s);
+      })();
+  </script>
+  
+
+<!-- google 统计 -->
+  
+
+</head>
+
+
+  <body>
+
+    <span class="mobile btn-mobile-menu">        
+      <div class="nav_container">
+         <nav class="nav-menu-item" style = "float:right">
+            <i class="nav-menu-item">
+              <a href="/#blog" title="" class="blog-button">  博客主页
+              </a>
+            </i>
+            
+                <i class="nav-menu-item">
+
+                  <a href="/archive" title="archive" class="btn-mobile-menu__icon">
+                      所有文章
+                  </a>
+                </i>
+            
+                <i class="nav-menu-item">
+
+                  <a href="/tags" title="tags" class="btn-mobile-menu__icon">
+                      分类
+                  </a>
+                </i>
+            
+                <i class="nav-menu-item">
+
+                  <a href="/about" title="about" class="btn-mobile-menu__icon">
+                      关于我
+                  </a>
+                </i>
+            
+          </nav>
+      </div>
+    </span>
+    
+    <header class="panel-cover " style="background-image: url('/images/background-cover.jpg')">
+  <div class="panel-main">
+
+    <div class="panel-main__inner panel-inverted">
+    <div class="panel-main__content">
+        <!-- 头像效果-start -->
+        <div class="ih-item circle effect right_to_left">            
+            <a href="/#blog" title="前往 岑志军的个人博客 的主页" class="blog-button">
+                <div class="img"><img src="/images/avatar.jpg" alt="img"></div>
+                <div class="info">
+                    <div class="info-back">
+                        <h2> 
+                            
+                                czjDevloper
+                            
+                        </h2>
+                        <p>
+                           
+                                iOS / React-Native
+                            
+                        </p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <!-- 头像效果-end -->
+        <h1 class="panel-cover__title panel-title"><a href="/#blog" title="link to homepage for 岑志军的个人博客" class="blog-button">岑志军的个人博客</a></h1>
+        
+        <span class="panel-cover__subtitle panel-subtitle">我的博客</span>
+        
+        <hr class="panel-cover__divider" />
+        <p class="panel-cover__description">欢迎来到我的博客~</p>
+        <hr class="panel-cover__divider panel-cover__divider--secondary" />
+        
+        
+        
+
+        <div class="navigation-wrapper">
+          <div>
+            <nav class="cover-navigation cover-navigation--primary">
+              <ul class="navigation">
+                <li class="navigation__item"><a href="/#blog" title="" class="blog-button">博客主页</a></li>
+                
+                  <li class="navigation__item"><a href="/archive" title="archive">所有文章</a></li>
+                
+                  <li class="navigation__item"><a href="/tags" title="tags">分类</a></li>
+                
+                  <li class="navigation__item"><a href="/about" title="about">关于我</a></li>
+                
+              </ul>
+            </nav>
+          </div>          
+        </div>
+
+
+        </div>
+      </div>
+    </div>
+    
+    
+    <div class="panel-cover--overlay cover-clear"></div>
+    
+  </div>
+</header>
+
+
+    <div class="content-wrapper">
+        <div class="content-wrapper__inner">
+            <div class="main-post-list hidden">
+
+  <ol class="post-list">
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2017/12/Swift-OC/" title="访问 OC和Swift互相跳转">OC和Swift互相跳转</a></h2>
+      <p class="excerpt">  欢迎访问我的个人博客首先在需要引入Swift的文件中导入头文件#import "工程名-Swift.h"  OC跳转Swift页面：#import "ViewController.h"#import "OCAndSwift-Swift.h"        // 引入头文件@interface ViewController ()@end@implementation ViewController- (void)viewDidLoad {    [super viewDidLoad];  ...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2017-12-07 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2017-12-07</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">iOS</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2017/12/Swift-OC/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2017/11/contact/" title="访问 iOS保存联系人到系统通讯录">iOS保存联系人到系统通讯录</a></h2>
+      <p class="excerpt">  欢迎访问我的个人博客1、首先判断当前通讯录是否存在这个联系人// 判断通讯录是否存在某个联系人+ (BOOL)isExistContactNameByName:(NSString *)contactName{    ABAddressBookRef addBook = nil;        __block BOOL isExist = NO;    CFErrorRef error = nil;    addBook = ABAddressBookCreateWithOptions(...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2017-11-13 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2017-11-13</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">iOS</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2017/11/contact/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2017/11/crash/" title="访问 iOS友盟错误分析定位">iOS友盟错误分析定位</a></h2>
+      <p class="excerpt">  欢迎放我我的个人博客  进入友盟后台点击：错误分析-&gt;错误列表看到如下：  点击一个进入详情，看到如下：  打开Xcode-&gt;Windows-&gt;Organizer-&gt;archivers选择你要查看的错误报告所在的版本，这个一定要选对！！！显示包内容找到dSYMs和Products下的Applications下的文件，并将它们拷贝到一个文件夹下  打开终端cd到刚才新建的文件夹(错误报告)的目录下，输入如下命令：xcrun atos -arch arm64 -o ...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2017-11-10 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2017-11-10</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">iOS</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2017/11/crash/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2017/09/%E5%8C%86%E5%8C%86/" title="访问 朱自清-匆匆">朱自清-匆匆</a></h2>
+      <p class="excerpt">燕子去了，有再来的时候；杨柳枯了，有再青的时候；桃花谢了，有再开的时 候。但是，聪明的，你告诉我，我们的日子为什么一去不复返呢？——是有人偷了他 们罢：那是谁？又藏在何处呢？是他们自己逃走了罢——如今又到了哪里呢？我不知道他们给了我多少日子，但我的手确乎是渐渐空虚了。在默默里算着，八千多日子已经从我手中溜去，像针尖上一滴水滴在大海里，我的日子滴在时间的流里，没有声音，也没有影子。我不禁头涔涔而泪潸潸了。去的尽管去了，来的尽管来着；去来的中间，又怎样地匆匆呢？早上我起来的时候，小屋里射进两三...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2017-09-24 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2017-09-24</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">读书笔记</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2017/09/%E5%8C%86%E5%8C%86/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2017/09/%E6%8A%8A%E6%97%B6%E9%97%B4%E5%BD%93%E5%81%9A%E6%9C%8B%E5%8F%8B/" title="访问 李笑来-把时间当做朋友">李笑来-把时间当做朋友</a></h2>
+      <p class="excerpt">      你的大脑并不是你，你的大脑是（属于）“你的”大脑。    不再让自己成为自己大脑的奴隶，而是选择翻身做主人。  正常人都是有私心的，高尚一点的人只是能够控制它，不把它转换成行动而已。  无论如何，都不要也不应该用别人的错误惩罚自己，那么做不仅不对，并且愚蠢。”  见识越少的人越喜欢用自己所有的见识作为判断依据，并且完全不顾自己见识的局限，也不知道自己的见识有局限。添加于 2017年9月24日星期日 下午11:07:41有一天，佛印禅师教苏东坡坐禅。两个人对坐了一会儿，苏东坡头脑...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2017-09-24 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2017-09-24</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">读书笔记</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2017/09/%E6%8A%8A%E6%97%B6%E9%97%B4%E5%BD%93%E5%81%9A%E6%9C%8B%E5%8F%8B/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2017/08/demo03/" title="访问 ReactNative-综合案例（03）">ReactNative-综合案例（03）</a></h2>
+      <p class="excerpt">  最近几天学了几个ReactNative组件，总觉得单纯的学几个组件进步慢，所以我打算做一些综合性的小案例，练习下实战，我从网上找到一个小案例，感觉挺好，也学习了很多，代码内容可能不太一样，主要区别是：我把RN官方不推荐或者已经放弃了的组件进行了替换，如果有需要的可以互相参考下接着上篇案例开始写，这篇文章将会讲解如何怎样利用WebView加载HTML文件。在WYNewsDetail.js文件写如下代码：import React, { Component } from 'react';im...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2017-08-22 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2017-08-22</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">ReactNative</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2017/08/demo03/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2017/08/%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/" title="访问 ReactNative-常用命令">ReactNative-常用命令</a></h2>
+      <p class="excerpt">  最近开发的时候发现一些常用的命令总是记不住，用到的时候又要Google，感觉好麻烦，整理一下常用的一些命令  创建项目react-native init WYNews但是最近发现初始化完毕之后，运行项目会报错Print: Entry, ":CFBundleIdentifier", Does Not Exist暂时解决方案是指定ReactNative版本：react-native init WYNews --version 0.47.1现在好像不行了，网上有些方法是这样的，亲测可用：re...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2017-08-21 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2017-08-21</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">ReactNative</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2017/08/%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2017/08/demo02/" title="访问 ReactNative-综合案例（02）">ReactNative-综合案例（02）</a></h2>
+      <p class="excerpt">  最近几天学了几个ReactNative组件，总觉得单纯的学几个组件进步慢，所以我打算做一些综合性的小案例，练习下实战，我从网上找到一个小案例，感觉挺好，也学习了很多，代码内容可能不太一样，主要区别是：我把RN官方不推荐或者已经放弃了的组件进行了替换，如果有需要的可以互相参考下接着上篇案例开始写，这篇文章将会讲解如何编写轮播图和列表源代码下载首先WYHome.js代码如下：import React, { Component } from 'react';import {    Style...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2017-08-21 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2017-08-21</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">ReactNative</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2017/08/demo02/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2017/08/demo01/" title="访问 ReactNative-综合案例（01）">ReactNative-综合案例（01）</a></h2>
+      <p class="excerpt">  最近几天学了几个ReactNative组件，总觉得单纯的学几个组件进步慢，所以我打算做一些综合性的小案例，练习下实战，我从网上找到一个小案例，感觉挺好，也学习了很多，代码内容可能不太一样，主要区别是：我把RN官方不推荐或者已经放弃了的组件进行了替换，如果有需要的可以互相参考下源代码下载建完一个工程之后，首先建一个WYMain.js文件，代码如下：首先安装所需组件：npm install --save react-navigationimport React, { Component }...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2017-08-20 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2017-08-20</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">ReactNative</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2017/08/demo01/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2017/08/swiper/" title="访问 ReactNative-轮播图">ReactNative-轮播图</a></h2>
+      <p class="excerpt">ReactNative中有专门实现轮播图的模块react-native-swiper  安装组件npm i react-native-swiper --save  导入组件import Swiper from 'react-native-swiper';  详细代码import React, { Component } from 'react';import {  AppRegistry,  StyleSheet,  Text,  Image,  View} from 'react-nat...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2017-08-15 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2017-08-15</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">ReactNative</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2017/08/swiper/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2017/08/tab-navigator/" title="访问 ReactNative-底部TabBar react-native-tab-navigator">ReactNative-底部TabBar react-native-tab-navigator</a></h2>
+      <p class="excerpt">首先需要安装 react-native-tab-navigatornpm install react-native-tab-navigator –save导入组件import TabNavigator from 'react-native-tab-navigator'详细代码如下：import React, { Component } from 'react';import {  AppRegistry,  ScrollView,  StyleSheet,  TouchableOpacit...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2017-08-13 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2017-08-13</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">ReactNative</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2017/08/tab-navigator/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2017/08/react-navigation/" title="访问 react-navigation的使用">react-navigation的使用</a></h2>
+      <p class="excerpt">react-navigation分为三个部分  StackNavigator类似顶部导航条，用来跳转页面和传递参数。  TabNavigator 类似底部标签栏，用来区分模块。  DrawerNavigator 抽屉，类似从App左侧滑出一个页面，具体我没有使用过，在这里不做讲解。TabNavigator的基本用法const TabNav = TabNavigator(  {    MainTab: {      screen: HomePage,      path: '/',     ...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2017-08-11 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2017-08-11</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">ReactNative</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2017/08/react-navigation/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2017/08/listView/" title="访问 ReactNative-ListView">ReactNative-ListView</a></h2>
+      <p class="excerpt">这只是一个简单的listView的小demo初始化项目之后，index.ios.js代码如下/** * Sample React Native App * https://github.com/facebook/react-native * @flow */import React, { Component } from 'react';import {  AppRegistry,  StyleSheet,  Text,  View,  ListView} from 'react-nati...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2017-08-09 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2017-08-09</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">ReactNative</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2017/08/listView/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2017/07/%E8%87%AA%E5%8A%A8%E6%89%93%E5%BC%80%E9%97%AA%E5%85%89%E7%81%AF/" title="访问 iOS自动打开闪光灯">iOS自动打开闪光灯</a></h2>
+      <p class="excerpt">现在好多应有都具备扫码功能，为了减少用户操作，一般会在光线比较暗的时候，自动打开闪光灯：1、导入头文件#import &lt;AVFoundation/AVFoundation.h&gt;#import &lt;ImageIO/ImageIO.h&gt;2、创建设备、输入输出流// 1.获取硬件设备    AVCaptureDevice *device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];    /...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2017-07-21 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2017-07-21</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">iOS</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2017/07/%E8%87%AA%E5%8A%A8%E6%89%93%E5%BC%80%E9%97%AA%E5%85%89%E7%81%AF/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2017/06/uilabel/" title="访问 iOS UILabel设置中划线不能包含中文">iOS UILabel设置中划线不能包含中文</a></h2>
+      <p class="excerpt">今天写代码突然发现给UILabel设置中划线失效了，纠结了好久，终于找到解决办法（有可能是iOS10.3的bug，别的系统没事），解决办法：NSMutableAttributedString *attStr = [[NSMutableAttributedString alloc] initWithString:@"15.0元"];[attStr addAttributes:@{NSStrikethroughStyleAttributeName: [NSNumber numberWithIn...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2017-06-27 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2017-06-27</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">iOS</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2017/06/uilabel/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2017/06/url-encode/" title="访问 iOS-URLEncode和URLDecode">iOS-URLEncode和URLDecode</a></h2>
+      <p class="excerpt">// urlencode- (NSString *)urlEncodedString {    NSString *encodedString = (NSString *)    CFBridgingRelease(CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault,                                                              (CFStringRef)self...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2017-06-05 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2017-06-05</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">iOS</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2017/06/url-encode/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2017/05/launch-advert/" title="访问 iOS广告启动页">iOS广告启动页</a></h2>
+      <p class="excerpt">产品需求：启动页逻辑: 上部分为广告区域，可在运营后台配置图片+跳转页(同No.2);首次开 APP，则请求一次配置，失败或无配置则不显示，一旦有网了即刻请求一次并 做好缓存; 客户端每4小时请求一次;每两小时显示一次广告页内容 用户点击则跳转已配置页面;启动页上有5s倒计时，时间到了启动页关闭，也 可手动点击跳过启动页，广告已过期也不显示。服务端返回模型： { “image” : “http://www.baidu.com“, “link” : “跳转链接”, “start” : “20...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2017-05-26 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2017-05-26</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">iOS</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2017/05/launch-advert/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2017/05/TTTAttributedLabel/" title="访问 TTTAttributedLabel高亮显示手机号码、网址">TTTAttributedLabel高亮显示手机号码、网址</a></h2>
+      <p class="excerpt">1、初始化label- (TTTAttributedLabel *)traceLabel{    if (_traceLabel == nil) {        _traceLabel = [TTTAttributedLabel new];        [_traceLabel setTextAlignment:NSTextAlignmentLeft];        // NSTextCheckingTypeLink        // 设置识别类型        _traceLab...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2017-05-12 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2017-05-12</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">iOS</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2017/05/TTTAttributedLabel/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2017/03/get-qrcode/" title="访问 iOS系统生成二维码">iOS系统生成二维码</a></h2>
+      <p class="excerpt">// 1. 创建一个二维码滤镜实例(CIFilter)    CIFilter *filter = [CIFilter filterWithName:@"CIQRCodeGenerator"];    // 滤镜恢复默认设置    [filter setDefaults];    // 2. 给滤镜添加数据    NSString *string = @"594589850445580904903";    NSData *data = [string dataUsingEncoding:...&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2017-03-27 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2017-03-27</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">iOS</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2017/03/get-qrcode/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+    <li>
+      <h2 class="post-list__post-title post-title"><a href="/2017/02/NSURLSession-Leak/" title="访问 NSURLSession内存泄漏">NSURLSession内存泄漏</a></h2>
+      <p class="excerpt">检查代码是否有leak的时候，发现NSURLSession存在leak，最后发现必须session请求完成后，立即释放，代码如下：- (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error{    [session finishTasksAndInvalidate];}&hellip;</p>
+      <div class="post-list__meta">        
+        <time datetime="2017-02-09 00:00:00 +0800" class="post-list__meta--date date">
+          <img src="/images/calendar.png" width="20px" /> 
+          2017-02-09</time> 
+        <div class = "tag-img-icon">
+          <img src="/images/tag-icon.svg" width="20px" /> 
+        </div>
+        <a href="/tags">
+          <div class = "post-list-icon-mate">
+            <span class="post-list__meta--tags-right">iOS</span>
+          </div>
+          <div class = "post-list-small-mate">
+          <a class="btn-border-small" href=/2017/02/NSURLSession-Leak/>阅读全文 » </a>
+          </div>
+      </div>
+      <hr class="post-list__divider" />
+    </li>
+    
+  </ol>
+
+  <hr class="post-list__divider " />
+
+<nav class="pagination" role="navigation">
+
+	<!-- 百度搜索 -->
+	<script type="text/javascript">(function(){document.write(unescape('%3Cdiv id="bdcs"%3E%3C/div%3E'));var bdcs = document.createElement('script');bdcs.type = 'text/javascript';bdcs.async = true;bdcs.src = 'http://znsv.baidu.com/customer_search/api/js?sid=12441349038163667913' + '&plate_url=' + encodeURIComponent(window.location.href) + '&t=' + Math.ceil(new Date()/3600000);var s = document.getElementsByTagName('script')[0];s.parentNode.insertBefore(bdcs, s);})();
+	</script>
+	
+    
+        <a class="newer-posts pagination__newer btn btn-small btn-tertiary" href="/#blog">&larr; 最近</a>
+    
+    <span class="pagination__page-number">2 / 4</span>
+    
+        <a class="older-posts pagination__older btn btn-small btn-tertiary" href="/page/3/#blog">更早 &rarr;</a>
+    
+</nav>
+
+
+</div>
+
+            <section class="footer">
+    <footer>
+        <div class = "footer_div">  
+        <nav class="cover-navigation navigation--social">
+          <ul class="navigation">
+
+          
+          <!-- Weibo -->
+          <li class="navigation__item_social">
+            <a href="http://weibo.com/3291155444" title="@3291155444 的微博" target="_blank">
+              <i class='social fa fa-weibo fa-2x'></i>
+              <span class="label">Weibo</span>
+            </a>
+          </li>
+          
+
+          
+          <!-- Github -->
+          <li class="navigation__item_social">
+            <a href="https://github.com/czjwarrior" title="@czjwarrior 的 Github" target="_blank">
+              <i class='social fa fa-github fa-2x'></i>
+              <span class="label">Github</span>
+            </a>
+          </li>
+          
+          
+          
+
+          
+
+          <!-- RSS -->
+          <li class="navigation__item_social">
+            <a href="/feed.xml" rel="author" title="RSS" target="_blank">
+              <i class='social fa fa-rss fa-2x'></i>
+              <span class="label">RSS</span>
+            </a>
+          </li>
+
+          
+          <!-- Email -->
+          <li class="navigation__item_social">
+            <a href="mailto:13621130170@163.com" title="Contact me">
+              <i class='social fa fa-envelope fa-2x'></i>
+              <span class="label">Email</span>
+            </a>
+          </li>
+          
+
+          </ul>
+        </nav>
+
+        </div>
+
+        <div class = "footer_div">  
+           <p class="copyright text-muted">
+            Copyright &copy; 岑志军的个人博客 2020
+            </p>
+        	<div align="right">
+    			<link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+
+          <!-- 访问统计 -->
+          <span id="busuanzi_container_site_pv">
+            本站总访问量
+            <span id="busuanzi_value_site_pv"></span>次
+          </span>
+
+        </div>
+        <div>
+    </footer>
+</section>
+
+        </div>
+    </div>
+    
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="/js/main.js"></script>
+
+<script type="text/javascript" src="/js/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+  </body>
+
+</html>

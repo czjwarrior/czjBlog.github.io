@@ -1,0 +1,266 @@
+I"�!<h2 id="app从开发到安装到手机的过程1">APP从开发到安装到手机的过程1</h2>
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-01-28-15170501088619.jpg" alt="" /></p>
+
+<ul>
+  <li>MJRefreshExample.app中的MJRefreshExample文件是iOS中的可执行文件，文件格式是Mach-O</li>
+</ul>
+
+<h2 id="app从开发到安装到手机的过程2">APP从开发到安装到手机的过程2</h2>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-01-28-15170501525919.jpg" alt="" /></p>
+
+<h2 id="逆向app的思路">逆向APP的思路</h2>
+<ul>
+  <li>界面分析
+    <ul>
+      <li>Cycript、Reveal</li>
+    </ul>
+  </li>
+  <li>代码分析
+    <ul>
+      <li>对Mach-O文件的静态分析</li>
+      <li>MachOView、class-dump、Hopper Disassembler、ida等</li>
+    </ul>
+  </li>
+  <li>动态调试
+    <ul>
+      <li>对运行中的APP进行代码调试</li>
+      <li>debugserver、LLDB</li>
+    </ul>
+  </li>
+  <li>代码编写
+    <ul>
+      <li>注入代码到APP中</li>
+      <li>必要时还可能需要重新签名、打包ipa</li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="class-dump">class-dump</h2>
+
+<p>顾名思义，它的作用就是把Mach-O文件的class信息给dump出来（把类信息给导出来），生成对应的.h头文件</p>
+
+<ul>
+  <li>官方地址：http://stevenygard.com/projects/class-dump/</li>
+  <li>下载完工具包后将class-dump文件复制到Mac的<code class="language-plaintext highlighter-rouge">/usr/local/bin</code>目录，这样在终端就能识别<code class="language-plaintext highlighter-rouge">class-dump</code>命令了</li>
+</ul>
+
+<h4 id="常用格式">常用格式</h4>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">class-dump  -H  Mach-O文件路径  -o  头文件存放目录</code>
+    <ul>
+      <li>-H表示要生成头文件</li>
+      <li>-o用于制定头文件的存放目录</li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="代码的编译过程">代码的编译过程</h2>
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-01-28-15170504403602.jpg" alt="" /></p>
+
+<ul>
+  <li>
+    <p>在同一种架构平台下，每一条汇编指令都有与之对应的唯一的机器指令</p>
+  </li>
+  <li>
+    <p>不同的OC代码，编译出来的汇编代码可能是一样的
+<img src="http://otogtitz7.bkt.clouddn.com/2018-01-28-15170504997663.jpg" alt="" /></p>
+  </li>
+</ul>
+
+<h2 id="hopper-disassmbler">Hopper Disassmbler</h2>
+
+<p>Hopper Disassmbler能够将Mach-O文件的机器语言代码反编译成汇编代码、OC伪代码或者Swift伪代码</p>
+
+<ul>
+  <li>常用快捷键
+    <ul>
+      <li><code class="language-plaintext highlighter-rouge">Shift + Option + X</code>（找出哪里引用了这个方法）</li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="动态库共享缓存dyld-shared-cache">动态库共享缓存（dyld shared cache）</h2>
+
+<p>从iOS3.1开始，为了提高性能，绝大部分的系统动态库文件都打包存放到了一个缓存文件中（dyld shared cache）</p>
+
+<ul>
+  <li>缓存文件路径：<code class="language-plaintext highlighter-rouge">/System/Library/Caches/com.apple.dyld/dyld_shared_cache_armX</code></li>
+</ul>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-01-28-15170506785604.jpg" alt="" /></p>
+
+<h2 id="动态库的加载">动态库的加载</h2>
+
+<p>在Mac\iOS中，是使用了<code class="language-plaintext highlighter-rouge">/usr/lib/dyld</code>程序来加载动态库</p>
+
+<ul>
+  <li>dyld
+    <ul>
+      <li>dynamic link editor，动态链接编辑器</li>
+      <li>dynamic loader，动态加载器</li>
+    </ul>
+  </li>
+  <li>dyld源码
+    <ul>
+      <li>https://opensource.apple.com/tarballs/dyld/
+        <h2 id="从动态库共享缓存抽取动态库">从动态库共享缓存抽取动态库</h2>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<p>可以使用dyld源码中的<code class="language-plaintext highlighter-rouge">launch-cache/dsc_extractor.cpp</code></p>
+
+<ul>
+  <li>将<code class="language-plaintext highlighter-rouge">#if 0</code>前面的代码删除（包括<code class="language-plaintext highlighter-rouge">#if 0</code>），把最后面的<code class="language-plaintext highlighter-rouge">#endif</code>也删掉</li>
+  <li>编译dsc_extractor.cpp
+    <ul>
+      <li>clang++ -o dsc_extractor dsc_extractor.cpp</li>
+    </ul>
+  </li>
+  <li>使用dsc_extractor
+    <ul>
+      <li><code class="language-plaintext highlighter-rouge">./dsc_extractor  动态库共享缓存文件的路径   用于存放抽取结果的文件夹</code></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="mach-o">Mach-O</h2>
+
+<p>Mach-O是Mach object的缩写，是Mac\iOS上用于存储程序、库的标准格式</p>
+
+<ul>
+  <li>属于Mach-O格式的文件类型有</li>
+</ul>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-01-28-15170509565684.jpg" alt="" /></p>
+
+<ul>
+  <li>可以在xnu源码中，查看到Mach-O格式的详细定义（https://opensource.apple.com/tarballs/xnu/）
+    <ul>
+      <li>EXTERNAL_HEADERS/mach-o/fat.h</li>
+      <li>EXTERNAL_HEADERS/mach-o/loader.h</li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="常见的mach-o文件类型">常见的Mach-O文件类型</h2>
+
+<ul>
+  <li>MH_OBJECT
+    <ul>
+      <li>目标文件（.o）</li>
+      <li>静态库文件(.a），静态库其实就是N个.o合并在一起</li>
+    </ul>
+  </li>
+  <li>MH_EXECUTE：可执行文件
+    <ul>
+      <li>.app/xx</li>
+    </ul>
+  </li>
+  <li>MH_DYLIB：动态库文件
+    <ul>
+      <li>.dylib</li>
+      <li>.framework/xx</li>
+    </ul>
+  </li>
+  <li>MH_DYLINKER：动态链接编辑器
+    <ul>
+      <li>/usr/lib/dyld</li>
+    </ul>
+  </li>
+  <li>MH_DSYM：存储着二进制文件符号信息的文件
+    <ul>
+      <li>.dSYM/Contents/Resources/DWARF/xx（常用于分析APP的崩溃信息）</li>
+    </ul>
+  </li>
+</ul>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-01-28-15170511417803.jpg" alt="" /></p>
+
+<h2 id="在xcode中查看target的mach-o类型">在Xcode中查看target的Mach-O类型</h2>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-01-28-15170511627723.jpg" alt="" /></p>
+
+<h2 id="mach-o的基本结构">Mach-O的基本结构</h2>
+
+<p>官方描述</p>
+
+<ul>
+  <li>https://developer.apple.com/library/content/documentation/DeveloperTools/Conceptual/MachOTopics/0-Introduction/introduction.html</li>
+  <li>
+    <p>一个Mach-O文件包含3个主要区域</p>
+
+    <ul>
+      <li>Header (文件类型、目标架构类型等
+)</li>
+      <li>Load commands(描述文件在虚拟内存中的逻辑结构、布局
+)</li>
+      <li>Raw segment data（在Load commands中定义的Segment的原始数据
+）</li>
+    </ul>
+  </li>
+</ul>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-01-28-15170512878063.jpg" alt="" /></p>
+
+<h2 id="窥探mach-o的结构">窥探Mach-O的结构</h2>
+
+<ul>
+  <li>命令行工具
+    <ul>
+      <li>file：查看Mach-O的文件类型
+        <ul>
+          <li><code class="language-plaintext highlighter-rouge">file  文件路径
+</code></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>otool：查看Mach-O特定部分和段的内容</p>
+  </li>
+  <li>lipo：常用于多架构Mach-O文件的处理
+    <ul>
+      <li>查看架构信息：<code class="language-plaintext highlighter-rouge">lipo  -info  文件路径</code></li>
+      <li>导出某种特定架构：<code class="language-plaintext highlighter-rouge">lipo  文件路径  -thin  架构类型  -output  输出文件路径</code></li>
+      <li>合并多种架构：<code class="language-plaintext highlighter-rouge">lipo  文件路径1  文件路径2  -output  输出文件路径</code></li>
+    </ul>
+  </li>
+  <li>GUI工具
+    <ul>
+      <li>MachOView（https://github.com/gdbinit/MachOView）</li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="universal-binary通用二进制文件">Universal Binary（通用二进制文件）</h2>
+
+<ul>
+  <li>通用二进制文件
+    <ul>
+      <li>同时适用于多种架构的二进制文件</li>
+      <li>包含了多种不同架构的独立的二进制文件</li>
+    </ul>
+  </li>
+  <li>因为需要储存多种架构的代码，通用二进制文件通常比单一平台二进制的程序要大</li>
+  <li>由于两种架构有共同的一些资源，所以并不会达到单一版本的两倍之多</li>
+  <li>由于执行过程中，只调用一部分代码，运行起来也不需要额外的内存</li>
+  <li>因为文件比原来的要大，也被称为“胖二进制文件”（Fat Binary）</li>
+</ul>
+
+<h2 id="dyld和mach-o">dyld和Mach-O</h2>
+
+<ul>
+  <li>dyld用于加载以下类型的Mach-O文件
+    <ul>
+      <li>MH_EXECUTE</li>
+      <li>MH_DYLIB</li>
+      <li>MH_BUNDLE</li>
+    </ul>
+  </li>
+  <li>APP的可执行文件、动态库都是由dyld负责加载的</li>
+</ul>
+
+:ET

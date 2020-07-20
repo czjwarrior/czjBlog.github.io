@@ -1,0 +1,198 @@
+I"�?<blockquote>
+  <p>五一之后，公司要求对代码进行整理，同时进行代码管理、自动化打包等标准化流程，这些东西一直是我想搞的，这次有了公司的支持，操作起来也更顺利了，代码管理、自动化打包会找时间写一篇博客，这次主要记录利用Cocoapods将多个项目中共用的代码抽离出私有库，方便其他项目的引用，也算是组件化的第一步吧。抽离出私有库的时候，参考了很多的博客，遇到了很多的问题，主要参考了<a href="http://blog.wtlucky.com/blog/2015/02/26/create-private-podspec/">这篇博客</a>。</p>
+</blockquote>
+
+<h2 id="为什么要进行代码抽离">为什么要进行代码抽离</h2>
+
+<p>很多公司不止有一个产品，当项目达到两个及以上的时候，就需要考虑代码的共用（理想情况下）。由于我们公司特殊情况（懒），原来做项目的时候没有考虑这么多，由于公司新项目与原来的项目有大量功能相似，当时我们就采用了创建新分支的形式创建了新项目，导致代码耦合性非常强，平常开发中遇到很多问题，比如：</p>
+
+<ul>
+  <li>有些代码可能这个项目需要，那个项目不需要</li>
+  <li>分支切换太过频繁</li>
+  <li>创建了大量分支</li>
+  <li>在这个分支上开发的时候，测试需要另一个项目的包，需要来回切换</li>
+  <li>。。。。等等</li>
+</ul>
+
+<p>先看下我们原来的代码结构，确实感觉很头疼：
+<img src="http://otogtitz7.bkt.clouddn.com/2018-05-10-15259585288914.jpg" alt="" /></p>
+
+<p>综上所述，代码抽离迫在眉睫。。。。</p>
+
+<h2 id="1创建私有spec-repo">1、创建私有<code class="language-plaintext highlighter-rouge">Spec Repo</code></h2>
+
+<p><code class="language-plaintext highlighter-rouge">Spec Repo</code>其实类似一个容器，里面装着所有的公开的Pods,当使用<code class="language-plaintext highlighter-rouge">Cocoapods</code>后，他就会被<code class="language-plaintext highlighter-rouge">clone</code>到本地的<code class="language-plaintext highlighter-rouge">~/.cocoapods/repos</code>目录下：
+<img src="http://otogtitz7.bkt.clouddn.com/2018-05-10-15259592117791.jpg" alt="" /></p>
+
+<p>因此我们也需要创建一个私有的<code class="language-plaintext highlighter-rouge">Spec Repo</code>，因为是公司项目，所以我们搞一个私有库，这次是我单独的练习，<code class="language-plaintext highlighter-rouge">GitHub</code>上创建私有库是收费的，所以这次我采用了免费的<code class="language-plaintext highlighter-rouge">Git</code>服务，我用的是<a href="https://coding.net/">Coding</a>，首先需要在<code class="language-plaintext highlighter-rouge">coding</code>上创建一个自己的<code class="language-plaintext highlighter-rouge">git</code>仓库，创建完成之后，在终端下执行如下命令</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pod repo add ZJTestSpecs https://coding.net/u/cenzhijun/p/ZJTestSpecs/git
+</code></pre></div></div>
+
+<p>成功的话就会在<code class="language-plaintext highlighter-rouge">~/.cocoapods/repos</code>目录下看到<code class="language-plaintext highlighter-rouge">ZJTestSpecs</code>文件夹了，第一步完成，这一步通常只需要执行一次</p>
+
+<h2 id="2创建pod项目的文件">2、创建<code class="language-plaintext highlighter-rouge">Pod</code>项目的文件</h2>
+
+<p>首先<code class="language-plaintext highlighter-rouge">cd</code>到你想创建项目的文件夹执行如下操作</p>
+
+<p><strong>记住一定要创建一个单独的名字，否则以后<code class="language-plaintext highlighter-rouge">pod search &lt;私有库&gt;</code>会找到<code class="language-plaintext highlighter-rouge">Github</code>上跟你重名的项目</strong></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pod lib create ZJPodPrivateTest
+</code></pre></div></div>
+
+<p>之后会出现下列问题：</p>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-05-10-DA3D7B14F4D628E154A175EFFDE87B27.jpg" alt="DA3D7B14F4D628E154A175EFFDE87B27" /></p>
+
+<p>接下来就是在你的<code class="language-plaintext highlighter-rouge">ZJPodPrivateTest</code>文件夹下添加自己的内容，将自己的模块部分放在<code class="language-plaintext highlighter-rouge">ZJPodPrivateTest/Classes</code>下，然后<code class="language-plaintext highlighter-rouge">cd</code>到<code class="language-plaintext highlighter-rouge">Example</code>文件夹下执行<code class="language-plaintext highlighter-rouge">pod update</code>命令，之后打开项目，就能在<code class="language-plaintext highlighter-rouge">Development Pods/ZJPodPrivateTest</code>文件夹下看到自己添加的组件了，之后需要将项目推送到远端仓库，同样需要先自己去<code class="language-plaintext highlighter-rouge">git</code>服务商哪里创建一个私有仓库，然后<code class="language-plaintext highlighter-rouge">cd</code>到<code class="language-plaintext highlighter-rouge">ZJPodPrivateTest</code>目录，执行如下操作：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git add -A
+git commit -a -m "init library"
+git remote add origin https://git.coding.net/cenzhijun/ZJPodPrivateTest.git
+
+git push origin master
+</code></pre></div></div>
+
+<p>这个时候执行<code class="language-plaintext highlighter-rouge">push</code>操作会报如下错误：</p>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-05-10-C3672E624EF076875C02B836EFE87ED7.jpg" alt="C3672E624EF076875C02B836EFE87ED7" /></p>
+
+<p>提示你需要先<code class="language-plaintext highlighter-rouge">pull</code>下代码，这一步不能直接<code class="language-plaintext highlighter-rouge">pull</code>,需要执行如下命令：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git pull origin master --allow-unrelated-histories
+</code></pre></div></div>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-05-10-D6043786E0DA1A559CA1DA5F27EB3F90.jpg" alt="D6043786E0DA1A559CA1DA5F27EB3F90" /></p>
+
+<p>有可能会出现冲突，解决冲突之后<code class="language-plaintext highlighter-rouge">push</code>代码：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git push origin master 
+</code></pre></div></div>
+
+<p>因为<code class="language-plaintext highlighter-rouge">podspec</code>文件获取版本控制的项目需要<code class="language-plaintext highlighter-rouge">tag</code>号，所以还要搭上一个<code class="language-plaintext highlighter-rouge">tag</code></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git tag -m "first release" 0.1.0
+git push --tags     #推送tag到远端仓库
+</code></pre></div></div>
+
+<p>做完这些之后开始编辑<code class="language-plaintext highlighter-rouge">podspec</code>文件，填上对应的信息。</p>
+
+<p>编辑完之后，执行如下命令，验证是否有效，不能有<code class="language-plaintext highlighter-rouge">error</code>或者<code class="language-plaintext highlighter-rouge">warning</code>：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pod lib lint
+</code></pre></div></div>
+
+<p>当看到</p>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-05-10-6CECC0B42712110AA9F952FFE1C2E179.jpg" alt="6CECC0B42712110AA9F952FFE1C2E179" /></p>
+
+<p>就说明验证通过</p>
+
+<h2 id="3本地测试podspec文件">3、本地测试podspec文件</h2>
+
+<p>自己可以创建一个新项目，在<code class="language-plaintext highlighter-rouge">Podfile</code>中指定自己编辑好的<code class="language-plaintext highlighter-rouge">podspec</code>文件，如下：（两种方式填写一种就行）</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pod 'ZJPodPrivateTest', :path =&gt; '~/Desktop/ZJPodPrivateTest'      # 指定路径
+# pod 'PodTestLibrary', :podspec =&gt; '~/Desktop/ZJPodPrivateTest/ZJPodPrivateTest.podspec'  # 指定podspec文件
+
+</code></pre></div></div>
+
+<p>然后执行<code class="language-plaintext highlighter-rouge">pod install</code>命令安装，然后打开项目发现库文件已经被加载到<code class="language-plaintext highlighter-rouge">Pods</code>子项目中了，不过没有在<code class="language-plaintext highlighter-rouge">Pods</code>目录下，而是在<code class="language-plaintext highlighter-rouge">Development Pods/ZJPodPrivateTest</code>目录下，因为是本地测试项目，没有吧<code class="language-plaintext highlighter-rouge">podspec</code>文件添加到<code class="language-plaintext highlighter-rouge">Spec Repo</code>中的缘故
+<img src="http://otogtitz7.bkt.clouddn.com/2018-05-10-EEBF626209D091109DC43B9298F96E26.jpg" alt="EEBF626209D091109DC43B9298F96E26" /></p>
+
+<p><br />
+<img src="http://otogtitz7.bkt.clouddn.com/2018-05-10-5B479CE603BFA168CD47132A8E8E5781.jpg" alt="5B479CE603BFA168CD47132A8E8E5781" /></p>
+
+<p>确认无误后，就可以提交<code class="language-plaintext highlighter-rouge">podspec</code>到<code class="language-plaintext highlighter-rouge">Spec Repo</code>中了</p>
+
+<h2 id="4提交podspec">4、提交podspec</h2>
+
+<p>提交很简单，只需要一个命令：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pod repo push ZJTestSpecs ZJPodPrivateTest.podspec  #前面是本地Repo名字 后面是podspec名字
+</code></pre></div></div>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-05-10-481992FDCEF1AB9F310B905AF4D4AC92.jpg" alt="481992FDCEF1AB9F310B905AF4D4A" /></p>
+
+<p>没有错误之后，就可以在<code class="language-plaintext highlighter-rouge">~/.cocoapods/repos/ZJTestSpecs</code>目录下看到自己的私有库了，同时我们远程的<code class="language-plaintext highlighter-rouge">Spec Repo</code>也有一次提交，已经被自动<code class="language-plaintext highlighter-rouge">push</code>上去了</p>
+
+<p>可以用<code class="language-plaintext highlighter-rouge">pod search ZJPodPrivateTest</code>查看自己的库了</p>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-05-10-714E14C7AA77A9CDECE5C5334B28F057.jpg" alt="714E14C7AA77A9CDECE5C5334B28F057" /></p>
+
+<p><strong>*一定要记住自己的创建的私有库一定不要跟Github上的第三方库重名，否则会搜不到，</strong>我博客里面有的是<code class="language-plaintext highlighter-rouge">ZJPodPrivateTest</code>有的是<code class="language-plaintext highlighter-rouge">ZJPodTest</code>，就是因为<code class="language-plaintext highlighter-rouge">ZJPodTest</code>跟<code class="language-plaintext highlighter-rouge">Github</code>上的一个第三方库重名了，才会又重新建了<code class="language-plaintext highlighter-rouge">ZJPodPrivateTest</code>，按照我博客操作的时候<code class="language-plaintext highlighter-rouge">ZJPodPrivateTest</code>和<code class="language-plaintext highlighter-rouge">ZJPodTest</code>可以认为是同一个仓库，有的截图了，有的忘了，有不明白的，可以问我！！！</p>
+
+<p>至此，自己的私有库就算制作好了</p>
+
+<h2 id="5使用制作好的pod">5、使用制作好的Pod</h2>
+
+<p>在<code class="language-plaintext highlighter-rouge">Podfile</code>文件中，内容如下：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>source 'https://github.com/CocoaPods/Specs.git'  # 官方库
+source 'https://git.coding.net/cenzhijun/ZJTestSpecs.git'   # 私有库
+
+platform :ios, '8.0'
+
+target 'TargetName' do
+pod 'AFNetworking', '~&gt; 3.0'    
+pod 'ZJPodPrivateTest', '0.1.0'   #自己的私有库
+end
+
+</code></pre></div></div>
+
+<p>至此就算大功告成了</p>
+
+<h2 id="6更新维护podspec">6、更新维护podspec</h2>
+
+<p><a href="http://blog.wtlucky.com/blog/2015/02/26/create-private-podspec/">这里写得很详细，参考这个吧</a></p>
+
+<h2 id="遇到的坑">遇到的坑</h2>
+
+<p><strong>错误一</strong></p>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-05-14-409FDEA31A5A4FA21B2B14E42D7D96A4.jpg" alt="409FDEA31A5A4FA21B2B14E42D7D96A4" /></p>
+
+<p><code class="language-plaintext highlighter-rouge">pod lib lint</code> 验证的时候一直报这个错，原因是私有库中添加了动态库或者静态库，解决方案：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pod lib lint --use-libraries
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">--use-libraries</code>：表示使用静态库或者是framework，这里主要是解决当我们依赖一些framework库后校验提示找不到库的时候用到。</p>
+
+<p><strong>错误二</strong></p>
+
+<p><img src="http://otogtitz7.bkt.clouddn.com/2018-05-14-E03336C72F6E450A612C4021C7FA09E6.jpg" alt="E03336C72F6E450A612C4021C7FA09E6" /></p>
+
+<p><code class="language-plaintext highlighter-rouge">pod lib lint</code>的时候一直有一些警告，可以忽略掉这些警告：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pod lib lint --allow-warnings
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">--allow-warnings</code>：表示允许警告</p>
+
+<p>保险起见可以使用：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pod lib lint --use-libraries --allow-warnings
+</code></pre></div></div>
+
+<p><strong>错误三</strong></p>
+
+<p><code class="language-plaintext highlighter-rouge">pod lib lint</code>验证通过，但是<code class="language-plaintext highlighter-rouge">repo push</code>的时候却一直报错，又忘截图了，大概是这样的：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>xcodebuild: Returned an unsuccessful exit code. You can use `--verbose` for more information
+</code></pre></div></div>
+
+<p>我之所以报这个错，是因为，修改了自己的私有库，打了<code class="language-plaintext highlighter-rouge">tag</code>，<code class="language-plaintext highlighter-rouge">podspec</code>文件对应的<code class="language-plaintext highlighter-rouge">s.version</code>忘了修改了，解决方案：</p>
+
+<p>重新发一个<code class="language-plaintext highlighter-rouge">release</code>版的，打上<code class="language-plaintext highlighter-rouge">tag</code>之后，修改<code class="language-plaintext highlighter-rouge">podspec</code>文件对应的<code class="language-plaintext highlighter-rouge">s.version</code>，重新<code class="language-plaintext highlighter-rouge">pod repo push</code></p>
+
+<p><strong>温馨提示：</strong>如果你在<code class="language-plaintext highlighter-rouge">pod lib lint</code>的时候用到了<code class="language-plaintext highlighter-rouge">--use-libraries</code>或者<code class="language-plaintext highlighter-rouge">--allow-warnings</code>，那么在<code class="language-plaintext highlighter-rouge">pod repo push</code>的时候也要加上这些指令！！！例如：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pod repo push ZJTestSpecs ZJEncryptPodTest.podspec --use-libraries --allow-warnings
+</code></pre></div></div>
+
+<h2 id="总结">总结</h2>
+
+<p>创建私有库的时候，尽管我参考的这篇文章已经写得十分详细，但是还是有一个过时的操作，很导致操作错误，尤其是在本地仓库<code class="language-plaintext highlighter-rouge">push</code>到远程仓库那里出现问题，同时创建私有库不能和<code class="language-plaintext highlighter-rouge">GitHub</code>上存在的第三方库重名也是我摸索很久发现的，希望看到这篇文章的同学能够少走弯路❤️❤️❤️❤️</p>
+
+:ET

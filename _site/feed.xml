@@ -1,0 +1,2927 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>岑志军的个人博客</title>
+    <description>欢迎来到我的博客~</description>
+    <link>http://localhost:4000/</link>
+    <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Mon, 20 Jul 2020 21:35:10 +0800</pubDate>
+    <lastBuildDate>Mon, 20 Jul 2020 21:35:10 +0800</lastBuildDate>
+    <generator>Jekyll v4.1.1</generator>
+    
+      <item>
+        <title>Masonry</title>
+        <description>&lt;h1 id=&quot;masonry-实现原理及链式调用分析&quot;&gt;&lt;a href=&quot;https://github.com/SnapKit/Masonry&quot;&gt;Masonry&lt;/a&gt; 实现原理及链式调用分析&lt;/h1&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;Masonry is a light-weight layout framework which wraps AutoLayout with a nicer syntax. Masonry has its own layout DSL which provides a chainable way of describing your NSLayoutConstraints which results in layout code that is more concise and readable. Masonry supports iOS and Mac OS X.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;翻译：&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;Masonry是一个轻量级的布局框架，它使用更好的语法包装AutoLayout。 Masonry有自己的布局DSL，它提供了一种链式调用的方式来描述NSLayoutConstraints，从而使布局代码更简洁，更易读。 Masonry支持iOS和Mac OS X.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&quot;什么是dsl&quot;&gt;什么是DSL&lt;/h2&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;DSL(Domain Specific Language) 翻译成中文就是:“领域特定语言”。首先，从定义就可以看出，DSL 也是一种编程语言，只不过它主要是用来处理某个特定领域的问题。
+  下边介绍iOS中如何实现链式调用的DSL。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&quot;为什么需要使用masonry&quot;&gt;为什么需要使用Masonry&lt;/h2&gt;
+
+&lt;p&gt;首先看下直接用&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;NSLayoutConstraints&lt;/code&gt;方式布局视图需要什么操作：&lt;/p&gt;
+
+&lt;p&gt;例如：我们需要布局一个视图&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;view1&lt;/code&gt;，使他距离父视图上下左右都为10，&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;NSLayoutConstraints&lt;/code&gt;布局代码如下：&lt;/p&gt;
+
+&lt;p&gt;公式：&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;view1.top&lt;/code&gt; = &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;superview.top&lt;/code&gt; * 1.0 + 10&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;UIView *superview = self.view;
+    
+    UIView *view1 = [[UIView alloc] init];
+    view1.translatesAutoresizingMaskIntoConstraints = NO;
+    view1.backgroundColor = [UIColor greenColor];
+    [superview addSubview:view1];
+    
+    UIEdgeInsets padding = UIEdgeInsetsMake(10, 10, 10, 10);
+    
+    [superview addConstraints:@[
+
+                                //view1 constraints
+                                [NSLayoutConstraint constraintWithItem:view1
+                                                             attribute:NSLayoutAttributeTop
+                                                         relatedBy:NSLayoutRelationEqual
+                                                            toItem:superview
+                                                         attribute:NSLayoutAttributeTop
+                                                        multiplier:1.0
+                                                          constant:padding.top],
+
+                            [NSLayoutConstraint constraintWithItem:view1
+                                                         attribute:NSLayoutAttributeLeft
+                                                         relatedBy:NSLayoutRelationEqual
+                                                            toItem:superview
+                                                         attribute:NSLayoutAttributeLeft
+                                                        multiplier:1.0
+                                                          constant:padding.left],
+
+                            [NSLayoutConstraint constraintWithItem:view1
+                                                         attribute:NSLayoutAttributeBottom
+                                                         relatedBy:NSLayoutRelationEqual
+                                                            toItem:superview
+                                                         attribute:NSLayoutAttributeBottom
+                                                        multiplier:1.0
+                                                          constant:-padding.bottom],
+
+                            [NSLayoutConstraint constraintWithItem:view1
+                                                         attribute:NSLayoutAttributeRight
+                                                         relatedBy:NSLayoutRelationEqual
+                                                            toItem:superview
+                                                         attribute:NSLayoutAttributeRight
+                                                        multiplier:1
+                                                          constant:-padding.right],
+
+                            ]];
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Masonry代码如下：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;[view1 mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.edges.mas_equalTo(superview).with.insets(padding);
+}];
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;由此可以看到使用&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;NSLayoutConstraints&lt;/code&gt;方式布局代码及其冗余且不易读。&lt;/p&gt;
+
+&lt;h2 id=&quot;masonry框架结构分析&quot;&gt;Masonry框架结构分析&lt;/h2&gt;
+
+&lt;p&gt;主要的几个类：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;View+MASAdditions.h&lt;/li&gt;
+  &lt;li&gt;MASConstraintMaker&lt;/li&gt;
+  &lt;li&gt;MASViewConstraint&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://i.loli.net/2019/05/27/5ceb29bd2fb7b97586.png&quot; alt=&quot;masonry_struct_chart&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;从调用mas_makeconstraints方法说起&quot;&gt;从调用&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;mas_makeConstraints&lt;/code&gt;方法说起&lt;/h2&gt;
+
+&lt;p&gt;首先我们看一个简单调用的例子：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;[view1 mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.mas_equalTo(superview).offset(10)
+}];
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;mas_makeConstraints:&lt;/code&gt;实现如下：首先将&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;self.translatesAutoresizingMaskIntoConstraints&lt;/code&gt;置为&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;NO&lt;/code&gt;，关闭自动添加约束，改为我们手动添加，接着创建一个&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;MASConstraintMaker&lt;/code&gt;对象，通过block将&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;constraintMaker&lt;/code&gt;对象回调给用户，让用户对&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;constraintMaker&lt;/code&gt;对象的属性进行初始化，其中&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;block(constraintMaker)&lt;/code&gt;就相当于我们直接在该方法内部调用&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;make.left.mas_equalTo(superview).offset(10)&lt;/code&gt;，然后调用&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;install&lt;/code&gt;方法对约束进行安装，该方法返回一个数组，数组当中存放约束数组，成员类型为&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;MASViewConstraint&lt;/code&gt;&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;- (NSArray *)mas_makeConstraints:(void(^)(MASConstraintMaker *))block {
+    self.translatesAutoresizingMaskIntoConstraints = NO;
+    MASConstraintMaker *constraintMaker = [[MASConstraintMaker alloc] initWithView:self];
+    block(constraintMaker);
+    return [constraintMaker install];
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;紧接着看下&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;block&lt;/code&gt;回调回来的操作是如何进行的，也就是下面的这些代码：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;make.left.mas_equalTo(superview).offset(10)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;点击去看下&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;.left&lt;/code&gt;的调用实现：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;- (MASConstraint *)addConstraintWithLayoutAttribute:(NSLayoutAttribute)layoutAttribute {
+    return [self constraint:nil addConstraintWithLayoutAttribute:layoutAttribute];
+}
+
+- (MASConstraint *)left {
+    return [self addConstraintWithLayoutAttribute:NSLayoutAttributeLeft];
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;最后调用：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;- (MASConstraint *)constraint:(MASConstraint *)constraint addConstraintWithLayoutAttribute:(NSLayoutAttribute)layoutAttribute {
+    MASViewAttribute *viewAttribute = [[MASViewAttribute alloc] initWithView:self.view layoutAttribute:layoutAttribute];
+    MASViewConstraint *newConstraint = [[MASViewConstraint alloc] initWithFirstViewAttribute:viewAttribute];
+    if ([constraint isKindOfClass:MASViewConstraint.class]) {
+        //replace with composite constraint
+        NSArray *children = @[constraint, newConstraint];
+        MASCompositeConstraint *compositeConstraint = [[MASCompositeConstraint alloc] initWithChildren:children];
+        compositeConstraint.delegate = self;
+        [self constraint:constraint shouldBeReplacedWithConstraint:compositeConstraint];
+        return compositeConstraint;
+    }
+    if (!constraint) {
+        newConstraint.delegate = self;
+        [self.constraints addObject:newConstraint];
+    }
+    return newConstraint;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;其中有一个&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;MASViewAttribute&lt;/code&gt;的类，该类其实是对&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;UIView&lt;/code&gt;和&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;NSLayoutAttribute&lt;/code&gt;的封装
+&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;MASViewConstraint&lt;/code&gt;是对&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;NSLayoutConstraint&lt;/code&gt;的封装，最后将布局约束添加到一个数组当中&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;block&lt;/code&gt;回调执行完毕之后，最后对布局进行安装&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;[constraintMaker install]&lt;/code&gt;，该方法，最后会调用到&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;MASViewConstraint&lt;/code&gt;当中的&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;install&lt;/code&gt;方法，其中有一个比较重要的方法：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;MAS_VIEW *closestCommonSuperview = [self.firstViewAttribute.view mas_closestCommonSuperview:self.secondViewAttribute.view];
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;- (instancetype)mas_closestCommonSuperview:(MAS_VIEW *)view {
+    MAS_VIEW *closestCommonSuperview = nil;     // 定义一个公共父视图
+
+    MAS_VIEW *secondViewSuperview = view;
+    while (!closestCommonSuperview &amp;amp;&amp;amp; secondViewSuperview) {    // 遍历secondView的父视图
+        MAS_VIEW *firstViewSuperview = self;
+        while (!closestCommonSuperview &amp;amp;&amp;amp; firstViewSuperview) { // 遍历当前视图的父视图
+            if (secondViewSuperview == firstViewSuperview) {
+                closestCommonSuperview = secondViewSuperview;   // 找到公共父视图
+            }
+            firstViewSuperview = firstViewSuperview.superview;
+        }
+        secondViewSuperview = secondViewSuperview.superview;
+    }
+    return closestCommonSuperview;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;该方法是查找两个视图最近的公共父视图，这个类似求两个数字的最小公倍数。如果找到了就返回，如果找不到就返回nil。寻找两个视图的公共父视图对于约束的添加来说是非常重要的，因为相对的约束是添加到其公共父视图上的。比如举个列子 viewA.left = viewB.right + 10, 因为是viewA与viewB的相对约束，那么约束是添加在viewA与viewB的公共父视图上的，如果viewB是viewA的父视图，那么约束就添加在viewB上从而对viewA起到约束作用。&lt;/p&gt;
+
+&lt;h2 id=&quot;遇到的问题&quot;&gt;遇到的问题&lt;/h2&gt;
+
+&lt;h4 id=&quot;mas_shorthand-和-mas_shorthand_globals的含义&quot;&gt;MAS_SHORTHAND 和 MAS_SHORTHAND_GLOBALS的含义&lt;/h4&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;MAS_SHORTHAND: 如果我们用&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Masonry&lt;/code&gt;框架不想写&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;mas_&lt;/code&gt;前缀，需要在导入头文件之前定义这个宏&lt;/li&gt;
+  &lt;li&gt;MAS_SHORTHAND_GLOBALS: 定义这个宏，可以让&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;equalTo&lt;/code&gt;接受基本数据类型，内部会对基本数据类型进行封装&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;//define this constant if you want to use Masonry without the 'mas_' prefix
+#define MAS_SHORTHAND
+//define this constant if you want to enable auto-boxing for default syntax
+#define MAS_SHORTHAND_GLOBALS
+#import &quot;Masonry.h&quot;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h4 id=&quot;convenience-initializer-和-designated-initializer&quot;&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Convenience initializer&lt;/code&gt; 和 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;designated initializer&lt;/code&gt;&lt;/h4&gt;
+
+&lt;p&gt;在我们阅读&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;masonry&lt;/code&gt;源码的过程中，我们发现有两个初始化方法，注释不太一样，位于&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;MASViewAttribute&lt;/code&gt;类下：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;/**
+ *  Convenience initializer.
+ */
+- (id)initWithView:(MAS_VIEW *)view layoutAttribute:(NSLayoutAttribute)layoutAttribute;
+
+/**
+ *  The designated initializer.
+ */
+- (id)initWithView:(MAS_VIEW *)view item:(id)item layoutAttribute:(NSLayoutAttribute)layoutAttribute;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;这两种初始化的方式有什么区别呢，平时在我们开发当中，我们可能需要通过初始化来确定一些属性的值，并不想由外界来修改它，于是我们可能会需要些很多个&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;initWith&lt;/code&gt;方法，加入我的这个对象有姓名、性别、年龄等属性，但是我初始化的时候，并不是所有地方都要知道这些信息，于是我们可能会有&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;initWithUserName:&lt;/code&gt;、&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;initWithSex:&lt;/code&gt;、&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;initWithUserName:age:&lt;/code&gt;等方法，为了管理我们的&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;initWith&lt;/code&gt;方法，&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Apple&lt;/code&gt; 将 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;init&lt;/code&gt; 方法分为两种类型：&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;designated initializer&lt;/code&gt; 和 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;convenience initializer&lt;/code&gt; (又叫 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;secondary initializer&lt;/code&gt;)&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;designated initializer&lt;/code&gt; 只有一个，它会为 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;class &lt;/code&gt;当中每个 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;property&lt;/code&gt; 都提供一个初始值，是最完整的 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;initWith&lt;/code&gt; 方法，例如我们在&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;masonry&lt;/code&gt;当中也可以看到：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;- (id)initWithView:(MAS_VIEW *)view layoutAttribute:(NSLayoutAttribute)layoutAttribute {
+    self = [self initWithView:view item:view layoutAttribute:layoutAttribute];
+    return self;
+}
+
+- (id)initWithView:(MAS_VIEW *)view item:(id)item layoutAttribute:(NSLayoutAttribute)layoutAttribute {
+    self = [super init];
+    if (!self) return nil;
+    
+    _view = view;
+    _item = item;
+    _layoutAttribute = layoutAttribute;
+    
+    return self;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;最终都会调用到&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;- (id)initWithView:(MAS_VIEW *)view item:(id)item layoutAttribute:(NSLayoutAttribute)layoutAttribute&lt;/code&gt;方法&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;convenience initializer&lt;/code&gt; 则可以有很多个，它可以选择只初始化部分的 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;property&lt;/code&gt;。&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;convenience initializer&lt;/code&gt; 最后到会调用到 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;designated initializer&lt;/code&gt;，所以 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;designated initializer&lt;/code&gt; 也可以叫做 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;final initializer&lt;/code&gt;&lt;/p&gt;
+
+&lt;h4 id=&quot;ns_noescape修饰符&quot;&gt;NS_NOESCAPE修饰符&lt;/h4&gt;
+&lt;p&gt;在&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;masonry&lt;/code&gt;源码当中，我们看到在修饰&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;block&lt;/code&gt;的时候用到了&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;NS_NOESCAPE&lt;/code&gt;&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;- (NSArray *)mas_makeConstraints:(void(NS_NOESCAPE ^)(MASConstraintMaker *make))block;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;NS_NOESCAPE&lt;/code&gt;用于修饰方法中的&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;block&lt;/code&gt;类型参数，作用是告诉编译器，这个&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;block&lt;/code&gt;在&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;mas_makeConstraints:&lt;/code&gt;方法返回之前就会执行完毕，而不是被保存起来在之后的某个时候再执行&lt;/p&gt;
+
+&lt;h4 id=&quot;masonry为什么不会引起循环引用&quot;&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;masonry&lt;/code&gt;为什么不会引起循环引用&lt;/h4&gt;
+
+&lt;p&gt;比如我们可能经常会写如下代码：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;[self.view mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.equalTo(self.view.superview).offset(10);
+}];
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;这里为什么不需要写&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;@weakify(self)&lt;/code&gt;，接着看&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;mas_makeConstraints:&lt;/code&gt;是如何实现的：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;- (NSArray *)mas_makeConstraints:(void(^)(MASConstraintMaker *))block {
+    self.translatesAutoresizingMaskIntoConstraints = NO;
+    MASConstraintMaker *constraintMaker = [[MASConstraintMaker alloc] initWithView:self];
+    block(constraintMaker);
+    return [constraintMaker install];
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;从代码中可以看到，&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;block&lt;/code&gt;强引用了&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;self&lt;/code&gt;,但是在&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;mas_makeConstraints:&lt;/code&gt;方法中&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;self&lt;/code&gt;并没有直接或间接持有&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;block&lt;/code&gt;，而是直接调用&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;block(constraintMaker)&lt;/code&gt;,所以不会引起强引用&lt;/p&gt;
+
+&lt;h2 id=&quot;链式调用实战应用&quot;&gt;链式调用实战应用&lt;/h2&gt;
+
+&lt;p&gt;在我们开发过程中，我们会经常用到&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;UILabel&lt;/code&gt;，每次初始化都要设置一堆的属性，比较麻烦，当然我们也可以采取类似如下方法：&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;+ (UILabel *)createLabelWithFont:(UIFont *)font andTextColor:(UIColor *)color andDefaultContent:(NSString *)content&lt;/code&gt;，但是一旦我们所需要初始化的参数比较多时，就会造成方法参数非常多，甚至我们有些参数根本不需要初始化，用链式编程该如何实现呢？？&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;首先为&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;UILabel&lt;/code&gt;创建一个&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;category&lt;/code&gt;，&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;#import &quot;UILabel+zjLabel.h&quot;&lt;/code&gt;，代码如下：&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;#import &quot;UILabel+zjLabel.h&quot;
+
+@implementation UILabel (zjLabel)
+
++ (UILabel *)zj_createLabel:(void (^)(UILabel * _Nonnull))block{
+    UILabel *label = [UILabel new];
+    block(label);
+    return label;
+}
+    
+- (UILabel *(^)(NSString *))zj_text{
+    return ^(NSString *str){
+        self.text = str;
+        
+        return self;
+    };
+}
+    
+- (UILabel *(^)(UIFont *))zj_font{
+    return ^(UIFont *font){
+        self.font = font;
+        return self;
+    };
+}
+    
+- (UILabel *(^)(UIColor *))zj_textColor{
+    return ^(UIColor *color){
+        self.textColor = color;
+        return self;
+    };
+}
+ 
+- (UILabel *(^)(NSTextAlignment))zj_textAlignment{
+    return ^(NSTextAlignment aligment){
+        self.textAlignment = aligment;
+        return self;
+    };
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;在需要的地方调用方式如下：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;UILabel *label = [UILabel zj_createLabel:^(UILabel * _Nonnull label) {
+        label.zj_text(@&quot;haha&quot;).zj_font([UIFont systemFontOfSize:24]).zj_textColor(UIColor.redColor);
+    }];
+    
+[superview addSubview:label];
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;不需要初始化的参数可以直接不写，只初始化我们需要的&lt;/p&gt;
+
+&lt;h2 id=&quot;总结&quot;&gt;总结&lt;/h2&gt;
+
+&lt;p&gt;另外很多人担心自动布局的性能问题，事实上苹果已经在iOS12中对&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;auto layout&lt;/code&gt;进行优化：&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://developer.apple.com/videos/play/wwdc2018/202/&quot;&gt;WWDC2018讲解了iOS12优化后的表现&lt;/a&gt;
+&lt;img src=&quot;https://i.loli.net/2019/05/27/5ceb29bd763ad56547.png&quot; alt=&quot;auto_layout_ optimize&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;可以看到在iOS12之前&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;auto layout&lt;/code&gt;性能会随着嵌套视图的增加呈指数增长，但是在iOS12上苹果官方已经对此进行了优化，随着嵌套视图的增加性能问题得到了大幅的提升。&lt;/p&gt;
+
+&lt;p&gt;链式编程的特点：方法返回值是&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;block&lt;/code&gt;，而且该&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;block&lt;/code&gt;必须有返回值，返回值就是对象本身，&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;block&lt;/code&gt;也可以输入参数&lt;/p&gt;
+
+&lt;p&gt;另外&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Masonry&lt;/code&gt;框架分析部分，做了简单的分析，想要看详细的&lt;a href=&quot;https://www.cnblogs.com/ludashi/archive/2016/07/11/5591572.html&quot;&gt;参考下方链接&lt;/a&gt;，作者写的太详细了，我都不知道写啥了。。。。。&lt;/p&gt;
+
+&lt;h2 id=&quot;refrence&quot;&gt;Refrence：&lt;/h2&gt;
+
+&lt;p&gt;https://www.cnblogs.com/ludashi/archive/2016/07/11/5591572.html&lt;/p&gt;
+
+</description>
+        <pubDate>Mon, 27 May 2019 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/2019/05/masonry/</link>
+        <guid isPermaLink="true">http://localhost:4000/2019/05/masonry/</guid>
+        
+        
+      </item>
+    
+      <item>
+        <title>iOS模仿系统相机拍照你不曾注意过的细节</title>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;距离上次写博客竟然过了一个月了，一方面是最近项目比较忙，另一方面是实在是有点儿懈怠了，强烈谴责一下自己。其实我最近在看一些技术书籍，发现一些好的书真心对自己帮助很大，看书的过程，好多原来模糊的概念、问题，都能感觉恍然大悟。当提笔想总结成一篇文章的时候，发现网上早已经有大量的优秀文章出现，所以就不敢献丑了。今天写的一篇文章，是最近自己项目中用到的，不算什么难点，只是感觉有必要记录一下。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&quot;需求&quot;&gt;需求&lt;/h2&gt;
+
+&lt;p&gt;由于我们APP集成了有道翻译的SDK，需要将拍出来的图片翻译成对应的语言，但是有道的SDK目前还做的不是很完善（比如：照片倾斜的时候，返回的角度不是很对，有道的技术说下个版本可能会更新）。于是产品要求拍照页面做成跟系统相机类似，当用户横屏拍摄的时候，需要客户端自己讲图片纠正回来，倒着拍的时候亦然。&lt;/p&gt;
+
+&lt;p&gt;自定义相机功能就不多说了，网上有大量的优秀文章，&lt;a href=&quot;https://www.jianshu.com/p/3949ac312be7&quot;&gt;这里随便从网上找了一个&lt;/a&gt;，需要的可以参考下&lt;/p&gt;
+
+&lt;h2 id=&quot;基础知识&quot;&gt;基础知识&lt;/h2&gt;
+
+&lt;p&gt;首先我们需要知道每一个&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;UIImage&lt;/code&gt;对象，都有一个&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;imageOrientation&lt;/code&gt;属性，里面保存着方向信息：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;typedef NS_ENUM(NSInteger, UIImageOrientation) {
+    UIImageOrientationUp,            // default orientation
+    UIImageOrientationDown,          // 180 deg rotation
+    UIImageOrientationLeft,          // 90 deg CCW
+    UIImageOrientationRight,         // 90 deg CW
+    UIImageOrientationUpMirrored,    // as above but image mirrored along other axis. horizontal flip
+    UIImageOrientationDownMirrored,  // horizontal flip
+    UIImageOrientationLeftMirrored,  // vertical flip
+    UIImageOrientationRightMirrored, // vertical flip
+};
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;根据这个属性信息，我们便可以对图像进行相应的旋转，将图片转到正确的方向，如何旋转？？有两种解决方案：&lt;/p&gt;
+
+&lt;h4 id=&quot;第一种给uiimage添加category&quot;&gt;第一种：给UIImage添加Category&lt;/h4&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;- (UIImage *)fixOrientation {
+
+    // No-op if the orientation is already correct
+    if (self.imageOrientation == UIImageOrientationUp) return self;
+
+    // We need to calculate the proper transformation to make the image upright.
+    // We do it in 2 steps: Rotate if Left/Right/Down, and then flip if Mirrored.
+    CGAffineTransform transform = CGAffineTransformIdentity;
+
+    switch (self.imageOrientation) {
+        case UIImageOrientationDown:
+        case UIImageOrientationDownMirrored:
+            transform = CGAffineTransformTranslate(transform, self.size.width, self.size.height);
+            transform = CGAffineTransformRotate(transform, M_PI);
+            break;
+
+        case UIImageOrientationLeft:
+        case UIImageOrientationLeftMirrored:
+            transform = CGAffineTransformTranslate(transform, self.size.width, 0);
+            transform = CGAffineTransformRotate(transform, M_PI_2);
+            break;
+
+        case UIImageOrientationRight:
+        case UIImageOrientationRightMirrored:
+            transform = CGAffineTransformTranslate(transform, 0, self.size.height);
+            transform = CGAffineTransformRotate(transform, -M_PI_2);
+            break;
+        case UIImageOrientationUp:
+        case UIImageOrientationUpMirrored:
+            break;
+    }
+
+    switch (self.imageOrientation) {
+        case UIImageOrientationUpMirrored:
+        case UIImageOrientationDownMirrored:
+            transform = CGAffineTransformTranslate(transform, self.size.width, 0);
+            transform = CGAffineTransformScale(transform, -1, 1);
+            break;
+
+        case UIImageOrientationLeftMirrored:
+        case UIImageOrientationRightMirrored:
+            transform = CGAffineTransformTranslate(transform, self.size.height, 0);
+            transform = CGAffineTransformScale(transform, -1, 1);
+            break;
+        case UIImageOrientationUp:
+        case UIImageOrientationDown:
+        case UIImageOrientationLeft:
+        case UIImageOrientationRight:
+            break;
+    }
+
+    // Now we draw the underlying CGImage into a new context, applying the transform
+    // calculated above.
+    CGContextRef ctx = CGBitmapContextCreate(NULL, self.size.width, self.size.height,
+                                             CGImageGetBitsPerComponent(self.CGImage), 0,
+                                             CGImageGetColorSpace(self.CGImage),
+                                             CGImageGetBitmapInfo(self.CGImage));
+    CGContextConcatCTM(ctx, transform);
+    switch (self.imageOrientation) {
+        case UIImageOrientationLeft:
+        case UIImageOrientationLeftMirrored:
+        case UIImageOrientationRight:
+        case UIImageOrientationRightMirrored:
+            // Grr...
+            CGContextDrawImage(ctx, CGRectMake(0,0,self.size.height,self.size.width), self.CGImage);
+            break;
+
+        default:
+            CGContextDrawImage(ctx, CGRectMake(0,0,self.size.width,self.size.height), self.CGImage);
+            break;
+    }
+
+    // And now we just create a new UIImage from the drawing context
+    CGImageRef cgimg = CGBitmapContextCreateImage(ctx);
+    UIImage *img = [UIImage imageWithCGImage:cgimg];
+    CGContextRelease(ctx);
+    CGImageRelease(cgimg);
+    return img;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h4 id=&quot;第二种利用drawinrect方法将图像画到画布上&quot;&gt;第二种：利用&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;drawInRect&lt;/code&gt;方法将图像画到画布上&lt;/h4&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;- (UIImage *)normalizedImage {
+    if (self.imageOrientation == UIImageOrientationUp) return self; 
+
+    UIGraphicsBeginImageContextWithOptions(self.size, NO, self.scale);
+    [self drawInRect:(CGRect){0, 0, self.size}];
+    UIImage *normalizedImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return normalizedImage;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;通过上面两种方式转换之后的&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;UIImage&lt;/code&gt;对象，其&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;imageOrientation&lt;/code&gt;属性，都会被修改成&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;UIImageOrientationUp&lt;/code&gt;，这样将图片传到后台，或者导出相册的时候，就不会出现照片旋转90度的问题。&lt;/p&gt;
+
+&lt;p&gt;但是有时候我们希望图片该旋转的时候，按照我们的意愿旋转（比如横评拍摄的时候），竖直拍摄的时候，图像正常显示，这时候我们就不能直接用上面的方法来判断了。仔细观察系统相机的拍摄，我发现除了竖直拍摄以外，别的情况下拍摄，图片都会自动旋转，这个时候就需要我们利用iPhone手机自带的硬件传感器对方向进行判断，以达到我们想要的结果，这里主要用到加速仪&lt;/p&gt;
+
+&lt;h2 id=&quot;加速仪类型cmacceleration&quot;&gt;加速仪(类型：CMAcceleration)&lt;/h2&gt;
+
+&lt;p&gt;加速仪可以检测三维空间中的加速度 ，坐标对应如下：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-07-01-o_coremotion1.png&quot; alt=&quot;o_coremotion1&quot; /&gt;
+例如：当垂直手持手机且顶部向上，Y坐标上回收到 -1G的加速度，（0，-1，0），当手机头部朝下，得到的各个坐标为：（0，1，0）&lt;/p&gt;
+
+&lt;h4 id=&quot;主要代码如下&quot;&gt;主要代码如下：&lt;/h4&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;- (void)startDeviceMotion{
+    if (![self.motionManager isDeviceMotionAvailable]) {return;}
+
+    [self.motionManager setDeviceMotionUpdateInterval:1.f];
+    [self.motionManager startDeviceMotionUpdatesToQueue:[NSOperationQueue mainQueue] withHandler:^(CMDeviceMotion * _Nullable motion, NSError * _Nullable error) {
+        
+        double gravityX = motion.gravity.x;
+        double gravityY = motion.gravity.y;
+        
+        if (fabs(gravityY)&amp;gt;=fabs(gravityX)) {
+            
+            if (gravityY &amp;gt;= 0) {
+                
+                // UIDeviceOrientationPortraitUpsideDown
+                [self setDeviceDirection:SSDeviceDirectionDown];
+                NSLog(@&quot;头向下&quot;);
+                
+            } else {
+                
+                // UIDeviceOrientationPortrait
+                [self setDeviceDirection:SSDeviceDirectionUp];
+                NSLog(@&quot;竖屏&quot;);
+            }
+            
+        } else {
+            
+            if (gravityX &amp;gt;= 0) {
+                // UIDeviceOrientationLandscapeRight
+                [self setDeviceDirection:SSDeviceDirectionRight];
+                NSLog(@&quot;头向右&quot;);
+            } else {
+                
+                // UIDeviceOrientationLandscapeLef
+                [self setDeviceDirection:SSDeviceDirectionLeft];
+                NSLog(@&quot;头向左&quot;);
+            }
+        }
+    }];
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;获取到方向信息，下面就可以对图片进行对应的处理了，主要用到了下面的这个方法：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;- (instancetype)initWithCIImage:(CIImage *)ciImage scale:(CGFloat)scale orientation:(UIImageOrientation)orientation NS_AVAILABLE_IOS(6_0);
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;该方法的作用是：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Creates and returns an image object with the specified scale and orientation factors.
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;创建并返回具有指定比例和方向特征的image对象。
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;最后对拍摄的图片进行处理：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;UIImage *transImage = [rsltImage fixOrientation];
+        
+        switch (self.deviceDirection) {
+            case SSDeviceDirectionUp:
+                transImage = [rsltImage fixOrientation];
+                break;
+            case SSDeviceDirectionLeft:
+                transImage = [rsltImage fixImageByOrientation:UIImageOrientationLeft];
+                break;
+            case SSDeviceDirectionRight:
+                transImage = [rsltImage fixImageByOrientation:UIImageOrientationRight];
+                break;
+            case SSDeviceDirectionDown:
+                transImage = [rsltImage fixImageByOrientation:UIImageOrientationDown];
+                break;
+            default:
+                break;
+        }
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;最终效果图&quot;&gt;最终效果图&lt;/h2&gt;
+&lt;p&gt;&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-07-01-take_pic_ocr.gif&quot; alt=&quot;take_pic_ocr&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;总结&quot;&gt;总结&lt;/h2&gt;
+
+&lt;p&gt;功能实现起来其实并不难，当时和同事纠结的地方在于，到底是采用支持横竖屏还是采用加速度传感器上面，最后经过分析系统相机，我还是采用了利用传感器做判断，期间也是查阅了很多的技术文章，无意中发现了一篇真心值得仔细阅读的&lt;a href=&quot;http://blog.leichunfeng.com/blog/2017/02/20/talking-about-the-decompression-of-the-image-in-ios/&quot;&gt;关于图片解压缩的文章&lt;/a&gt;。最后，再次对最近的松懈进行反思，继续撸起袖子，加油干！！！&lt;/p&gt;
+
+&lt;h2 id=&quot;refrence&quot;&gt;Refrence&lt;/h2&gt;
+
+&lt;p&gt;https://www.cnblogs.com/sunyanyan/p/5213854.html&lt;/p&gt;
+
+&lt;p&gt;http://feihu.me/blog/2015/how-to-handle-image-orientation-on-iOS/&lt;/p&gt;
+
+</description>
+        <pubDate>Sun, 01 Jul 2018 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/2018/07/take-pic-ocr/</link>
+        <guid isPermaLink="true">http://localhost:4000/2018/07/take-pic-ocr/</guid>
+        
+        <category>iOS</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>iOS逆向-ipa包重签名及非越狱手机安装多个微信</title>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;前一段时间学了点儿逆向相关的一些东西，但是都是基于越狱手机上的操作，给视频类应用去广告之类的。随着苹果生态圈的逐渐完善、及苹果对自身系统的保护越来越严格，导致现在的iPhone手机并不像以前那样存在大量的越狱用户。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;前段时间我自己申请了个微信小号，申请小号的目的就是原来微信号好友中乱七八糟的人实在太多，感觉自己的朋友圈都是一些无关紧要的垃圾信息，曾经关闭了一段时间的朋友圈，但是最近遇到了好多技术上很强的同行，还想了解大佬们的动态。于是我就想着申请了个小号，但是麻烦来了，iPhone手机并不像安卓手机那样存在着微信多开之类的应用，将自己手机越狱吧成本太高，于是就想着通过技术手段安装多个微信，下面步入正题：&lt;/p&gt;
+
+&lt;h2 id=&quot;为什么要重签名&quot;&gt;为什么要重签名&lt;/h2&gt;
+
+&lt;p&gt;其实我们平时开发的App，程序运行主要就是加载一个&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Mach-o&lt;/code&gt;可执行文件。当我们将程序打包成&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ipa&lt;/code&gt;文件，上传到App Store的时候，期间就是进行了一些加壳操作，比如：数字证书签名等。重签名的目的就是将别人的程序重新签上我们的证书信息。也可以简单理解为将别人的加密文件解密，加上我们自己的加密算法。&lt;/p&gt;
+
+&lt;h4 id=&quot;逆向当中的一些专业术语&quot;&gt;逆向当中的一些专业术语&lt;/h4&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;加壳：利用特殊算法（iOS中数字证书），对可执行文件的编码进行改变，以达到保护程序代码的目的&lt;/li&gt;
+  &lt;li&gt;脱壳：摘掉壳程序，将未加密的可执行文件&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Mach-o&lt;/code&gt;还原出来&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&quot;查看应用是否加壳&quot;&gt;查看应用是否加壳&lt;/h4&gt;
+
+&lt;p&gt;将下载好的&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ipa&lt;/code&gt;包解压缩之后，拿到里面的&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Mach-o&lt;/code&gt;文件，&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;cd&lt;/code&gt;到所在目录，执行如下命令：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;otool -l 可执行文件路径 | grep crypt
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-05-29-15276021774171.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;其中&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;cryptid&lt;/code&gt;代码是否加壳，&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;1&lt;/code&gt;代表加壳，&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;0&lt;/code&gt;代表已脱壳。我们发现打印了两遍，其实代表着该可执行文件支持两种架构&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;armv7&lt;/code&gt;和&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;arm64&lt;/code&gt;.&lt;/p&gt;
+
+&lt;h4 id=&quot;查看应用支持哪种架构&quot;&gt;查看应用支持哪种架构&lt;/h4&gt;
+
+&lt;p&gt;终端下执行如下命令查看架构信息&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;lipo -info 文件路径
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-05-29-15276023773959.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;除了查看架构信息，还可以利用该指令导出某种特定架构、合并多种架构：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;导出特定架构&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;lipo 文件路径 -thin 架构类型 -output 输出文件路径
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;合并多种架构&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;lipo 文件路径1 文件路径2 -output 输出文件路径
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h4 id=&quot;怎么给应用脱壳&quot;&gt;怎么给应用脱壳&lt;/h4&gt;
+
+&lt;p&gt;给应用脱壳有两种途径：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;一、直接从一些第三方应用商店里面下载你想脱壳的应用，例如：&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;PP助手&lt;/code&gt;、&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;iTools&lt;/code&gt;等&lt;/li&gt;
+  &lt;li&gt;二、自己脱壳，利用&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;GitHub&lt;/code&gt;上开源的一些工具，常用的有&lt;a href=&quot;https://github.com/KJCracks/Clutch/releases&quot;&gt;Clutch&lt;/a&gt;、&lt;a href=&quot;https://github.com/stefanesser/dumpdecrypted/&quot;&gt;dumdecrypted&lt;/a&gt;。具体如何使用，请自行Google&lt;/li&gt;
+  &lt;li&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;前期准备工作：&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;一台iPhone，越不越狱都行&lt;/li&gt;
+  &lt;li&gt;开发者证书或者企业证书（个人账号也行，但是应用安装上之后，有效期只有7天）&lt;/li&gt;
+  &lt;li&gt;电脑安装 &lt;a href=&quot;https://dantheman827.github.io/ios-app-signer/&quot;&gt;iOS App Signer&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;其实重签名的方式有很多，比如：可以利用&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;sigh resign&lt;/code&gt;命令，在终端下操作，还可以借助一些逆向相关的重签名工具，本文采用&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;iOS App Signer&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;了解以上基本概念之后，下面正式开始史上最详细的重签名过程，以微信为例：&lt;/p&gt;
+
+&lt;h2 id=&quot;第一步准备好脱壳后的微信app&quot;&gt;第一步：准备好脱壳后的微信App&lt;/h2&gt;
+
+&lt;p&gt;我是直接从&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;PP助手&lt;/code&gt;上下载的，感兴趣的可以自己手动脱壳&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-05-29-CC5D0564776F714701F45AE5846D3464.jpg&quot; alt=&quot;CC5D0564776F714701F45AE5846D3464&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;第二步将对用的ipa文件解压修改一些东西&quot;&gt;第二步：将对用的&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ipa&lt;/code&gt;文件解压，修改一些东西&lt;/h2&gt;
+
+&lt;p&gt;注意：个人证书不能重签&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Extension&lt;/code&gt;文件，所以要删除&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ipa&lt;/code&gt;包中包含的相应文件，包括&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Watch&lt;/code&gt;里面的&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Extension&lt;/code&gt;，为了方便一般直接将&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Watch&lt;/code&gt;文件删除：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-05-29-C00C57F8EB9509B60FDCD8006DF3E719.jpg&quot; alt=&quot;C00C57F8EB9509B60FDCD8006DF3E719&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-05-29-34293DFAD48B9B855A066721DC0D358B.jpg&quot; alt=&quot;34293DFAD48B9B855A066721DC0D358B&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;第三步利用ios-app-signer给微信重签名&quot;&gt;第三步：利用&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;iOS App Signer&lt;/code&gt;给微信重签名&lt;/h2&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-05-29-D063FFD5907B3090DE0494AF05978BDB.jpg&quot; alt=&quot;D063FFD5907B3090DE0494AF05978BDB&quot; /&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;第一项：对应的&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;.ipa&lt;/code&gt;或者&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;.app&lt;/code&gt;路径&lt;/li&gt;
+  &lt;li&gt;第二项：我们自己的签名证书&lt;/li&gt;
+  &lt;li&gt;第三项：证书对应的&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Profile&lt;/code&gt;文件，默认项&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Re-Sign Only&lt;/code&gt;是无效的，选择证书下存在的&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Profile&lt;/code&gt;文件）&lt;/li&gt;
+  &lt;li&gt;第四项：重签名之后的&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Bundle identifier&lt;/code&gt;（选择了&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Profile&lt;/code&gt;文件，一般会自动填写）&lt;/li&gt;
+  &lt;li&gt;下面几项可以随便写&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-05-29-25441B7BB39F6BADE92ECA6187C0F6AA.jpg&quot; alt=&quot;25441B7BB39F6BADE92ECA6187C0F6AA&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;签名完毕之后对应的文件夹下会生成重签名之后的&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ipa&lt;/code&gt;包&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-05-29-F2804E382DD16002B001BAA1F927AA3C.jpg&quot; alt=&quot;F2804E382DD16002B001BAA1F927AA3&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;注意：&lt;/strong&gt;利用&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;iOS App Signer&lt;/code&gt;重签名，在删除掉相应的&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Extension&lt;/code&gt;，选择路径的时候，一定要选择&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Payload&lt;/code&gt;文件夹下对应的&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;.app&lt;/code&gt;文件，否则会报找不到&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Payload&lt;/code&gt;文件夹的错误：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-05-29-4C2E14FA5CA3D81E4BEC2F44D9D93647.jpg&quot; alt=&quot;4C2E14FA5CA3D81E4BEC2F44D9D93647&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;安装重签名之后的微信&quot;&gt;安装重签名之后的微信&lt;/h2&gt;
+
+&lt;p&gt;可以用&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;PP助手安装&lt;/code&gt;，也可以用&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Xcode&lt;/code&gt;安装，我采用&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Xocde&lt;/code&gt;安装：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/423503-33808e5a3de12398.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&quot; alt=&quot;install-wechat&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;不出意外地话，第二个微信就成功的安装到了你的手机上。如果装不上的话，基本上大部分原因就是证书不对。。。&lt;/p&gt;
+
+&lt;h2 id=&quot;最终效果&quot;&gt;最终效果&lt;/h2&gt;
+
+&lt;p&gt;多个证书可以多次重新签名，安装多个相同的应用&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-05-29-wechat_hook_01.jpg&quot; alt=&quot;wechat_hook_01&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-05-29-wechat_hook_02.jpg&quot; alt=&quot;wechat_hook_02&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;这篇文章图有点儿多。。。。。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;注意：重签名方式安装的微信，是对微信APP的一种破解，会被官方认定为非安全软件，有被封号的危险&lt;/strong&gt;。但是这种方式对破解各种其他软件都是有用的，利用逆向相关的知识，我们可以利用这种知识做很多我们想做的事儿！！！（不要做非法的事情哈！）&lt;/p&gt;
+
+&lt;h2 id=&quot;遇到的坑&quot;&gt;遇到的坑&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;错误一：
+&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-06-04-988D211E9B6C6BEF7659DAA8854AAFBD.jpg&quot; alt=&quot;988D211E9B6C6BEF7659DAA8854AAFBD&quot; /&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;解决办法：&lt;/strong&gt;证书不对，仔细检查下证书&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;错误二
+&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-06-04-BD2A4E9CB954AB66E6598ED5CCA85F8B.jpg&quot; alt=&quot;BD2A4E9CB954AB66E6598ED5CCA85F8B&quot; /&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;解决办法：&lt;/strong&gt;删除&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ipa&lt;/code&gt;包里面的&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;watch&lt;/code&gt;相关的文件&lt;/p&gt;
+
+&lt;h2 id=&quot;总结&quot;&gt;总结&lt;/h2&gt;
+
+&lt;p&gt;过程其实很简单，我始终认为借助一些工具能完成的东西，都是很简单的，因为不需要敲代码。总算给自己iPhone装上了多个微信，原来还打算买个安卓手机呢，哈哈，给自己省了一大笔钱。。。&lt;/p&gt;
+
+</description>
+        <pubDate>Tue, 29 May 2018 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/2018/05/wechat-hook/</link>
+        <guid isPermaLink="true">http://localhost:4000/2018/05/wechat-hook/</guid>
+        
+        <category>iOS</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>KVO详解及底层实现</title>
+        <description>&lt;h2 id=&quot;什么是kvo&quot;&gt;什么是KVO??&lt;/h2&gt;
+
+&lt;p&gt;KVO就是&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;NSKeyValueObserving&lt;/code&gt;，请看官方文档的解释：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-05-20-15267338239333.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;大概翻译如下：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;一种非正式协议，通知其他对象的指定属性发生了改变。
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;简单理解就是，可以监听一个对象的某个属性是否发生改变。&lt;/p&gt;
+
+&lt;p&gt;那么问题来了，什么是非正式协议？？有正式协议吗？？&lt;/p&gt;
+
+&lt;p&gt;麻蛋，本来想找官方文档的，找了半天没找到。从&lt;a href=&quot;https://stackoverflow.com/questions/3082383/whats-the-difference-between-formal-and-informal-protocols-in-objective-c/3082409&quot;&gt;Stackoverflow&lt;/a&gt;找到了答案，貌似原来官方文档的链接失效了&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-05-20-15267396254430.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;大概翻译如下：&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;非正式协议：&lt;/strong&gt;非正式协议是NSObject的一个类别&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Category&lt;/code&gt;，几乎所有的对象都隐含的采用（类别是OC的语言特性，能够给类对象添加方法而不需要创建子类），非正式协议的方法是可选的&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;正式协议：&lt;/strong&gt; 一个正式协议声明了类需要实现的方法列表，正式协议有自己的声明、采用和类型检查语法。你可以使用&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;@required&lt;/code&gt;或者&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;optional&lt;/code&gt;关键字指定方法是否必须实现。子类继承父类采用的协议。正式协议也可以遵守其他协议&lt;/p&gt;
+
+&lt;h2 id=&quot;kvo实现&quot;&gt;KVO实现&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;监听某个对象的某个属性&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;- (void)addObserver:(NSObject *)observer forKeyPath:(NSString *)keyPath options:(NSKeyValueObservingOptions)options context:(nullable void *)context;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;实现非正式协议&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;- (void)observeValueForKeyPath:(nullable NSString *)keyPath ofObject:(nullable id)object change:(nullable NSDictionary&amp;lt;NSKeyValueChangeKey, id&amp;gt; *)change context:(nullable void *)context;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;移除监听&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;- (void)removeObserver:(NSObject *)observer forKeyPath:(NSString *)keyPath;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;简单代码演示：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view, typically from a nib.
+    
+    self.person = [[ZJPerson alloc] init];
+    
+    [self.person setName:@&quot;zhangsan&quot;];
+    
+    [self.person addObserver:self forKeyPath:@&quot;name&quot; options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context:nil];
+    
+}
+
+- (void)touchesBegan:(NSSet&amp;lt;UITouch *&amp;gt; *)touches withEvent:(UIEvent *)event{
+    [self.person setName:@&quot;lisi&quot;];
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary&amp;lt;NSKeyValueChangeKey,id&amp;gt; *)change context:(void *)context{
+    NSLog(@&quot;%@&quot;, change);
+}
+
+- (void)dealloc{
+    [self.person removeObserver:self forKeyPath:@&quot;name&quot;];
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;打印结果：
+&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-05-20-15267408193583.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;用法其实很简单，接下来重点来了，KVO为什么能够监听到属性变化，底层做了什么？？&lt;/p&gt;
+
+&lt;h2 id=&quot;kvo底层实现探究&quot;&gt;KVO底层实现探究&lt;/h2&gt;
+
+&lt;p&gt;首先，我们利用&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;runtime&lt;/code&gt;在添加监听之前和之后分别打印一下类对象&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;NSLog(@&quot;%@&quot;, object_getClass(self.person));
+[self.person addObserver:self forKeyPath:@&quot;name&quot; options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context:nil];
+NSLog(@&quot;%@&quot;, object_getClass(self.person));
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;打印结果：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;2018-05-19 22:48:18.726028+0800 KVO[33804:3059947] ZJPerson
+2018-05-19 22:48:18.726535+0800 KVO[33804:3059947] NSKVONotifying_ZJPerson
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;我们发现添加监听之后，实例对象的类对象发生了变化，系统为我们动态添加了一个&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;NSKVONotifying_+类名&lt;/code&gt;的类，因为我们改变对象属性的值是通过&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;setter&lt;/code&gt;方法实现了，所以很明显是系统动态生成的&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;NSKVONotifying_ZJPerson&lt;/code&gt;类重写了&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;setter&lt;/code&gt;方法。不信的话，我们可以做一个实验，自己手动添加一个&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;NSKVONotifying_ZJPerson&lt;/code&gt;类，看下会打印什么&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;2018-05-19 22:56:32.223288+0800 KVO[33919:3068985] [general] KVO failed to allocate class pair for name NSKVONotifying_ZJPerson, automatic key-value observing will not work for this class
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;错误提示很明显，告诉我们创建&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;NSKVONotifying_ZJPerson&lt;/code&gt;类失败，KVO失效&lt;/p&gt;
+
+&lt;p&gt;那么系统自动创建重写的的&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;setter&lt;/code&gt;方法内部做了什么呢？？同样在添加监听方法之前，利用&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;runtime&lt;/code&gt;打印下方法的实现,截图如下：
+&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-05-20-15267426406662.jpg&quot; alt=&quot;&quot; /&gt;
+发现方法实现变了，内部调用了系统&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Foundation&lt;/code&gt;框架下的&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;_NSSetObjectValueAndNotify&lt;/code&gt;方法。那么这个框架内部又是怎么实现的呢，我们可以下断点，查看下函数调用栈：&lt;/p&gt;
+
+&lt;p&gt;首先通过设置一个观察点，观察属性的变化：
+&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-05-20-15267750438339.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;继续执行，可以看到函数调用栈如下：
+&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-05-20-15267751175105.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;在结果发生改变的地方继续下断点调试：
+&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-05-20-15267753001990.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-05-20-15267760918851.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;由以上函数调用栈，我们大致可以猜测出，&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;_NSSetObjectValueAndNotify&lt;/code&gt;函数内部实现过程如下：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;1. `-[NSObject(NSKeyValueObservingPrivate) _changeValueForKey:key:key:usingBlock:]:
+2. -[NSObject(NSKeyValueObservingPrivate) _changeValueForKeys:count:maybeOldValuesDict:usingBlock:]:
+3. [ZJPerson setName:];
+4. `NSKeyValueDidChange:
+5. `NSKeyValueNotifyObserver:
+6. - (void)observeValueForKeyPath:ofObject:change:context
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;简化成OC的伪代码大致如下：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;- (void)setName:(NSString *)name{
+    _NSSetObjectValueAndNotify();
+}
+
+void _NSSetObjectValueAndNotify {
+    [self willChangeValueForKey:@&quot;name&quot;];
+    [super setName:name];
+    [self didChangeValueForKey:@&quot;name&quot;];
+}
+
+- (void)didChangeValueForKey:(NSString *)key{
+    [observe observeValueForKeyPath:key ofObject:self change:nil context:nil];
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h4 id=&quot;nskvonotifying_zjperson内部都重写了哪些方法&quot;&gt;NSKVONotifying_ZJPerson内部都重写了哪些方法&lt;/h4&gt;
+
+&lt;p&gt;可以利用&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;runtime&lt;/code&gt;方法打印一下方法列表：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;unsigned int count;
+Method *methods = class_copyMethodList(object_getClass(self.person), &amp;amp;count);
+    
+for (NSInteger index = 0; index &amp;lt; count; index++) {
+   Method method = methods[index];
+   
+   NSString *methodStr = NSStringFromSelector(method_getName(method));
+   
+   NSLog(@&quot;%@\n&quot;, methodStr);
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;打印结果：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;2018-05-20 08:57:07.883400+0800 KVO[35888:3218908] setName:
+2018-05-20 08:57:07.883571+0800 KVO[35888:3218908] class
+2018-05-20 08:57:07.883676+0800 KVO[35888:3218908] dealloc
+2018-05-20 08:57:07.883793+0800 KVO[35888:3218908] _isKVOA
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;简单分析下重写这些方法的作用：&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;class&lt;/code&gt;：重写这个方法，是为了伪装苹果自动为我们生成的中间类。
+&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;dealloc&lt;/code&gt;：应该是处理对象销毁之前的一些收尾工作
+&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;_isKVOA&lt;/code&gt;：告诉系统使用了&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kvo&lt;/code&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;拓展&quot;&gt;拓展&lt;/h2&gt;
+
+&lt;p&gt;学任何东西，通过我们的思考一定会问出一些别的问题，通过深入了解kvo，下面两个问题，是面试经常会被问到的，也是我所能想到的：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;如何动态生成一个类？？&lt;/li&gt;
+  &lt;li&gt;知道了原理，能不能自己写一个KVO？？&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&quot;动态生成一个自己的类&quot;&gt;动态生成一个自己的类&lt;/h4&gt;
+
+&lt;p&gt;既然是动态生成，肯定是利用了苹果的&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;runtime&lt;/code&gt;机制，通过上面对&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;KVO&lt;/code&gt;的学习，也了解到了&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;runtime&lt;/code&gt;的强大之处。&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;创建类&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Class customClass = objc_allocateClassPair([NSObject class], &quot;ZJCustomClass&quot;, 0);
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;添加实例变量&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;// 添加实例变量
+    class_addIvar(customClass, &quot;age&quot;, sizeof(int), 0, &quot;i&quot;);
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;添加方法，&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;V@:&lt;/code&gt;表示方法的&lt;a href=&quot;https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/ObjCRuntimeGuide/Articles/ocrtTypeEncodings.html#//apple_ref/doc/uid/TP40008048-CH100-SW1&quot;&gt;参数和返回值&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;// 添加方法
+    class_addMethod(customClass, @selector(hahahha), (IMP)hahahha, &quot;V@:&quot;);
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;需要实现方法：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;void hahahha(id self, SEL _cmd)
+{
+    NSLog(@&quot;hahahha====&quot;);
+}
+
+- (void)hahahha{
+
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;注册到运行时环境&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;objc_registerClassPair(customClass);
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h6 id=&quot;打印方法列表和成员变量列表查看是否创建成功&quot;&gt;打印方法列表和成员变量列表，查看是否创建成功&lt;/h6&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;#pragma mark - Util
+
+- (NSString *)copyMethodsByClass:(Class)cls{
+    unsigned int count;
+    Method *methods = class_copyMethodList(cls, &amp;amp;count);
+    
+    NSString *methodStrs = @&quot;&quot;;
+    
+    for (NSInteger index = 0; index &amp;lt; count; index++) {
+        Method method = methods[index];
+        
+        NSString *methodStr = NSStringFromSelector(method_getName(method));
+        
+        methodStrs = [NSString stringWithFormat:@&quot;%@ &quot;, methodStr];
+    }
+    
+    free(methods);
+    
+    return methodStrs;
+}
+
+- (NSString *)copyIvarsByClass:(Class)cls{
+    unsigned int count;
+    Ivar *ivars = class_copyIvarList(cls, &amp;amp;count);
+    
+    NSMutableString *ivarStrs = [NSMutableString string];
+    
+    for (NSInteger index = 0; index &amp;lt; count; index++) {
+        Ivar ivar = ivars[index];
+        
+        NSString *ivarName = [NSString stringWithUTF8String:ivar_getName(ivar)];  //获取成员变量的名字
+        
+        NSString *ivarType = [NSString stringWithUTF8String:ivar_getTypeEncoding(ivar)]; //获取成员变量的数据类型
+        
+        [ivarStrs appendString:@&quot;\n&quot;];
+        [ivarStrs appendString:ivarName];
+        [ivarStrs appendString:@&quot;-&quot;];
+        [ivarStrs appendString:ivarType];
+        
+    }
+    
+    free(ivars);
+    
+    return ivarStrs;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;调用方法可看到创建成功：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;NSLog(@&quot;%@&quot;, [self copyMethodsByClass:customClass]);
+NSLog(@&quot;%@&quot;, [self copyIvarsByClass:customClass]);
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-05-20-15267820941306.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;动态创建类大致就这些步骤。。。&lt;/p&gt;
+
+&lt;h4 id=&quot;自己动手写一个kvo&quot;&gt;自己动手写一个KVO&lt;/h4&gt;
+
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;KVO&lt;/code&gt;底层实现还是很复杂的，下面我只是简单的写下实现过程：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;因为它是一个非正式协议，给&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;NSObject&lt;/code&gt;新建一个&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Category&lt;/code&gt;，&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;NSObject+kvo.h&lt;/code&gt;,添加监听方法：&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;.h文件&lt;/strong&gt;&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;#import &amp;lt;Foundation/Foundation.h&amp;gt;
+
+@interface NSObject (kvo)
+
+- (void)zj_addObserver:(NSObject *)observer forKeyPath:(NSString *)keyPath options:(NSKeyValueObservingOptions)options context:(nullable void *)context;
+
+@end
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;strong&gt;.m文件&lt;/strong&gt;&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;#import &quot;NSObject+kvo.h&quot;
+#import &amp;lt;objc/runtime.h&amp;gt;
+#import &amp;lt;objc/message.h&amp;gt;
+
+@implementation NSObject (kvo)
+
+- (void)zj_addObserver:(NSObject *)observer forKeyPath:(NSString *)keyPath options:(NSKeyValueObservingOptions)options context:(void *)context{
+    //动态添加一个类
+    NSString *originClassName = NSStringFromClass([self class]);
+    
+    NSString *newClassName = [@&quot;ZJKVO_&quot; stringByAppendingString:originClassName];
+    
+    const char *newName = [newClassName UTF8String];
+    
+    // 继承自当前类，创建一个子类
+    Class kvoClass = objc_allocateClassPair([self class], newName, 0);
+    
+    // 添加setter方法
+    class_addMethod(kvoClass, @selector(setName:), (IMP)setName, &quot;v@:@&quot;);
+    
+    //注册新添加的这个类
+    objc_registerClassPair(kvoClass);
+    
+    // 修改isa指针，由ZJPerson指向ZJKVO_Person
+    object_setClass(self, kvoClass);
+    
+    // 保存观察者属性到当前类中
+    objc_setAssociatedObject(self, (__bridge const void *)@&quot;observer&quot;, observer, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+#pragma mark - 重写父类方法
+
+void setName(id self, SEL _cmd, NSString *name) {
+    
+    // 保存当前KVO的类
+    Class kvoClass = [self class];
+    
+    // 将self的isa指针指向父类ZJPerson，调用父类setter方法
+    object_setClass(self, class_getSuperclass([self class]));
+    
+    // 调用父类setter方法，重新复制
+    objc_msgSend(self, @selector(setName:), name);
+    
+    // 取出ZJKVO_Person观察者
+    id objc = objc_getAssociatedObject(self, (__bridge const void *)@&quot;observer&quot;);
+
+    // 通知观察者，执行通知方法
+    objc_msgSend(objc, @selector(observeValueForKeyPath:ofObject:change:context:), name, self, nil, name);
+    
+    // 重新修改为ZJKVO_Person类
+    object_setClass(self, kvoClass);
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;strong&gt;注意一&lt;/strong&gt;
+要修改下xcode中的一个配置，将它改为NO，否则会报参数太多的错误：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-05-20-15267859753684.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;注意二&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;解释下代码中&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;v@:@&lt;/code&gt;的意思：&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;第一个&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;v&lt;/code&gt;表示方法返回值&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;void&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;第二三个&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;@:&lt;/code&gt;一般是一块的，因为函数至少有两个参数&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;self和_cmd&lt;/code&gt;，一般是固定写法&lt;/li&gt;
+  &lt;li&gt;最后一个&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;@&lt;/code&gt;表示参数类型，是一个对象&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;下面在代码中实验，看下我们自己写的kvo有没有执行：&lt;/p&gt;
+
+&lt;p&gt;修改添加监听者的方法，改成我们自己的&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;[self.person zj_addObserver:self forKeyPath:@&quot;name&quot; options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context:nil];
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;看下回调中的打印：
+&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-05-20-15267866044207.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;发现确实监听到了。。。&lt;/p&gt;
+
+&lt;h1 id=&quot;代码地址&quot;&gt;&lt;a href=&quot;https://github.com/czjwarrior/DailyPractice&quot;&gt;代码地址&lt;/a&gt;&lt;/h1&gt;
+
+&lt;h2 id=&quot;总结&quot;&gt;总结&lt;/h2&gt;
+&lt;p&gt;kvo用法其实非常简单，但是深入了解，深入思考的话，知识点非常多。花了一天多的时间，期间查阅了很多文档（发现官方文档真的是非常有用），总算是写完了，对KVO有了一个更深入的认识和理解。今天是520，感谢女朋友的理解，终于可以陪她出去玩了，哈哈。。。&lt;/p&gt;
+
+</description>
+        <pubDate>Sun, 20 May 2018 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/2018/05/kvo/</link>
+        <guid isPermaLink="true">http://localhost:4000/2018/05/kvo/</guid>
+        
+        <category>iOS</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>数据安全及各种加密算法对比</title>
+        <description>&lt;p&gt;平时开发中不仅会遇到各种需要保护用户隐私的情况，而且还有可能需要对公司核心数据进行保护，这时候加密隐私数据就成为了必要。然而市场上存在着各种各样的抓包工具及解密算法，甚至一些公司有专门的逆向部门，这就加大了数据安全的风险，本文将通过以下几个方面对各种加密算法进行分析对比：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Base64编码（基础）&lt;/li&gt;
+  &lt;li&gt;单项散列函数 MD5、SHA1、SHA256、SHA512等&lt;/li&gt;
+  &lt;li&gt;消息认证码 HMAC-MD5、HMAC-SHA1&lt;/li&gt;
+  &lt;li&gt;
+    &lt;table&gt;
+      &lt;tbody&gt;
+        &lt;tr&gt;
+          &lt;td&gt;对称加密 DES&lt;/td&gt;
+          &lt;td&gt;3DES&lt;/td&gt;
+          &lt;td&gt;AES（高级加密标准）&lt;/td&gt;
+        &lt;/tr&gt;
+      &lt;/tbody&gt;
+    &lt;/table&gt;
+  &lt;/li&gt;
+  &lt;li&gt;非对称加密 RSA&lt;/li&gt;
+  &lt;li&gt;数字签名&lt;/li&gt;
+  &lt;li&gt;证书&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;通常我们对消息进行加解密有两种处理方式：&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;只需要保存一个值，保证该值得机密性，不需要知道原文（用户登录）&lt;/li&gt;
+  &lt;li&gt;除了保证机密性外还需要对加密后的值进行解密得到原文&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&quot;base64编码&quot;&gt;Base64编码&lt;/h2&gt;
+&lt;p&gt;由于我们可能对各种各样的数据进行加密，比如：视频、音频、文本文件等，所以加密之前我们需要统一文件类型，然后再进行加密处理。&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Base64编码&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;// 要编码的字符串
+NSString *str = @&quot;haha&quot;;
+
+// 转换成二进制文件
+NSData *data = [str dataUsingEncoding:NSUTF8StringEncoding];
+
+// 进行base64编码
+NSString *dataStr = [data base64EncodedStringWithOptions:kNilOptions];
+
+NSLog(@&quot;%@&quot;, dataStr);
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Base64解码&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;// 先对数据进行解码
+NSData *encData = [[NSData alloc]initWithBase64EncodedString:dataStr options:kNilOptions];
+    
+// 将二进制数据转换成字符串
+NSString *encStr = [[NSString alloc]initWithData:encData encoding:NSUTF8StringEncoding];
+    
+NSLog(@&quot;%@&quot;, encStr);
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;接下来分析一下Base64的&lt;a href=&quot;https://zh.wikipedia.org/wiki/Base64&quot;&gt;编码过程&lt;/a&gt;，参考维基百科：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-05-14-15260869886055.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;如果要编码的字节数不能被3整除，最后会多出1个或2个字节，那么可以使用下面的方法进行处理：先使用0字节值在末尾补足，使其能够被3整除，然后再进行Base64的编码。在编码后的Base64文本后加上一个或两个=号，代表补足的字节数。也就是说，当最后剩余两个八位字节（2个byte）时，最后一个6位的Base64字节块有四位是0值，最后附加上两个等号；如果最后剩余一个八位字节（1个byte）时，最后一个6位的base字节块有两位是0值，最后附加一个等号。 参考下表：&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-05-14-15260870722695.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Base64编码原理&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;将所有字符串转换成ASCII码&lt;/li&gt;
+  &lt;li&gt;将ASCII码转换成8位二进制&lt;/li&gt;
+  &lt;li&gt;将二进制三位归成一组（不足三位在后边补0），再按每组6位，拆成若干组&lt;/li&gt;
+  &lt;li&gt;统一在6位二进制后不足8位的补0&lt;/li&gt;
+  &lt;li&gt;将补0后的二进制转换成十进制&lt;/li&gt;
+  &lt;li&gt;从Base64编码表取出十进制对应的Base64编码&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;若原数据长度不是3的倍数时且剩下1个输入数据，则在编码结果后加2个=；若剩下2个输入数据，则在编码结果后加1个=&lt;/p&gt;
+
+&lt;p&gt;如上面的例子：&lt;/p&gt;
+
+&lt;p&gt;原数据为&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;A&lt;/code&gt;，数据长度为1，1 % 3 = 1   后面加两个==&lt;/p&gt;
+
+&lt;p&gt;原数据为&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;bc&lt;/code&gt;，数据长度为2，2 % 3 = 2  后面加一个=&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Base64编码的特点&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;可以将任意的二进制数据进行Base64编码。&lt;/li&gt;
+  &lt;li&gt;所有的数据都能被编码为并只用65个字符就能表示的文本文件。&lt;/li&gt;
+  &lt;li&gt;编码后的65个字符包括A~Z,a~z,0~9,+,/,=&lt;/li&gt;
+  &lt;li&gt;对文件或字符串进行Base64编码后将比原始大小增加33%。&lt;/li&gt;
+  &lt;li&gt;能够逆运算&lt;/li&gt;
+  &lt;li&gt;不够安全，但却被很多加密算法作为编码方式&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&quot;单项散列函数&quot;&gt;单项散列函数&lt;/h2&gt;
+
+&lt;p&gt;单向散列函数也称为消息摘要函数、哈希函数或者杂凑函数。
+单向散列函数输出的散列值又称为消息摘要或者指纹&lt;/p&gt;
+
+&lt;p&gt;特点：&lt;/p&gt;
+&lt;ol&gt;
+  &lt;li&gt;对任意长度的消息散列得到散列值是定长的&lt;/li&gt;
+  &lt;li&gt;散列计算速度快，非常高效&lt;/li&gt;
+  &lt;li&gt;消息不同，则散列值一定不同&lt;/li&gt;
+  &lt;li&gt;消息相同，则散列值一定相同&lt;/li&gt;
+  &lt;li&gt;具备单向性，无法逆推计算&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;经典算法：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;MD4、MD5、SHA1、SHA256、SHA512等&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;安全性：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;md5解密网站：http://www.cmd5.com&lt;/li&gt;
+  &lt;li&gt;MD5的强抗碰撞性已经被证实攻破，即对于重要数据不应该再继续使用MD5加密。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;疑问一：单项散列函数为什么不可逆？？&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;原来好多同学知识知道md5加密是不可逆的，却不知道是为什么，其实散列函数可以将任意长度的输入经过变化得到不同的输出，如果存在两个不同的输入得到了相同的散列值，我们称之为这是一个碰撞，因为使用的&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;hash&lt;/code&gt;算法，在计算过程中原文的部分信息是丢失了的，一个MD5理论上可以对应多个原文，因为MD5是有限多个，而原文是无限多个的。&lt;/p&gt;
+
+&lt;p&gt;网上看到一个形象的例子：2 + 5 = 7，但是根据 7 的结果，却并不能推算出是由 2 + 5计算得来的&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;疑问二：为什么有些网站可以解密MD5后的数据？？&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;MD5&lt;a href=&quot;http://www.cmd5.com/&quot;&gt;解密网站&lt;/a&gt;，并不是对加密后的数据进行解密，而是数据库中存在大量的加密后的数据，对用户输入的数据进行匹配（也叫暴力碰撞），匹配到与之对应的数据就会输出，并没有对应的解密算法。&lt;/p&gt;
+
+&lt;h4 id=&quot;md5改进&quot;&gt;MD5改进&lt;/h4&gt;
+
+&lt;p&gt;由以上信息可以知道，MD5加密后的数据也并不是特别安全的，其实并没有绝对的安全策略，我们可以对MD5进行改进，加大破解的难度，典型的加大解密难度的方式有一下几种：&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;加盐（Salt）：在明文的固定位置插入随机串，然后再进行MD5&lt;/li&gt;
+  &lt;li&gt;先加密，后乱序：先对明文进行MD5，然后对加密得到的MD5串的字符进行乱序&lt;/li&gt;
+  &lt;li&gt;先乱序，后加密：先对明文字符串进行乱序处理，然后对得到的串进行加密&lt;/li&gt;
+  &lt;li&gt;先乱序，再加盐，再MD5等&lt;/li&gt;
+  &lt;li&gt;HMac消息认证码&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;也可以进行多次的md5运算，总之就是要加大破解的难度。&lt;/p&gt;
+
+&lt;h4 id=&quot;hmac消息认证码对md5的改进&quot;&gt;Hmac消息认证码（对MD5的改进）&lt;/h4&gt;
+
+&lt;p&gt;&lt;strong&gt;原理：&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;消息的发送者和接收者有一个共享密钥&lt;/li&gt;
+  &lt;li&gt;发送者使用共享密钥对消息加密计算得到MAC值（消息认证码）&lt;/li&gt;
+  &lt;li&gt;消息接收者使用共享密钥对消息加密计算得到MAC值&lt;/li&gt;
+  &lt;li&gt;比较两个MAC值是否一致&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;&lt;strong&gt;使用：&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;客户端需要在发送的时候把（消息）+（消息·HMAC）一起发送给服务器&lt;/li&gt;
+  &lt;li&gt;服务器接收到数据后，对拿到的消息用共享的KEY进行HMAC，比较是否一致，如果一致则信任&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-05-14-15261103539157.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;对称加密算法&quot;&gt;对称加密算法&lt;/h2&gt;
+
+&lt;p&gt;对称加密的特点：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;加密/解密使用相同的密钥&lt;/li&gt;
+  &lt;li&gt;是可逆的&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;经典算法：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;DES  数据加密标准&lt;/li&gt;
+  &lt;li&gt;3DES  使用3个密钥，对消息进行（密钥1·加密）+（密钥2·解密）+（密钥3·加密）&lt;/li&gt;
+  &lt;li&gt;AES  高级加密标准&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;密码算法可以分为分组密码和流密码两种：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;分组密码：每次只能处理特定长度的一zu数据的一类密码算法。一个分组的比特数量就称之为分组长度。&lt;/li&gt;
+  &lt;li&gt;流密码：对数据流进行连续处理的一类算法。流密码中一般以1比特、8比特或者是32比特等作为单位俩进行加密和解密。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;分组模式：主要有两种&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;ECB模式(又称电子密码本模式)
+    &lt;ul&gt;
+      &lt;li&gt;使用ECB模式加密的时候，相同的明文分组会被转换为相同的密文分组。&lt;/li&gt;
+      &lt;li&gt;类似于一个巨大的明文分组 -&amp;gt; 密文分组的对照表。&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-05-14-15261268137714.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;某一块分组被修改，不影响后面的加密结果&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;CBC模式(又称电子密码链条)
+    &lt;ul&gt;
+      &lt;li&gt;在CBC模式中，首先将明文分组与前一个密文分组进行XOR(异或)运算，然后再进行加密。&lt;/li&gt;
+      &lt;li&gt;每一个分组的加密结果依赖需要与前一个进行异或运算，由于第一个分组没有前一个分组，所以需要提供一个初始向量&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;iv&lt;/code&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+
+    &lt;p&gt;&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-05-14-15261269484225.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;某一块分组被修改，影响后面的加密结果&lt;/strong&gt;&lt;/p&gt;
+
+&lt;h4 id=&quot;代码演示两种分组模式&quot;&gt;代码演示两种分组模式&lt;/h4&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;AES - ECB模式&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;加密：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;    /**
+     *  加密字符串并返回base64编码字符串
+     *
+     *  @param string    要加密的字符串
+     *  @param keyString 加密密钥
+     *  @param iv        初始化向量(8个字节)
+     *
+     *  @return 返回加密后的base64编码字符串
+     */
+    NSLog(@&quot;%@&quot;, [[EncryptionTools sharedEncryptionTools] encryptString:@&quot;haha&quot; keyString:@&quot;abc&quot; iv:nil]);
+    
+    // 输出 MIoAu+xUEpQZSUmkZUW6JQ==
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;解密：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;NSLog(@&quot;%@&quot;, [[EncryptionTools sharedEncryptionTools] decryptString:@&quot;MIoAu+xUEpQZSUmkZUW6JQ==&quot; keyString:@&quot;abc&quot; iv:nil]);
+    
+// 输出 haha
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;AES - CBC模式&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;加密：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;uint8_t iv[8] = {1,2,3,4,5,6,7,8};
+
+NSData *data = [[NSData alloc] initWithBytes:iv length:sizeof(iv)];
+
+NSLog(@&quot;%@&quot;, [[EncryptionTools sharedEncryptionTools] encryptString:@&quot;haha&quot; keyString:@&quot;abc&quot; iv:data]);
+    
+// 输出 E/wWqUTiw/E+1DThAzV39A==
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;解密：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;NSLog(@&quot;%@&quot;, [[EncryptionTools sharedEncryptionTools] decryptString:@&quot;E/wWqUTiw/E+1DThAzV39A==&quot; keyString:@&quot;abc&quot; iv:data]);
+    
+// 输出 haha
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;strong&gt;对称加密存在的问题？？&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;很明显，对称加密主要取决于秘钥的安全性，数据传输的过程中，如果秘钥被别人破解的话，以后的加解密就将失去意义&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-05-14-15261292485801.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;其实有点儿类似于我们平常看的谍战类的电视剧，地下党将情报发送给后方，通常需要一个中间人将密码本传输给后方，如果中间人被抓交出密码本，那么将来所有的情报都将失去意义，由此可见情报工作多么的重要！！！&lt;/p&gt;
+
+&lt;p&gt;对称密码体制中只有一种密钥，并且是非公开的，如果要解密就得让对方知道密钥。所以保证其安全性就是保证密钥的安全，而非对称密钥体制有两种密钥，其中一个是公开的，这样就可以不需要像对称密码那样传输对方的密钥了&lt;/p&gt;
+
+&lt;h2 id=&quot;非对称加密&quot;&gt;非对称加密&lt;/h2&gt;
+
+&lt;p&gt;鉴于对称加密存在的风险，非对称加密应运而生&lt;/p&gt;
+
+&lt;p&gt;特点：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;使用公钥加密，使用私钥解密&lt;/li&gt;
+  &lt;li&gt;公钥是公开的，私钥保密&lt;/li&gt;
+  &lt;li&gt;加密处理安全，但是性能极差&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;非对称密码体制的特点：算法强度复杂、安全性依赖于算法与密钥，但是由于其算法复杂，而使得加密解密速度没有对称加密解密的速度快&lt;/p&gt;
+
+&lt;p&gt;经典算法：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;RSA&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h6 id=&quot;rsa算法原理&quot;&gt;RSA算法原理&lt;/h6&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;* 求N，准备两个质数p和q,N = p x q
+* 求L,L是p-1和q-1的最小公倍数。L = lcm（p-1,q-1）
+* 求E，E和L的最大公约数为1（E和L互质）
+* 求D，E x D mode L = 1 ###### RSA加密实践
+* p = 17,q = 19 =&amp;gt;N = 323
+* lcm（p-1,q-1）=&amp;gt;lcm（16，18）=&amp;gt;L= 144
+* gcd（E,L）=1 =&amp;gt;E=5
+* E乘以几可以mode L =1? D=29可以满足
+* 得到公钥为：E=5,N=323
+* 得到私钥为：D=29,N=323
+* 加密 明文的E次方 mod N = 123的5次方 mod 323 = 225（密文）
+* 解密 密文的D次方 mod N = 225的29次方 mod 323 = 123（明文）
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h6 id=&quot;openssl生成密钥命令&quot;&gt;openssl生成密钥命令&lt;/h6&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;生成强度是 512 的 RSA 私钥：$ openssl genrsa -out private.pem 512&lt;/li&gt;
+  &lt;li&gt;以明文输出私钥内容：$ openssl rsa -in private.pem -text -out private.txt&lt;/li&gt;
+  &lt;li&gt;校验私钥文件：$ openssl rsa -in private.pem -check&lt;/li&gt;
+  &lt;li&gt;从私钥中提取公钥：$ openssl rsa -in private.pem -out public.pem -outform PEM -pubout&lt;/li&gt;
+  &lt;li&gt;以明文输出公钥内容：$ openssl rsa -in public.pem -out public.txt -pubin -pubout -text&lt;/li&gt;
+  &lt;li&gt;使用公钥加密小文件：$ openssl rsautl -encrypt -pubin -inkey public.pem -in msg.txt -out msg.bin&lt;/li&gt;
+  &lt;li&gt;使用私钥解密小文件：$ openssl rsautl -decrypt -inkey private.pem -in msg.bin -out a.txt&lt;/li&gt;
+  &lt;li&gt;将私钥转换成 DER 格式：$ openssl rsa -in private.pem -out private.der -outform der&lt;/li&gt;
+  &lt;li&gt;将公钥转换成 DER 格式：$ openssl rsa -in public.pem -out public.der -pubin -outform der&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h6 id=&quot;非对称加密存在的安全问题&quot;&gt;非对称加密存在的安全问题&lt;/h6&gt;
+
+&lt;p&gt;原理上看非对称加密非常安全，客户端用公钥进行加密，服务端用私钥进行解密，数据传输的只是公钥，原则上看，就算公钥被人截获，也没有什么用，因为公钥只是用来加密的，那还存在什么问题呢？？那就是经典的&lt;strong&gt;中间人攻击&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-05-14-15261322915101.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;废了半天劲画的图，太low了，我还是自己总结一遍吧！！！&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;中间人攻击详细步骤：&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;客户端向服务器请求公钥信息&lt;/li&gt;
+  &lt;li&gt;服务端返回给客户端公钥被中间人截获&lt;/li&gt;
+  &lt;li&gt;中间人将截获的公钥存起来&lt;/li&gt;
+  &lt;li&gt;中间人自己伪造一套自己的公钥和私钥&lt;/li&gt;
+  &lt;li&gt;中间人将自己伪造的公钥发送给客户端&lt;/li&gt;
+  &lt;li&gt;客户端将重要信息利用伪造的公钥进行加密&lt;/li&gt;
+  &lt;li&gt;中间人获取到自己公钥加密的重要信息&lt;/li&gt;
+  &lt;li&gt;中间人利用自己的私钥对重要信息进行解密&lt;/li&gt;
+  &lt;li&gt;中间人篡改重要信息（将给客户端转账改为向自己转账）&lt;/li&gt;
+  &lt;li&gt;中间人将篡改后的重要信息利用原来截获的公钥进行加密，发送给服务器&lt;/li&gt;
+  &lt;li&gt;服务器收到错误的重要信息（给中间人转账）&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;&lt;strong&gt;疑问一：为什么会造成中间人攻击？？&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;造成中间人攻击的直接原因就是客户端没办法判断公钥信息的正确性。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;疑问二：怎么解决中间人攻击？？&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;需要对公钥进行&lt;strong&gt;数字签名&lt;/strong&gt;。就像古代书信传递，家人之所以知道这封信是你写的，是因为信上有你的签名、印章等证明你身份的信息。&lt;/p&gt;
+
+&lt;p&gt;数字签名需要严格验证发送发的身份信息！！！&lt;/p&gt;
+
+&lt;h2 id=&quot;数字证书&quot;&gt;数字证书&lt;/h2&gt;
+
+&lt;p&gt;数字证书包含：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;公钥&lt;/li&gt;
+  &lt;li&gt;认证机构的数字签名（权威机构CA）&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;数字证书可以自己生成，也可以从权威机构购买，但是注意，自己生成的证书，只能自己认可，别人都不认可.&lt;/p&gt;
+
+&lt;p&gt;权威机构签名的证书：
+以&lt;a href=&quot;https://github.com/&quot;&gt;GitHub官网&lt;/a&gt;为例，Chrome浏览器打开网址，地址栏有一个小绿锁，点击，内容如下：&lt;/p&gt;
+
+&lt;h4 id=&quot;权威机构认证的证书&quot;&gt;权威机构认证的证书：&lt;/h4&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-05-14-15261345080716.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;可以看到连接是安全的，点击证书可以看到详细信息
+&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-05-14-15261345685235.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;这是由权威机构认证的证书，但是是需要花钱的，一年至少得一两千，所以也有些公司用自己签名的证书，自己签名的证书不被信任，可能会提示用户有风险，比如原来的12306网站，现在大多数网站也都采用了CA签名数字证书进行签名，自己做签名的也不好找了！！！12306都改成CA认证的了。。。&lt;/p&gt;
+
+&lt;h4 id=&quot;自己生成一个证书&quot;&gt;自己生成一个证书&lt;/h4&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;生成私钥&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;openssl genrsa -out private.pem 1024
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;创建证书请求&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;openssl req -new -key private.pem -out rsacert.csr
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;生成证书并签名，有效期10年&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;openssl x509 -req -days 3650 -in rsacert.csr -signkey private.pem -out rsacert.crt
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;将 PEM 格式文件转换成 DER 格式&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;openssl x509 -outform der -in rsacert.crt -out rsacert.der
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;导出P12文件&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;openssl pkcs12 -export -out p.p12 -inkey private.pem -in rsacert.crt
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-05-14-15263070093426.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;注意：&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;在iOS开发中，不能直接使用 PEM 格式的证书，因为其内部进行了Base64编码，应该使用的是DER的证书，是二进制格式的&lt;/li&gt;
+  &lt;li&gt;OpenSSL默认生成的都是PEM格式的证书&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;代码演示：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;// p12 是私钥
+    // .der 是公钥
+    // 非对称加密，使用公钥加密，私钥解密
+    
+    // 加载公钥
+    [[RSACryptor sharedRSACryptor] loadPublicKey:[[NSBundle mainBundle] pathForResource:@&quot;rsacert.der&quot; ofType:nil]];
+    
+    // 对数据加密
+    NSData *data = [[RSACryptor sharedRSACryptor] encryptData:[@&quot;hahaha&quot; dataUsingEncoding:NSUTF8StringEncoding]];
+    
+    // 对加密得到的密文进行base64编码打印
+    NSLog(@&quot;%@&quot;, [data base64EncodedStringWithOptions:kNilOptions]);
+    
+    // 输出结果：PflhCgTVNegcQXrb39RJOoxCRRIHuZ3LN0/hoxTDFBbC+8yKjp0m+/hxVUWBVsTo28WnNFCAFfrQ2of5SkqttD51a5eLb21R7bQSQRxg/gVZ5hePcE3vh7Slfcxm2qJM+J8hRWDP/MF4BiDLXI9ZqTpLCSS5mjJtmUBf2wNvI1Y=
+    
+    // 私钥解密
+    
+    // 加载私钥
+    [[RSACryptor sharedRSACryptor] loadPrivateKey:[[NSBundle mainBundle] pathForResource:@&quot;p.p12&quot; ofType:nil] password:@&quot;123456&quot;];
+
+    // 解密
+    NSData *decryDeta = [[RSACryptor sharedRSACryptor] decryptData:data];
+    
+    NSLog(@&quot;%@&quot;, [[NSString alloc] initWithData:decryDeta encoding:NSUTF8StringEncoding]);
+    
+    // 输出：hahaha
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h1 id=&quot;代码地址&quot;&gt;&lt;a href=&quot;https://github.com/czjwarrior/DailyPractice&quot;&gt;代码地址&lt;/a&gt;&lt;/h1&gt;
+
+&lt;h2 id=&quot;总结&quot;&gt;总结&lt;/h2&gt;
+
+&lt;p&gt;至此数据安全和加解密相关结算完毕，写博客的过程，也是学习的过程，断断续续的写了三四天，总算写完了，同时也对原来一些模糊的概念有了更清晰的认识，写的这篇文章看了&lt;a href=&quot;https://www.jianshu.com/u/c5703017b9f5&quot;&gt;文顶顶老师&lt;/a&gt;的视频，受益匪浅，十分感谢，最近学习发现，学的越多，感觉会的越少，时间十分的不够用。同时渴望遇到一些希望进步、不甘平凡的同行！！！共勉！！！&lt;/p&gt;
+
+</description>
+        <pubDate>Mon, 14 May 2018 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/2018/05/data-security/</link>
+        <guid isPermaLink="true">http://localhost:4000/2018/05/data-security/</guid>
+        
+        <category>iOS底层</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>使用Cocoapods创建私有库</title>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;五一之后，公司要求对代码进行整理，同时进行代码管理、自动化打包等标准化流程，这些东西一直是我想搞的，这次有了公司的支持，操作起来也更顺利了，代码管理、自动化打包会找时间写一篇博客，这次主要记录利用Cocoapods将多个项目中共用的代码抽离出私有库，方便其他项目的引用，也算是组件化的第一步吧。抽离出私有库的时候，参考了很多的博客，遇到了很多的问题，主要参考了&lt;a href=&quot;http://blog.wtlucky.com/blog/2015/02/26/create-private-podspec/&quot;&gt;这篇博客&lt;/a&gt;。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&quot;为什么要进行代码抽离&quot;&gt;为什么要进行代码抽离&lt;/h2&gt;
+
+&lt;p&gt;很多公司不止有一个产品，当项目达到两个及以上的时候，就需要考虑代码的共用（理想情况下）。由于我们公司特殊情况（懒），原来做项目的时候没有考虑这么多，由于公司新项目与原来的项目有大量功能相似，当时我们就采用了创建新分支的形式创建了新项目，导致代码耦合性非常强，平常开发中遇到很多问题，比如：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;有些代码可能这个项目需要，那个项目不需要&lt;/li&gt;
+  &lt;li&gt;分支切换太过频繁&lt;/li&gt;
+  &lt;li&gt;创建了大量分支&lt;/li&gt;
+  &lt;li&gt;在这个分支上开发的时候，测试需要另一个项目的包，需要来回切换&lt;/li&gt;
+  &lt;li&gt;。。。。等等&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;先看下我们原来的代码结构，确实感觉很头疼：
+&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-05-10-15259585288914.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;综上所述，代码抽离迫在眉睫。。。。&lt;/p&gt;
+
+&lt;h2 id=&quot;1创建私有spec-repo&quot;&gt;1、创建私有&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Spec Repo&lt;/code&gt;&lt;/h2&gt;
+
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Spec Repo&lt;/code&gt;其实类似一个容器，里面装着所有的公开的Pods,当使用&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Cocoapods&lt;/code&gt;后，他就会被&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;clone&lt;/code&gt;到本地的&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;~/.cocoapods/repos&lt;/code&gt;目录下：
+&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-05-10-15259592117791.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;因此我们也需要创建一个私有的&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Spec Repo&lt;/code&gt;，因为是公司项目，所以我们搞一个私有库，这次是我单独的练习，&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;GitHub&lt;/code&gt;上创建私有库是收费的，所以这次我采用了免费的&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Git&lt;/code&gt;服务，我用的是&lt;a href=&quot;https://coding.net/&quot;&gt;Coding&lt;/a&gt;，首先需要在&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;coding&lt;/code&gt;上创建一个自己的&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;git&lt;/code&gt;仓库，创建完成之后，在终端下执行如下命令&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;pod repo add ZJTestSpecs https://coding.net/u/cenzhijun/p/ZJTestSpecs/git
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;成功的话就会在&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;~/.cocoapods/repos&lt;/code&gt;目录下看到&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ZJTestSpecs&lt;/code&gt;文件夹了，第一步完成，这一步通常只需要执行一次&lt;/p&gt;
+
+&lt;h2 id=&quot;2创建pod项目的文件&quot;&gt;2、创建&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Pod&lt;/code&gt;项目的文件&lt;/h2&gt;
+
+&lt;p&gt;首先&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;cd&lt;/code&gt;到你想创建项目的文件夹执行如下操作&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;记住一定要创建一个单独的名字，否则以后&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;pod search &amp;lt;私有库&amp;gt;&lt;/code&gt;会找到&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Github&lt;/code&gt;上跟你重名的项目&lt;/strong&gt;&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;pod lib create ZJPodPrivateTest
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;之后会出现下列问题：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-05-10-DA3D7B14F4D628E154A175EFFDE87B27.jpg&quot; alt=&quot;DA3D7B14F4D628E154A175EFFDE87B27&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;接下来就是在你的&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ZJPodPrivateTest&lt;/code&gt;文件夹下添加自己的内容，将自己的模块部分放在&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ZJPodPrivateTest/Classes&lt;/code&gt;下，然后&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;cd&lt;/code&gt;到&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Example&lt;/code&gt;文件夹下执行&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;pod update&lt;/code&gt;命令，之后打开项目，就能在&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Development Pods/ZJPodPrivateTest&lt;/code&gt;文件夹下看到自己添加的组件了，之后需要将项目推送到远端仓库，同样需要先自己去&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;git&lt;/code&gt;服务商哪里创建一个私有仓库，然后&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;cd&lt;/code&gt;到&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ZJPodPrivateTest&lt;/code&gt;目录，执行如下操作：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;git add -A
+git commit -a -m &quot;init library&quot;
+git remote add origin https://git.coding.net/cenzhijun/ZJPodPrivateTest.git
+
+git push origin master
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;这个时候执行&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;push&lt;/code&gt;操作会报如下错误：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-05-10-C3672E624EF076875C02B836EFE87ED7.jpg&quot; alt=&quot;C3672E624EF076875C02B836EFE87ED7&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;提示你需要先&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;pull&lt;/code&gt;下代码，这一步不能直接&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;pull&lt;/code&gt;,需要执行如下命令：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;git pull origin master --allow-unrelated-histories
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-05-10-D6043786E0DA1A559CA1DA5F27EB3F90.jpg&quot; alt=&quot;D6043786E0DA1A559CA1DA5F27EB3F90&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;有可能会出现冲突，解决冲突之后&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;push&lt;/code&gt;代码：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;git push origin master 
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;因为&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;podspec&lt;/code&gt;文件获取版本控制的项目需要&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;tag&lt;/code&gt;号，所以还要搭上一个&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;tag&lt;/code&gt;&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;git tag -m &quot;first release&quot; 0.1.0
+git push --tags     #推送tag到远端仓库
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;做完这些之后开始编辑&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;podspec&lt;/code&gt;文件，填上对应的信息。&lt;/p&gt;
+
+&lt;p&gt;编辑完之后，执行如下命令，验证是否有效，不能有&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;error&lt;/code&gt;或者&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;warning&lt;/code&gt;：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;pod lib lint
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;当看到&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-05-10-6CECC0B42712110AA9F952FFE1C2E179.jpg&quot; alt=&quot;6CECC0B42712110AA9F952FFE1C2E179&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;就说明验证通过&lt;/p&gt;
+
+&lt;h2 id=&quot;3本地测试podspec文件&quot;&gt;3、本地测试podspec文件&lt;/h2&gt;
+
+&lt;p&gt;自己可以创建一个新项目，在&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Podfile&lt;/code&gt;中指定自己编辑好的&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;podspec&lt;/code&gt;文件，如下：（两种方式填写一种就行）&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;pod 'ZJPodPrivateTest', :path =&amp;gt; '~/Desktop/ZJPodPrivateTest'      # 指定路径
+# pod 'PodTestLibrary', :podspec =&amp;gt; '~/Desktop/ZJPodPrivateTest/ZJPodPrivateTest.podspec'  # 指定podspec文件
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;然后执行&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;pod install&lt;/code&gt;命令安装，然后打开项目发现库文件已经被加载到&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Pods&lt;/code&gt;子项目中了，不过没有在&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Pods&lt;/code&gt;目录下，而是在&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Development Pods/ZJPodPrivateTest&lt;/code&gt;目录下，因为是本地测试项目，没有吧&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;podspec&lt;/code&gt;文件添加到&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Spec Repo&lt;/code&gt;中的缘故
+&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-05-10-EEBF626209D091109DC43B9298F96E26.jpg&quot; alt=&quot;EEBF626209D091109DC43B9298F96E26&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;br /&gt;
+&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-05-10-5B479CE603BFA168CD47132A8E8E5781.jpg&quot; alt=&quot;5B479CE603BFA168CD47132A8E8E5781&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;确认无误后，就可以提交&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;podspec&lt;/code&gt;到&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Spec Repo&lt;/code&gt;中了&lt;/p&gt;
+
+&lt;h2 id=&quot;4提交podspec&quot;&gt;4、提交podspec&lt;/h2&gt;
+
+&lt;p&gt;提交很简单，只需要一个命令：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;pod repo push ZJTestSpecs ZJPodPrivateTest.podspec  #前面是本地Repo名字 后面是podspec名字
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-05-10-481992FDCEF1AB9F310B905AF4D4AC92.jpg&quot; alt=&quot;481992FDCEF1AB9F310B905AF4D4A&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;没有错误之后，就可以在&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;~/.cocoapods/repos/ZJTestSpecs&lt;/code&gt;目录下看到自己的私有库了，同时我们远程的&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Spec Repo&lt;/code&gt;也有一次提交，已经被自动&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;push&lt;/code&gt;上去了&lt;/p&gt;
+
+&lt;p&gt;可以用&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;pod search ZJPodPrivateTest&lt;/code&gt;查看自己的库了&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-05-10-714E14C7AA77A9CDECE5C5334B28F057.jpg&quot; alt=&quot;714E14C7AA77A9CDECE5C5334B28F057&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;*一定要记住自己的创建的私有库一定不要跟Github上的第三方库重名，否则会搜不到，&lt;/strong&gt;我博客里面有的是&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ZJPodPrivateTest&lt;/code&gt;有的是&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ZJPodTest&lt;/code&gt;，就是因为&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ZJPodTest&lt;/code&gt;跟&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Github&lt;/code&gt;上的一个第三方库重名了，才会又重新建了&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ZJPodPrivateTest&lt;/code&gt;，按照我博客操作的时候&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ZJPodPrivateTest&lt;/code&gt;和&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ZJPodTest&lt;/code&gt;可以认为是同一个仓库，有的截图了，有的忘了，有不明白的，可以问我！！！&lt;/p&gt;
+
+&lt;p&gt;至此，自己的私有库就算制作好了&lt;/p&gt;
+
+&lt;h2 id=&quot;5使用制作好的pod&quot;&gt;5、使用制作好的Pod&lt;/h2&gt;
+
+&lt;p&gt;在&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Podfile&lt;/code&gt;文件中，内容如下：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;source 'https://github.com/CocoaPods/Specs.git'  # 官方库
+source 'https://git.coding.net/cenzhijun/ZJTestSpecs.git'   # 私有库
+
+platform :ios, '8.0'
+
+target 'TargetName' do
+pod 'AFNetworking', '~&amp;gt; 3.0'    
+pod 'ZJPodPrivateTest', '0.1.0'   #自己的私有库
+end
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;至此就算大功告成了&lt;/p&gt;
+
+&lt;h2 id=&quot;6更新维护podspec&quot;&gt;6、更新维护podspec&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://blog.wtlucky.com/blog/2015/02/26/create-private-podspec/&quot;&gt;这里写得很详细，参考这个吧&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;遇到的坑&quot;&gt;遇到的坑&lt;/h2&gt;
+
+&lt;p&gt;&lt;strong&gt;错误一&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-05-14-409FDEA31A5A4FA21B2B14E42D7D96A4.jpg&quot; alt=&quot;409FDEA31A5A4FA21B2B14E42D7D96A4&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;pod lib lint&lt;/code&gt; 验证的时候一直报这个错，原因是私有库中添加了动态库或者静态库，解决方案：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;pod lib lint --use-libraries
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;--use-libraries&lt;/code&gt;：表示使用静态库或者是framework，这里主要是解决当我们依赖一些framework库后校验提示找不到库的时候用到。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;错误二&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-05-14-E03336C72F6E450A612C4021C7FA09E6.jpg&quot; alt=&quot;E03336C72F6E450A612C4021C7FA09E6&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;pod lib lint&lt;/code&gt;的时候一直有一些警告，可以忽略掉这些警告：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;pod lib lint --allow-warnings
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;--allow-warnings&lt;/code&gt;：表示允许警告&lt;/p&gt;
+
+&lt;p&gt;保险起见可以使用：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;pod lib lint --use-libraries --allow-warnings
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;strong&gt;错误三&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;pod lib lint&lt;/code&gt;验证通过，但是&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;repo push&lt;/code&gt;的时候却一直报错，又忘截图了，大概是这样的：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;xcodebuild: Returned an unsuccessful exit code. You can use `--verbose` for more information
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;我之所以报这个错，是因为，修改了自己的私有库，打了&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;tag&lt;/code&gt;，&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;podspec&lt;/code&gt;文件对应的&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;s.version&lt;/code&gt;忘了修改了，解决方案：&lt;/p&gt;
+
+&lt;p&gt;重新发一个&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;release&lt;/code&gt;版的，打上&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;tag&lt;/code&gt;之后，修改&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;podspec&lt;/code&gt;文件对应的&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;s.version&lt;/code&gt;，重新&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;pod repo push&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;温馨提示：&lt;/strong&gt;如果你在&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;pod lib lint&lt;/code&gt;的时候用到了&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;--use-libraries&lt;/code&gt;或者&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;--allow-warnings&lt;/code&gt;，那么在&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;pod repo push&lt;/code&gt;的时候也要加上这些指令！！！例如：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;pod repo push ZJTestSpecs ZJEncryptPodTest.podspec --use-libraries --allow-warnings
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;总结&quot;&gt;总结&lt;/h2&gt;
+
+&lt;p&gt;创建私有库的时候，尽管我参考的这篇文章已经写得十分详细，但是还是有一个过时的操作，很导致操作错误，尤其是在本地仓库&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;push&lt;/code&gt;到远程仓库那里出现问题，同时创建私有库不能和&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;GitHub&lt;/code&gt;上存在的第三方库重名也是我摸索很久发现的，希望看到这篇文章的同学能够少走弯路❤️❤️❤️❤️&lt;/p&gt;
+
+</description>
+        <pubDate>Thu, 10 May 2018 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/2018/05/create-podspec/</link>
+        <guid isPermaLink="true">http://localhost:4000/2018/05/create-podspec/</guid>
+        
+        <category>iOS</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>fastlane实现自动化打包</title>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;正常产品开发完成之后，我们都需要给测试人员打包，又是测试包，又是生产包的，打一次包需要浪费十几分钟的时间，甚至有时候，你刚打完包，产品过来告诉你某个地方需要微调一下（麻蛋，这个时候是不是想弄死他），但是没办法，只好改完bug，继续打包，就这样可能一上午或者一下午就这样浪费了，所以有一个能够自动化打包的工具不仅能够为我们节省大量的时间，&lt;strong&gt;还可以让我们能够装逼&lt;/strong&gt;。。。。。（这是重点）&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;其实自动化打包的工具有很多，比较流行的有&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Jenkins&lt;/code&gt;和&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;fastlane&lt;/code&gt;，原来尝试过&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Jenkins&lt;/code&gt;,感觉这个工具比较麻烦，需要配置的东西非常多，还需要仓库地址等等很多信息，不像&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;fastlane&lt;/code&gt;感觉是傻瓜式的，非常简单，目前&lt;a href=&quot;https://github.com/fastlane/fastlane&quot;&gt;Github上已经超过两万star了&lt;/a&gt;，而且团队人员众多，下面步入正题！！！&lt;/p&gt;
+
+&lt;h2 id=&quot;安装前的准备工作&quot;&gt;安装前的准备工作&lt;/h2&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;首先确认是否安装了ruby，终端查看下ruby版本&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;ruby -v
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;确认是否安装了Xcode命令行工具&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;xcode-select  --install
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;如果出现
+&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-04-26-15247254544910.jpg&quot; alt=&quot;&quot; /&gt;
+表示已经安装成功&lt;/p&gt;
+
+&lt;p&gt;如果出现：
+&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-04-26-15247255157977.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;就点击安装就行了。。。&lt;/p&gt;
+
+&lt;p&gt;下面就正式开始安装fastlane了&lt;/p&gt;
+
+&lt;h2 id=&quot;安装步骤&quot;&gt;安装步骤&lt;/h2&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;安装fastlane&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo gem install fastlane
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;切换到工程目录初始化&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;fastlane init
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;初始化的过程中会出现下面的选项：
+&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-04-26-0280EF1C30306802E173DFDFD724032A.jpg&quot; alt=&quot;0280EF1C30306802E173DFDFD724032A&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;第一个选项的意思是：自动截屏。这个功能能帮我们自动截取APP中的截图，并添加手机边框（如果需要的话）
+第二个选项的意思是：自动发布beta版本用于TestFlight
+第二个选项的意思是：自动发布到AppStore
+第二个选项的意思是：手动设置&lt;/p&gt;
+
+&lt;p&gt;我在这里选的是第四个（大家可根据自己需要选择），截图如下：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-04-26-ACA6B6119DF13E2F16A1A6512563A32F.jpg&quot; alt=&quot;ACA6B6119DF13E2F16A1A6512563A32F&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;紧接着一直点击&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;enter&lt;/code&gt;键，知道安装成功会出现如下截图&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-04-26-D51E2EB4B604605AE7C5B86951DCE6E8.jpg&quot; alt=&quot;D51E2EB4B604605AE7C5B86951DCE6E8&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;安装成功之后，会在我们的工程目录生成一个&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;fastlane&lt;/code&gt;文件夹：
+&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-04-26-15247263009632.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;然后此时，我们需要自己编辑&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Appfile&lt;/code&gt;和&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Fastfile&lt;/code&gt;两个文件:&lt;/p&gt;
+
+&lt;p&gt;首先看&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Appfile&lt;/code&gt;文件，我的如下：
+&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-04-26-15247264551130.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;然后是&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Fastfile&lt;/code&gt;文件：
+&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-04-26-15247266906282.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;其中的&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;firim&lt;/code&gt;是指定到上传到&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;fir&lt;/code&gt;的，如果只是单纯的想把包打出来可以不写哪一行。&lt;/p&gt;
+
+&lt;p&gt;这样的话就可以顺利打包了。。。
+执行打包命令：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;fastlane betaDebug
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;打包成功截图如下：
+&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-04-26-15247289369146.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;自动上传至fir或者蒲公英&quot;&gt;自动上传至&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;fir&lt;/code&gt;或者蒲公英&lt;/h2&gt;
+
+&lt;p&gt;但是，如果想将自己打好的包直接上传到&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;fir&lt;/code&gt;或者蒲公英等平台，请看下面的步骤：&lt;/p&gt;
+
+&lt;p&gt;执行如下命令安装&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;fir&lt;/code&gt;插件：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;fastlane add_plugin fir
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;自动上传到&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;fir&lt;/code&gt;还需执行如下命令：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;gem install fir-cli
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;如果是蒲公英平台，安装如下插件：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;fastlane add_plugin pgyer
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;此时&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;fastlane&lt;/code&gt;文件夹会变成如下结构：
+注意：&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;package&lt;/code&gt;文件夹是在第一次打包的时候生成的
+&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-04-26-15247270913064.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;此时执行打包命令,就可以自动打包，并上传至&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;fir&lt;/code&gt;了。&lt;/p&gt;
+
+&lt;p&gt;安装完插件之后&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Pluginfile&lt;/code&gt;文件内容如下：（&lt;strong&gt;注意&lt;/strong&gt;：你安装了什么插件，就会在该文件中显示）
+&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-04-26-15247278181731.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;上传&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;fir&lt;/code&gt;成功截图如下：
+&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-04-26-15247271925792.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;生成的&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ipa&lt;/code&gt;包和&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;dysm&lt;/code&gt;文件如下：
+&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-04-26-15247276440903.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;至此，自动化打包安装过程结束，下面记录下我遇到的坑。&lt;/p&gt;
+
+&lt;h2 id=&quot;遇到的坑&quot;&gt;遇到的坑&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;错误一&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-04-26-908AA24D21E5040D79E27747E6D621AD.jpg&quot; alt=&quot;908AA24D21E5040D79E27747E6D621AD&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;我遇到这个问题的原因是，证书没有匹配对，修改&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Fastfile&lt;/code&gt;文件，仔细查看下&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;export_method&lt;/code&gt;参数是否配对就行了。。。&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;错误二&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-04-26-D7ADA2F6C1CCA094D0E07D81EF414DE3.jpg&quot; alt=&quot;D7ADA2F6C1CCA094D0E07D81EF414DE3&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;错误指出的很明显，请一定要记住&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;:&lt;/code&gt;后面一定要紧跟自己写的名称&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;错误三&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;打包成功了，但是上传至&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;fir&lt;/code&gt;一直失败
+忘记截图了，大概报错说明如下：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Could not find action, lane or variable 'firim'
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;我原先看文档，看到有人将&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Gemfile&lt;/code&gt;和&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Gemfile.lock&lt;/code&gt;文件拖到&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;fastlane&lt;/code&gt;文件夹里面了，但是自动生成的话是在这个文件夹外面的，但是我想着放到一个文件夹里面方便管理，就这样报错了，所以记住，它生成在哪你就放在哪就行。&lt;/p&gt;
+
+&lt;p&gt;报错原因是，没有找到&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;firim&lt;/code&gt;这个action，可以在终端下面查看是否安装了这个&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;action&lt;/code&gt;&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;fastlane actions [firim]
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;如果安装了，会显示如下：
+&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-04-26-15247287834633.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;如果没有安装，会提示没找到，这个时候重新安装下插件就好了。&lt;/p&gt;
+
+&lt;h2 id=&quot;shell脚本打包&quot;&gt;shell脚本打包&lt;/h2&gt;
+
+&lt;p&gt;除了借助一些开源框架外，我原来也用过&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;shell&lt;/code&gt;脚本打包，无非是自己写一个脚本，里面包含很多的打包命令，但是还是感觉没有&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;fastlane&lt;/code&gt;简单方便，有兴趣的可以参考&lt;a href=&quot;https://github.com/stackhou/AutoPacking-iOS&quot;&gt;GitHub上的这个&lt;/a&gt;，写的比较详细&lt;/p&gt;
+
+&lt;h2 id=&quot;总结&quot;&gt;总结&lt;/h2&gt;
+
+&lt;p&gt;至此，利用&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;fastlane&lt;/code&gt;自动化打包就算告一段落了，但是&lt;a href=&quot;https://docs.fastlane.tools/&quot;&gt;fastlane官网&lt;/a&gt;还提供了很多的语法说明，感兴趣的可以参考下，另外说明下，由于我是最近才开始用，所以一般给测试人员打包的时候我都是用&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;fastlane&lt;/code&gt;，真正要上线提交AppStore的时候，我还是用Xcode，毕竟放心。提交到App Store还没用过，有什么坑我也不知道，如果有人实践过，欢迎评论区互相交流（另外，觉得写得不错的，请点赞❤️❤️❤️！！！哈哈）&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;我的博客即将搬运同步至腾讯云+社区，邀请大家一同入驻：https://cloud.tencent.com/developer/support-plan?invite_code=1denjdl5jafn&lt;/p&gt;
+
+</description>
+        <pubDate>Thu, 26 Apr 2018 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/2018/04/autoPacking/</link>
+        <guid isPermaLink="true">http://localhost:4000/2018/04/autoPacking/</guid>
+        
+        <category>iOS</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>Quartz2D实战-画板工具</title>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;一直想让自己每天都能进步，但是学习这个事情一直都无法坚持，只有自己感觉到了紧迫感，才会敲起代码，研究自己以前没接触过的知识，写博客的目的就是希望能够和更多的朋友一起讨论，促进交流，共同进步！！！&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&quot;什么是quartz2d&quot;&gt;什么是Quartz2D&lt;/h2&gt;
+
+&lt;p&gt;Quartz2D的API是纯C语言的，它是一个二维绘图引擎，同时支持iOS和Mac系统。Quartz2D的API来自于&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Core Graphics&lt;/code&gt;框架，数据类型和函数基本都以CG作为前缀：&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;CGContextRef&lt;/code&gt;、&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;CGPathRef&lt;/code&gt;等。实际开发中&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;UIKit&lt;/code&gt;框架能够帮我们完成大部分UI，但是有些UI比较复杂，普通的UIView无法满足我们的开发需要，这是就可以利用&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Quartz2D&lt;/code&gt;技术画出我们想要的控件。&lt;/p&gt;
+
+&lt;h2 id=&quot;drawrect&quot;&gt;DrawRect:&lt;/h2&gt;
+
+&lt;p&gt;首先我们需要知道，&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;- (void)drawRect:(CGRect)rect&lt;/code&gt;方法是在什么时候调用：
+&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-04-21-15242802130958.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;我们发现该方法是在视图即将展示的时候调用的，在这个方法中可以获取到上下文，将试图绘制到View上，其实每一个View内部都有一个&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;layer&lt;/code&gt;属性，这个方法中就可以了取得一个layer,所以我们绘制的东西其实是绘制到View的layer上，试图之所以能够显示东西，就是因为他的内部有一个layer&lt;/p&gt;
+
+&lt;p&gt;所以之所以实现drawRect:方法，是因为，在这个方法当中可以获取到图形上下文，之后，才会View才会展示出来&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;- (void)drawRect:(CGRect)rect&lt;/code&gt;的调用时机：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;当view第一次显示到屏幕上时（被加到UIWindow上显示出来）&lt;/li&gt;
+  &lt;li&gt;调用view的&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;setNeedsDisplay&lt;/code&gt;或者&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;setNeedsDisplayInRect:&lt;/code&gt;时&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;图形上下文graphics-context&quot;&gt;图形上下文（Graphics Context）&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;保存绘图信息、绘图状态&lt;/li&gt;
+  &lt;li&gt;决定绘制的输出目标（绘制到什么地方去？）
+    &lt;ul&gt;
+      &lt;li&gt;（输出目标可以是PDF文件、Bitmap或者显示器的窗口上）&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;相同的一套绘图序列，指定不同的Graphics Context，就可将相同的图像绘制到不同的目标上&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;绘制好的图形会保存到图像上下文中去，图像上下文中的绘制的图像又会显示在我们指定的输出目标当中&lt;/p&gt;
+
+&lt;p&gt;Quartz2D提供的几种上下文类型：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Bitmap Graphics Context&lt;/li&gt;
+  &lt;li&gt;PDF Graphics Context&lt;/li&gt;
+  &lt;li&gt;Window Graphics Context&lt;/li&gt;
+  &lt;li&gt;Layer Graphics Context&lt;/li&gt;
+  &lt;li&gt;Printer Graphics Context&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;quartz2d绘图的基本步骤&quot;&gt;Quartz2D绘图的基本步骤&lt;/h2&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;获得图形上下文&lt;/li&gt;
+  &lt;li&gt;拼接路径（下面代码是搞一条线段，添加矩形、椭圆、圆弧的代码可以查看具体的APi，用法基本相同）&lt;/li&gt;
+  &lt;li&gt;绘制路径&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;代码示例：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;CGContextRef ctx = UIGraphicsGetCurrentContext();
+
+CGContextMoveToPoint(ctx, 10, 10);
+CGContextAddLineToPoint(ctx, 100, 100);
+
+CGContextStrokePath(ctx); // CGContextFillPath(ctx);
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;图形上下文栈的操作&quot;&gt;图形上下文栈的操作&lt;/h2&gt;
+
+&lt;p&gt;将当前的上下文copy一份,保存到栈顶(那个栈叫做”图形上下文栈”，&lt;strong&gt;先进后出&lt;/strong&gt;)&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;void CGContextSaveGState(CGContextRef c)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;将栈顶的上下文出栈,替换掉当前的上下文&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;void CGContextRestoreGState(CGContextRef c)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;quartz2d的内存管理&quot;&gt;Quartz2D的内存管理&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;使用含有“Create”或“Copy”的函数创建的对象，使用完后必须释放，否则将导致内存泄露&lt;/li&gt;
+  &lt;li&gt;使用不含有“Create”或“Copy”的函数获取的对象，则不需要释放&lt;/li&gt;
+  &lt;li&gt;如果retain了一个对象，不再使用时，需要将其release掉&lt;/li&gt;
+  &lt;li&gt;可以使用Quartz 2D的函数来指定retain和release一个对象。例如，如果创建了一个CGColorSpace对象，则使用函数CGColorSpaceRetain和CGColorSpaceRelease来retain和release对象。&lt;/li&gt;
+  &lt;li&gt;也可以使用Core Foundation的CFRetain和CFRelease。&lt;strong&gt;注意不能传递NULL值给这些函数&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;实战-画板工具&quot;&gt;实战-画板工具&lt;/h2&gt;
+
+&lt;p&gt;了解了&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Quartz2D&lt;/code&gt;的基本知识后，我们就可以运用这些知识，进行一些综合的练习.&lt;/p&gt;
+
+&lt;h4 id=&quot;主要代码如下&quot;&gt;主要代码如下&lt;/h4&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;添加手势&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(pan:)];
+[self addGestureRecognizer:pan];
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;实现方法：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;- (void)pan:(UIPanGestureRecognizer *)pan{
+    // 获取当前位置所在点
+    CGPoint curP = [pan locationInView:self];
+    
+    // 笔尖代码（这段代码可以去掉，主要是加了个笔尖，完善功能，提升用户体验）
+    {
+        //获取偏移量
+        //获取的偏移量是相对于最原始的点
+        CGPoint transP = [pan translationInView:self.pointView];
+        
+        [self.pointView setAlpha:1.f];
+        
+        CGFloat pointW = self.lineWidth + 5;
+        CGPoint pointP = CGPointMake(curP.x - pointW / 2, curP.y - pointW / 2);
+        
+        [self.pointView setFrame:(CGRect){pointP, self.lineWidth + 5, self.lineWidth + 5}];
+        [self.pointView.layer setCornerRadius:self.pointView.bounds.size.width / 2];
+        [self.pointView.layer setBorderWidth:1.f];
+        [self.pointView.layer setBorderColor:self.lineColor.CGColor];
+        
+        self.pointView.transform = CGAffineTransformTranslate(self.pointView.transform, transP.x, transP.y);
+        
+        //清0操作(不让偏移量进行累加,获取的是相对于上一次的值,每一次走的值.)
+        [pan setTranslation:CGPointMake(0, 0) inView:self.pointView];
+    }
+    
+    if (pan.state == UIGestureRecognizerStateBegan) {
+        
+        ZJBezierPath *path = [ZJBezierPath bezierPath];
+        path.lineWidth = self.lineWidth;
+        path.lineJoinStyle = kCGLineJoinRound;
+        path.lineCapStyle = kCGLineCapRound;
+        path.lineColor = self.lineColor;    // //颜色必须得要在drawRect方法当中进行绘制    继承系统类,添加属性我们自己的东西.
+        self.path = path;
+        
+        //设置路径的起点
+        [self.path moveToPoint:curP];
+        
+        [self.pathArray addObject:path];
+        
+    } else if (pan.state == UIGestureRecognizerStateChanged){
+        
+        //添加一根线到当前手指所在的点
+        [self.path addLineToPoint:curP];
+        
+        [self setNeedsDisplay];
+        
+    } else if (pan.state == UIGestureRecognizerStateEnded){
+        [self.pointView setAlpha:0.f];
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;代码里都有详细注释，下面主要讲解一些属性的设置区别：&lt;/p&gt;
+
+&lt;p&gt;lineJoinStyle：有三种样式&lt;/p&gt;
+
+&lt;p&gt;主要是线条的交接处的样式&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;typedef CF_ENUM(int32_t, CGLineJoin) {
+    kCGLineJoinMiter,
+    kCGLineJoinRound,
+    kCGLineJoinBevel
+};
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;注意观察线条的连接处&lt;/p&gt;
+
+&lt;p&gt;kCGLineJoinMiter：
+&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-04-21-15242842023166.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;kCGLineJoinRound：
+&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-04-21-15242842734094.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;kCGLineJoinBevel
+&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-04-21-15242841103834.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;实现&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;- (void)drawRect:(CGRect)rect&lt;/code&gt;方法&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;- (void)drawRect:(CGRect)rect {
+    
+    for (ZJBezierPath *path in self.pathArray) {
+        
+      // 绘制路径
+      [path.lineColor set];
+      [path stroke];
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;我们发现我们并没有在该方法内部获取上下文、描述路径等操作就可以将路径绘制到view上去。重点看&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;[path stroke]&lt;/code&gt;方法，其实这个方法内部已经帮我们实现了绘制视图的几个步骤：&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;获取上下文&lt;/li&gt;
+  &lt;li&gt;描述路径&lt;/li&gt;
+  &lt;li&gt;把路径添加到上下文&lt;/li&gt;
+  &lt;li&gt;把上下文的内容渲染到View的layer&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;伪代码如下：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;1. 获取上下文
+CGContextRef ctx = UIGraphicsGetCurrentContext();
+
+2. 描述路径
+UIBezierPath *path = [UIBezierPath bezierPathWithRect:CGRectMake(0, 0, 10, 10)];
+    
+3. 把路径添加到上下文
+CGContextAddPath(ctx, path.CGPath);
+    
+4. 把上下文的内容渲染到View的layer
+CGContextStrokePath(ctx);
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h1 id=&quot;代码地址&quot;&gt;&lt;a href=&quot;https://github.com/czjwarrior/DailyPractice&quot;&gt;代码地址&lt;/a&gt;&lt;/h1&gt;
+
+&lt;h2 id=&quot;最终效果图&quot;&gt;最终效果图&lt;/h2&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-04-21-15242857269228.gif&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+</description>
+        <pubDate>Sat, 21 Apr 2018 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/2018/04/Quartz2d%E5%AE%9E%E6%88%98/</link>
+        <guid isPermaLink="true">http://localhost:4000/2018/04/Quartz2d%E5%AE%9E%E6%88%98/</guid>
+        
+        <category>iOS</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>（4）OC中消息和消息转发-02</title>
+        <description>&lt;p&gt;&lt;a href=&quot;https://www.jianshu.com/p/89093871596b&quot;&gt;上篇文章讲到&lt;/a&gt;，如果通过&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;_class_resolveInstanceMethod&lt;/code&gt;和&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;- (id)forwardingTargetForSelector:(SEL)aSelector&lt;/code&gt;还是没找到IMP,也就是方法的实现，那我们只能手动添加方法的实现，也就是上篇文章提到的&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;regular forwarding&lt;/code&gt;或者&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Normal Forwarding&lt;/code&gt;：&lt;/p&gt;
+
+&lt;p&gt;我们先看一下方法的调用过程都执行了哪些方法？首先我们把方法实现注释掉。
+&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-03-28-15222251043432.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;首先在方法调用的地方打一个断点，然后在控制台执行&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;call (void)instrumentObjcMessageSends(YES)&lt;/code&gt;，继续执行，打印结果：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-03-28-15222252259604.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;然后我们前往文件夹&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-03-28-15222252771728.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;找到&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;msgSends&lt;/code&gt;开头的文件，打开会看到如下执行过程：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-03-28-15222253682896.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;所以我们可以得出结论，程序向某个对象发送没实现的消息，在程序崩溃之前会给我们三次机会弥补，接下来，我们用代码来验证第一个方法&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;resolveInstanceMethod:&lt;/code&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;resolveinstancemethod&quot;&gt;resolveInstanceMethod:&lt;/h2&gt;
+
+&lt;p&gt;第一种方式：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;+ (BOOL)resolveInstanceMethod:(SEL)sel{
+    
+    if (sel == @selector(eat)) {
+        
+        class_addMethod([self class], sel, imp_implementationWithBlock(^{
+            
+            NSLog(@&quot;resolveInstanceMethod====&quot;);
+            
+        }), &quot;v@:&quot;);
+        
+        return YES;
+    }
+    return [super resolveInstanceMethod:sel];
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;第二种方式：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;void myMethodIMP(id self, SEL _cmd)
+{
+    NSLog(@&quot;resolveInstanceMethod====&quot;);
+}
+
++ (BOOL)resolveInstanceMethod:(SEL)sel{
+    
+    if (sel == @selector(eat)) {
+        
+        class_addMethod([self class], sel, (IMP)myMethodIMP, &quot;v@:&quot;);
+        
+        return YES;
+    }
+    return [super resolveInstanceMethod:sel];
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;代码中的&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;&quot;v@:&quot;&lt;/code&gt;表示方法的参数和返回值，&lt;a href=&quot;https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/ObjCRuntimeGuide/Articles/ocrtTypeEncodings.html#//apple_ref/doc/uid/TP40008048-CH100-SW1&quot;&gt;可参考这里&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;上面两种方法的任意一种都能是程序正常执行：
+&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-03-28-15222266670256.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;forwardingtargetforselector&quot;&gt;forwardingTargetForSelector:&lt;/h2&gt;
+
+&lt;p&gt;如果上面的方法&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;+ (BOOL)resolveInstanceMethod:(SEL)sel&lt;/code&gt;返回NO,接着就会进行消息转发,执行&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;forwardingTargetForSelector:&lt;/code&gt;，继续试验：&lt;/p&gt;
+
+&lt;p&gt;首先我们新建一个&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;PersonNew&lt;/code&gt;的类，在该类中实现&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;- (void)eat&lt;/code&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;#import &quot;PersonNew.h&quot;
+
+@implementation PersonNew
+
+- (void)eat{
+    NSLog(@&quot;Person eat=======&quot;);
+}
+
+@end
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;然后回到&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Person&lt;/code&gt;类中实现如下代码：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;+ (BOOL)resolveInstanceMethod:(SEL)sel{
+    
+    return [super resolveInstanceMethod:sel];
+}
+
+- (id)forwardingTargetForSelector:(SEL)aSelector{
+    
+    if (aSelector == @selector(eat)) {
+        return [PersonNew new];
+    }
+    
+    return [super forwardingTargetForSelector:aSelector];
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;发现程序也是可以正常执行的：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-03-28-15222271717976.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;事实证明，如果实现这个方法，程序在运行时调用的时候只要不返回&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;nil&lt;/code&gt;或者&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;self&lt;/code&gt;，系统会将该消息转发给别的对象来处理，在别的对象当中，甚至不需要再头文件将方法名暴露出来，系统会找到要转发的类，自动查找。&lt;/p&gt;
+
+&lt;h2 id=&quot;methodsignatureforselector&quot;&gt;methodSignatureForSelector:&lt;/h2&gt;
+
+&lt;p&gt;如果上面的两种方式无法找到方法的实现，那么我们就只能自己创建一个&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;NSInvocation&lt;/code&gt;对象，实现代码如下：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;+ (BOOL)resolveInstanceMethod:(SEL)sel{
+    
+    return [super resolveInstanceMethod:sel];
+}
+
+- (id)forwardingTargetForSelector:(SEL)aSelector{
+    
+//    if (aSelector == @selector(eat)) {
+//        return [PersonNew new];
+//    }
+    return [super forwardingTargetForSelector:aSelector];
+}
+
+- (NSMethodSignature *)methodSignatureForSelector:(SEL)aSelector{
+    if (aSelector == @selector(eat)) {
+        return [NSMethodSignature signatureWithObjCTypes:&quot;v@:&quot;];
+    }
+    return [super methodSignatureForSelector:aSelector];
+}
+
+- (void)forwardInvocation:(NSInvocation *)anInvocation{
+    
+    if (anInvocation.selector == @selector(eat)) {
+        [anInvocation invokeWithTarget:[PersonNew new]];
+        return;
+    }
+    
+    [super forwardInvocation:anInvocation];
+    
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;上面代码证明，当程序在上面两种方法之后都没有找到IMP,程序会尝试调用&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;methodSignatureForSelector:&lt;/code&gt;方法，获取方法的参数和返回值，如果返回&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;nil&lt;/code&gt;,程序就会&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Crash&lt;/code&gt;，如果返回一个方法签名，系统就会创建一个&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;NSInvocation&lt;/code&gt;对象并调用&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;- (void)forwardInvocation:&lt;/code&gt;方法。&lt;/p&gt;
+
+&lt;h2 id=&quot;class方法&quot;&gt;class方法&lt;/h2&gt;
+
+&lt;p&gt;如果上面三个方法都没能找到IMP(也就是方法的实现)，通过上面的打印，我们看到程序还会执行&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;class&lt;/code&gt;方法，我查了好多资料，都没有介绍&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;class&lt;/code&gt;方法是干什么的，本着刨根问底的精神，我做了好久的实验，发现了，如果前面三种方式都不行的话，其实这个方法还是有点儿用处的，请看代码：&lt;/p&gt;
+
+&lt;p&gt;首先前面三个方法我们都不重写，然后把对应的方法实现注释掉&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;- (void)forwardInvocation:(NSInvocation *)anInvocation{
+    
+    if (anInvocation.selector == @selector(eat)) {
+        [anInvocation invokeWithTarget:[PersonNew new]];
+        return;
+    }
+    
+    [super forwardInvocation:anInvocation];
+    
+}
+
+- (Class)class{
+   
+    return [PersonNew class];
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;注意：我重写了class方法，返回一个有方法实现的类。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-03-28-15222319274916.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;发现程序依然可以正常运行。。。。&lt;/p&gt;
+
+&lt;p&gt;我怀疑：如果程序没有通过前面三种方法找到方法的实现，程序会动态调用一次&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;- (Class)class&lt;/code&gt;方法，查看我们是否改变了对象所指向的类，如果发现我们改变了，程序就会通过消息转发&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;forwardInvocation:(NSInvocation *)anInvocation&lt;/code&gt;找到方法的实现。&lt;/p&gt;
+
+&lt;h3 id=&quot;请注意千万不要轻易重写--classclass方法因为如果我们这样重写了这个方法那么相对应的类对象就会变成我们重写之后的类对象&quot;&gt;请注意：千万不要轻易重写&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;- (Class)class&lt;/code&gt;方法，因为如果我们这样重写了这个方法，那么相对应的类对象就会变成我们重写之后的类对象&lt;/h3&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Person *p = [[Person alloc] init];
+        
+PersonNew *p1 = [[PersonNew alloc] init];
+   
+[p eat];
+   
+NSLog(@&quot;&quot;);
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;打印对应的类对象如下：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-03-28-15222326123191.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;doesnotrecognizeselector&quot;&gt;doesNotRecognizeSelector:&lt;/h2&gt;
+
+&lt;p&gt;终于到最后一步了，好累。。。。。&lt;/p&gt;
+
+&lt;p&gt;如果通过前面的种种方式都没法找到对应的IMP实现，那就完蛋了，神仙都救不了它了，程序最终会执行&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;doesNotRecognizeSelector:&lt;/code&gt;方法：&lt;/p&gt;
+
+&lt;p&gt;请看对应的底层实现：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;// Replaced by CF (throws an NSException)
+- (void)doesNotRecognizeSelector:(SEL)sel {
+    _objc_fatal(&quot;-[%s %s]: unrecognized selector sent to instance %p&quot;, 
+                object_getClassName(self), sel_getName(sel), self);
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;跟我们的&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Crash&lt;/code&gt;信息做下对比&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-03-28-15222329055754.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;是不是看着很熟悉，没错，就是挂了。。。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://github.com/czjwarrior/RunTimeDemo&quot;&gt;&lt;strong&gt;代码地址&lt;/strong&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;br /&gt;
+终于写完了，觉得不错的，请点赞❤️❤️❤️！！！谢谢！！！&lt;/p&gt;
+
+</description>
+        <pubDate>Wed, 28 Mar 2018 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/2018/03/msgSend-02/</link>
+        <guid isPermaLink="true">http://localhost:4000/2018/03/msgSend-02/</guid>
+        
+        <category>iOS底层</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>（3）OC中消息和消息转发-01</title>
+        <description>&lt;p&gt;前一段时间有朋友问了下面的这个问题，我给出的回答是这样的：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-03-26-15220365281833.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;其实上面回答的方法调用也都是基于以前对runtime的理解，和自己试验出来的结果，但是，回答完这个问题之后，抱着探究到底的精神（其实是这几天产品没提什么需求，有点儿闲），问了自己一个问题：你怎么知道是底层调用的是这几个方法？？。。。又是一番查资料，验证问题。。。下面正式开始分析：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;首先新建一个Person类，代码如下：&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Person.h&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;#import &amp;lt;Foundation/Foundation.h&amp;gt;
+
+@interface Person : NSObject
+
+- (void)eat;
+
+@end
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Person.m&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;#import &quot;Person.h&quot;
+
+@implementation Person
+
+- (void)eat{
+    NSLog(@&quot;Person eat=======&quot;);
+}
+
+@end
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;很简单的一个类&lt;/p&gt;
+
+&lt;p&gt;在main函数里面调用&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;eat&lt;/code&gt;方法：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Person *p = [[Person alloc] init];
+        
+[p eat];
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;将&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;main.m&lt;/code&gt;代码转换成c++代码：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt; xcrun -sdk iphoneos clang -arch arm64 -rewrite-objc main.m -o main.cpp
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;在&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;main.cpp&lt;/code&gt;文件当中查看底层实现：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;int main(int argc, const char * argv[]) {
+    /* @autoreleasepool */ { __AtAutoreleasePool __autoreleasepool; 
+
+        Person *p = ((Person *(*)(id, SEL))(void *)objc_msgSend)((id)((Person *(*)(id, SEL))(void *)objc_msgSend)((id)objc_getClass(&quot;Person&quot;), sel_registerName(&quot;alloc&quot;)), sel_registerName(&quot;init&quot;));
+
+        ((void (*)(id, SEL))(void *)objc_msgSend)((id)p, sel_registerName(&quot;eat&quot;));
+
+    }
+    return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;通过这些代码我们发现，OC中方法调用本质上就是给对象发消息，上面给对象发消息的代码可以简写成：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;objc_msgSend(p, @selector(eat));
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;上面方法调用的意思就是：给&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;p&lt;/code&gt;对象发送名为&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;eat&lt;/code&gt;的消息，所以OC中给对象发消息本质上都是调用&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;objc_msgSend&lt;/code&gt;方法，接着看下苹果官方文档对这个方法的定义（我是用的Dash查看的）：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-03-26-15220439314182.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;self&lt;/code&gt; ：指向接收消息的类实例的指针。简单来说就是消息的接收者。&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;op&lt;/code&gt;：处理消息的方法选择器，也就是我们常见的&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;@selector()&lt;/code&gt;。&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;...&lt;/code&gt;：包含方法参数的可变参数列表，&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-03-26-15220443215386.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;翻译如下：&lt;/p&gt;
+
+&lt;p&gt;当遇到方法调用时，编译器生成对其中一个函数的调用。当向superclass发消息的时候调用的是&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;objc_msgSendSuper&lt;/code&gt;，向其他对象发消息的时候调用&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;objc_msgSend&lt;/code&gt;，方法返回值是一个结构体的时候调用的是&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;objc_msgSendSuper_stret&lt;/code&gt;和&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;objc_msgSend_stret&lt;/code&gt;。&lt;/p&gt;
+
+&lt;p&gt;接下来我们再看下&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;objc_msgSend&lt;/code&gt;的底层实现，&lt;a href=&quot;https://opensource.apple.com/tarballs/objc4/&quot;&gt;objc 源码&lt;/a&gt;，发现底层是用汇编代码实现的（表示很蛋疼）：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;ENTRY _objc_msgSend
+	UNWIND _objc_msgSend, NoFrame
+	MESSENGER_START
+
+	NilTest	NORMAL
+
+	GetIsaFast NORMAL		// r10 = self-&amp;gt;isa  
+	CacheLookup NORMAL, CALL	// calls IMP on success
+
+	NilTestReturnZero NORMAL
+
+	GetIsaSupport NORMAL
+
+// cache miss: go search the method lists
+LCacheMiss:
+	// isa still in r10
+	MESSENGER_END_SLOW
+	jmp	__objc_msgSend_uncached
+
+	END_ENTRY _objc_msgSend
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;由于本人汇编就懂几个简单的指令，所以就做简单分析：&lt;/p&gt;
+
+&lt;p&gt;首先，&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;GetIsaFast&lt;/code&gt;获取对象的isa指针，接着通过&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;CacheLookup&lt;/code&gt;从缓存查找方法的实现，会调用&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;cache_getImp(Class cls, SEL sel)&lt;/code&gt;，如果缓存中没有查到也就是&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;cache miss&lt;/code&gt;，会跳到&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;__objc_msgSend_uncached&lt;/code&gt;方法：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;STATIC_ENTRY __objc_msgSend_uncached
+	UNWIND __objc_msgSend_uncached, FrameWithNoSaves
+	
+	// THIS IS NOT A CALLABLE C FUNCTION
+	// Out-of-band r10 is the searched class
+
+	// r10 is already the class to search
+	MethodTableLookup NORMAL	// r11 = IMP
+	jmp	*%r11			// goto *imp
+
+	END_ENTRY __objc_msgSend_uncached
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;在这个方法里面又会调用&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;MethodTableLookup&lt;/code&gt;查找方法列表：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;.macro MethodTableLookup
+
+	push	%rbp
+	mov	%rsp, %rbp
+	
+	sub	$$0x80+8, %rsp		// +8 for alignment
+
+	movdqa	%xmm0, -0x80(%rbp)
+	push	%rax			// might be xmm parameter count
+	movdqa	%xmm1, -0x70(%rbp)
+	push	%a1
+	movdqa	%xmm2, -0x60(%rbp)
+	push	%a2
+	movdqa	%xmm3, -0x50(%rbp)
+	push	%a3
+	movdqa	%xmm4, -0x40(%rbp)
+	push	%a4
+	movdqa	%xmm5, -0x30(%rbp)
+	push	%a5
+	movdqa	%xmm6, -0x20(%rbp)
+	push	%a6
+	movdqa	%xmm7, -0x10(%rbp)
+
+	// _class_lookupMethodAndLoadCache3(receiver, selector, class)
+   ...
+   ...
+   省略
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;在&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;MethodTableLookup&lt;/code&gt;里面又调用了&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;_class_lookupMethodAndLoadCache3&lt;/code&gt;方法：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;/***********************************************************************
+* _class_lookupMethodAndLoadCache.
+* Method lookup for dispatchers ONLY. OTHER CODE SHOULD USE lookUpImp().
+* This lookup avoids optimistic cache scan because the dispatcher 
+* already tried that.
+**********************************************************************/
+IMP _class_lookupMethodAndLoadCache3(id obj, SEL sel, Class cls)
+{
+    return lookUpImpOrForward(cls, sel, obj, 
+                              YES/*initialize*/, NO/*cache*/, YES/*resolver*/);
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;接下来看一下&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;lookUpImpOrForward&lt;/code&gt;的实现&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;IMP lookUpImpOrForward(Class cls, SEL sel, id inst, 
+                       bool initialize, bool cache, bool resolver)
+{
+    IMP imp = nil;
+    bool triedResolver = NO;
+
+    runtimeLock.assertUnlocked();
+
+    // Optimistic cache lookup
+    if (cache) {
+        imp = cache_getImp(cls, sel);
+        if (imp) return imp;
+    }
+
+    // runtimeLock is held during isRealized and isInitialized checking
+    // to prevent races against concurrent realization.
+
+    // runtimeLock is held during method search to make
+    // method-lookup + cache-fill atomic with respect to method addition.
+    // Otherwise, a category could be added but ignored indefinitely because
+    // the cache was re-filled with the old value after the cache flush on
+    // behalf of the category.
+
+    runtimeLock.read();
+
+    if (!cls-&amp;gt;isRealized()) {
+        // Drop the read-lock and acquire the write-lock.
+        // realizeClass() checks isRealized() again to prevent
+        // a race while the lock is down.
+        runtimeLock.unlockRead();
+        runtimeLock.write();
+
+        realizeClass(cls);
+
+        runtimeLock.unlockWrite();
+        runtimeLock.read();
+    }
+
+    if (initialize  &amp;amp;&amp;amp;  !cls-&amp;gt;isInitialized()) {
+        runtimeLock.unlockRead();
+        _class_initialize (_class_getNonMetaClass(cls, inst));
+        runtimeLock.read();
+        // If sel == initialize, _class_initialize will send +initialize and 
+        // then the messenger will send +initialize again after this 
+        // procedure finishes. Of course, if this is not being called 
+        // from the messenger then it won't happen. 2778172
+    }
+
+    
+ retry:    
+    runtimeLock.assertReading();
+
+    // Try this class's cache.
+
+    imp = cache_getImp(cls, sel);
+    if (imp) goto done;
+
+    // Try this class's method lists.
+    {
+        Method meth = getMethodNoSuper_nolock(cls, sel);
+        if (meth) {
+            log_and_fill_cache(cls, meth-&amp;gt;imp, sel, inst, cls);
+            imp = meth-&amp;gt;imp;
+            goto done;
+        }
+    }
+
+    // Try superclass caches and method lists.
+    {
+        unsigned attempts = unreasonableClassCount();
+        for (Class curClass = cls-&amp;gt;superclass;
+             curClass != nil;
+             curClass = curClass-&amp;gt;superclass)
+        {
+            // Halt if there is a cycle in the superclass chain.
+            if (--attempts == 0) {
+                _objc_fatal(&quot;Memory corruption in class list.&quot;);
+            }
+            
+            // Superclass cache.
+            imp = cache_getImp(curClass, sel);
+            if (imp) {
+                if (imp != (IMP)_objc_msgForward_impcache) {
+                    // Found the method in a superclass. Cache it in this class.
+                    log_and_fill_cache(cls, imp, sel, inst, curClass);
+                    goto done;
+                }
+                else {
+                    // Found a forward:: entry in a superclass.
+                    // Stop searching, but don't cache yet; call method 
+                    // resolver for this class first.
+                    break;
+                }
+            }
+            
+            // Superclass method list.
+            Method meth = getMethodNoSuper_nolock(curClass, sel);
+            if (meth) {
+                log_and_fill_cache(cls, meth-&amp;gt;imp, sel, inst, curClass);
+                imp = meth-&amp;gt;imp;
+                goto done;
+            }
+        }
+    }
+
+    // No implementation found. Try method resolver once.
+
+    if (resolver  &amp;amp;&amp;amp;  !triedResolver) {
+        runtimeLock.unlockRead();
+        _class_resolveMethod(cls, sel, inst);
+        runtimeLock.read();
+        // Don't cache the result; we don't hold the lock so it may have 
+        // changed already. Re-do the search from scratch instead.
+        triedResolver = YES;
+        goto retry;
+    }
+
+    // No implementation found, and method resolver didn't help. 
+    // Use forwarding.
+
+    imp = (IMP)_objc_msgForward_impcache;
+    cache_fill(cls, sel, imp, inst);
+
+ done:
+    runtimeLock.unlockRead();
+
+    return imp;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;我们重点看&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;// No implementation found. Try method resolver once.&lt;/code&gt;下面的代码，如果依然没有找到方法的实现，会调用&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;_class_resolveMethod&lt;/code&gt;方法：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;void _class_resolveMethod(Class cls, SEL sel, id inst)
+{
+    if (! cls-&amp;gt;isMetaClass()) {
+        // try [cls resolveInstanceMethod:sel]
+        _class_resolveInstanceMethod(cls, sel, inst);
+    } 
+    else {
+        // try [nonMetaClass resolveClassMethod:sel]
+        // and [cls resolveInstanceMethod:sel]
+        _class_resolveClassMethod(cls, sel, inst);
+        if (!lookUpImpOrNil(cls, sel, inst, 
+                            NO/*initialize*/, YES/*cache*/, NO/*resolver*/)) 
+        {
+            _class_resolveInstanceMethod(cls, sel, inst);
+        }
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;在这个方法里面，我们可以清楚地看到，首先会判断该对象是否是元类对象，如果不是，会调用&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;_class_resolveInstanceMethod&lt;/code&gt;方法，否则会调用&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;_class_resolveClassMethod&lt;/code&gt;方法。如果还没有找到对应的IMP方法实现：&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;// No implementation found, and method resolver didn't help. 
+// Use forwarding.
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;接下来就会用到消息转发，调用这个方法&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;_objc_msgForward_impcache&lt;/code&gt;&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;/********************************************************************
+*
+* id _objc_msgForward(id self, SEL _cmd,...);
+*
+* _objc_msgForward and _objc_msgForward_stret are the externally-callable
+*   functions returned by things like method_getImplementation().
+* _objc_msgForward_impcache is the function pointer actually stored in
+*   method caches.
+*
+********************************************************************/
+
+	STATIC_ENTRY __objc_msgForward_impcache
+	// Method cache version
+
+	// THIS IS NOT A CALLABLE C FUNCTION
+	// Out-of-band condition register is NE for stret, EQ otherwise.
+
+	MESSENGER_START
+	nop
+	MESSENGER_END_SLOW
+	
+	jne	__objc_msgForward_stret
+	jmp	__objc_msgForward
+
+	END_ENTRY __objc_msgForward_impcache
+	
+	
+	ENTRY __objc_msgForward
+	// Non-stret version
+
+	movq	__objc_forward_handler(%rip), %r11
+	jmp	*%r11
+
+	END_ENTRY __objc_msgForward
+
+
+	ENTRY __objc_msgForward_stret
+	// Struct-return version
+
+	movq	__objc_forward_stret_handler(%rip), %r11
+	jmp	*%r11
+
+	END_ENTRY __objc_msgForward_stret
+	...
+   ...
+   省略
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;从description可以看到&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;__objc_msgForward_impcache&lt;/code&gt;实际上是一个存储在方法缓存当中的函数指针，当某种类型的对象处理消息的过程中，无论怎样都找不到对应的IMP实现时，会将它作为sel对应的imp记入缓存。所以，从严格意义上来讲&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;_class_resolveInstanceMethod&lt;/code&gt;和&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;_class_resolveClassMethod&lt;/code&gt;并不是由&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;__objc_msgForward_impcache&lt;/code&gt;触发的，并不能算作消息转发的后续步骤，消息转发后，该对象如果再次遇到同名消息是，会直接从缓存中找到对应的IMP,即&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;_objc_msgForward_impcache&lt;/code&gt;，此时我们需要重写&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;- (id)forwardingTargetForSelector:(SEL)aSelector&lt;/code&gt;方法，重定向到别的类当中找到方法的实现。&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;imp = (IMP)_objc_msgForward_impcache;
+cache_fill(cls, sel, imp, inst);
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;官方文档截图：
+&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-03-26-15220568983751.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;主要看下官方文档里面的Discussion：
+&lt;img src=&quot;http://otogtitz7.bkt.clouddn.com/2018-03-26-15220569597686.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;官方文档写的非常清楚：当你只想将消息重定向到另一个类时，用这个方法非常有用，因为它比常规的转发快一个数量级,他转发的目标是捕获&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;NSInvocation&lt;/code&gt;。也有人将这种方式称为&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Fast Forwarding&lt;/code&gt;，因为这一步不会创建&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;NSInvocation&lt;/code&gt;对象。&lt;/p&gt;
+
+&lt;p&gt;今天先写这么多，还没完呢，上网查了好多资料，好多网上资料苹果的源代码都是老的，跟最新代码不太一样，也费了我很多时间，下一篇文章将会介绍如何通过&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;regular forwarding&lt;/code&gt;也有人叫&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Normal Forwarding&lt;/code&gt;，动态添加方法实现。。。。&lt;/p&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;br /&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;&lt;strong&gt;References:&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;https://lpd-ios.github.io/2017/12/19/ObjC-Message/&lt;/li&gt;
+&lt;/ul&gt;
+
+</description>
+        <pubDate>Mon, 26 Mar 2018 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/2018/03/msgSend-01/</link>
+        <guid isPermaLink="true">http://localhost:4000/2018/03/msgSend-01/</guid>
+        
+        <category>iOS底层</category>
+        
+        
+      </item>
+    
+  </channel>
+</rss>

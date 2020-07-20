@@ -1,0 +1,7 @@
+I"�<p>```
+AFHTTPSessionManager *manager = [[AFHTTPSessionManager alloc] initWithBaseURL:@”” sessionConfiguration:[self setProxyWithConfig]];
+    [manager.requestSerializer setValue:@”MQQBrowser” forHTTPHeaderField:@”User-Agent”];
+    [manager.responseSerializer setAcceptableContentTypes:[NSSet setWithObjects:@”text/html”, nil]];
+    manager.responseSerializer = [AFHTTPResponseSerializer serializer];
+    [manager.requestSerializer setValue:cookieStr forHTTPHeaderField:@”Cookie”];</p>
+:ET

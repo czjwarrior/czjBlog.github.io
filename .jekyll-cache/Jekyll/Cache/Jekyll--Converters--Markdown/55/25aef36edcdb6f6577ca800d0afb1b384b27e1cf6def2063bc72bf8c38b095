@@ -1,0 +1,18 @@
+I"�<p>1、当前时间减去18年</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>+ (NSDate *)dateWithYearsBeforeNow:(NSInteger)year{
+    NSDate *currentDate = currentDate = [NSDate date];
+    NSCalendar *calendar = nil;
+    if (IOS8Higher) {
+        calendar = [NSCalendar calendarWithIdentifier:NSCalendarIdentifierGregorian];
+    } else {
+        calendar = [NSCalendar currentCalendar];
+    }
+    NSDateComponents *dateComponents = [calendar components:NSYearCalendarUnit fromDate:currentDate];
+    [dateComponents setYear:year * -1];
+
+    return [calendar dateByAddingComponents:dateComponents toDate:currentDate options:0];
+}
+</code></pre></div></div>
+
+:ET

@@ -1,0 +1,2 @@
+I":<p><a href="https://www.jianshu.com/p/89093871596b">上篇文章讲到</a>，如果通过<code class="language-plaintext highlighter-rouge">_class_resolveInstanceMethod</code>和<code class="language-plaintext highlighter-rouge">- (id)forwardingTargetForSelector:(SEL)aSelector</code>还是没找到IMP,也就是方法的实现，那我们只能手动添加方法的实现，也就是上篇文章提到的<code class="language-plaintext highlighter-rouge">regular forwarding</code>或者<code class="language-plaintext highlighter-rouge">Normal Forwarding</code>：</p>
+:ET
